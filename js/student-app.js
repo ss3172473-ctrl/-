@@ -1118,9 +1118,10 @@ class StudentApp {
 }
 
 // 앱 시작
-document.addEventListener('DOMContentLoaded', () => {
-  const app = new StudentApp();
-  app.init();
-});
+// 앱 시작 코드는 student.html에서 처리함
+// document.addEventListener('DOMContentLoaded', () => {
+//   const app = new StudentApp();
+//   app.init();
+// });
 
 export { StudentApp };

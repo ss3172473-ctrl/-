@@ -35,6 +35,9 @@ class PoseAnalyzer {
       audio: false
     });
     this.videoElement.srcObject = this.mediaStream;
+    this.videoElement.onloadedmetadata = () => {
+      this.videoElement.play();
+    };
     console.log('[PoseAnalyzer] 카메라 스트림 획득 완료');
 
     // MediaPipe Pose 초기화
