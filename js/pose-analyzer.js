@@ -118,17 +118,18 @@ class PoseAnalyzer {
     // 비디오 데이터가 준비되었을 때만 처리
     if (this.videoElement.readyState >= 2) {
       try {
-        // 병렬 처리를 위해 Promise.all 사용 (성능 모니터링 필요)
-        const promises = [this.pose.send({ image: this.videoElement })];
+        // 1. Pose 분석 (핵심 기능 - 우선 처리)
+        await this.pose.send({ image: this.videoElement });
 
-        // Face Mesh도 함께 처리 (시각화 업데이트)
+        // 2. Face Mesh 분석 (시각화 전용 - 에러나 지연이 핵심 로직을 방해하지 않도록 분리)
         if (this.faceMeshVisualizer) {
-          promises.push(this.faceMeshVisualizer.send(this.videoElement));
+          // 비동기로 실행하고 결과 기다리지 않음 (Fire-and-forget style)
+          this.faceMeshVisualizer.send(this.videoElement).catch(e => {
+            // FaceMesh 에러는 조용히 무시 혹은 디버그용
+          });
         }
-
-        await Promise.all(promises);
       } catch (e) {
-        console.warn('[PoseAnalyzer] Pose/Face 분석 중 에러 (일시적):', e);
+        console.warn('[PoseAnalyzer] Pose 분석 중 에러 (일시적):', e);
       }
     }
 
