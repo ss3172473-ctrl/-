@@ -3,6 +3,7 @@
  * 학생의 자세를 분석하여 서있음/앉음/자리비움 판단
  */
 import { CONFIG, STATUS } from './config.js';
+import { FaceMeshVisualizer } from './face-mesh-visualizer.js';
 
 class PoseAnalyzer {
   constructor() {
@@ -19,6 +20,7 @@ class PoseAnalyzer {
     this.lastDetectionTime = Date.now(); // 마지막 감지 시간
     this.awayCheckInterval = null; // 자리비움 체크 타이머
     this.focusAnalyzer = null; // 집중도 분석기 연결
+    this.faceMeshVisualizer = null; // 페이스 메쉬 시각화
   }
 
   async init(videoElement, canvasElement) {
@@ -58,6 +60,9 @@ class PoseAnalyzer {
     });
 
     this.pose.onResults((results) => this.onResults(results));
+
+    // Face Mesh Visualizer 초기화
+    this.faceMeshVisualizer = new FaceMeshVisualizer(this.canvasCtx);
 
     // 카메라 초기화 (window.Camera 제거 - 스트림 충돌 방지)
     // 대신 requestAnimationFrame 루프 사용
@@ -113,9 +118,17 @@ class PoseAnalyzer {
     // 비디오 데이터가 준비되었을 때만 처리
     if (this.videoElement.readyState >= 2) {
       try {
-        await this.pose.send({ image: this.videoElement });
+        // 병렬 처리를 위해 Promise.all 사용 (성능 모니터링 필요)
+        const promises = [this.pose.send({ image: this.videoElement })];
+
+        // Face Mesh도 함께 처리 (시각화 업데이트)
+        if (this.faceMeshVisualizer) {
+          promises.push(this.faceMeshVisualizer.send(this.videoElement));
+        }
+
+        await Promise.all(promises);
       } catch (e) {
-        console.warn('[PoseAnalyzer] Pose 분석 중 에러 (일시적):', e);
+        console.warn('[PoseAnalyzer] Pose/Face 분석 중 에러 (일시적):', e);
       }
     }
 
@@ -148,6 +161,11 @@ class PoseAnalyzer {
     this.canvasCtx.save();
     this.canvasCtx.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
     this.canvasCtx.drawImage(results.image, 0, 0, this.canvasElement.width, this.canvasElement.height);
+
+    // Face Mesh 시각화 그리기 (Pose보다 위에, 혹은 아래에? - 보통 화면 위에 오버레이)
+    if (this.faceMeshVisualizer) {
+      this.faceMeshVisualizer.draw(this.canvasElement);
+    }
 
     let currentStatus = STATUS.UNKNOWN;
 
