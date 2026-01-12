@@ -358,11 +358,18 @@
   <script type="module">
     import { StudentApp } from './js/student-app.js';
 
-    // 앱 초기화
-    document.addEventListener('DOMContentLoaded', () => {
+    // 앱 초기화 (DOM 로드 완료 시점 처리)
+    const initApp = () => {
+      console.log('[StudentApp] 초기화 시작');
       const app = new StudentApp();
-      app.init();
-    });
+      app.init().catch(e => console.error('[StudentApp] 초기화 실패:', e));
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initApp);
+    } else {
+      initApp();
+    }
   </script>
 </body>
 
