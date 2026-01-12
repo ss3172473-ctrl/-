@@ -26,9 +26,12 @@ class PoseAnalyzer {
     this.canvasElement = canvasElement;
     this.canvasCtx = canvasElement.getContext('2d');
 
-    // 먼저 카메라 스트림 직접 획득
+    // 먼저 카메라 스트림 직접 획득 (HD 화질 요청)
     this.mediaStream = await navigator.mediaDevices.getUserMedia({
-      video: { width: 640, height: 480 },
+      video: {
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+      },
       audio: false
     });
     this.videoElement.srcObject = this.mediaStream;
@@ -69,7 +72,7 @@ class PoseAnalyzer {
     this.lastStatus = STATUS.UNKNOWN;
     this.lastDetectionTime = Date.now();
     this.camera.start();
-    
+
     // 자리비움 체크 타이머 시작 (5초 후부터, 초기화 시간 확보)
     setTimeout(() => {
       this.awayCheckInterval = setInterval(() => {
@@ -109,7 +112,7 @@ class PoseAnalyzer {
   checkAwayStatus() {
     const now = Date.now();
     const timeSinceLastDetection = now - this.lastDetectionTime;
-    
+
     // 3초 이상 감지가 없으면 자리비움
     if (timeSinceLastDetection > 3000 && this.lastStatus !== STATUS.AWAY) {
       console.log('[PoseAnalyzer] 3초 이상 감지 없음 - 자리비움으로 변경');
@@ -134,19 +137,19 @@ class PoseAnalyzer {
       const nose = results.poseLandmarks[0];
       const leftShoulder = results.poseLandmarks[11];
       const rightShoulder = results.poseLandmarks[12];
-      
-      const hasGoodVisibility = 
+
+      const hasGoodVisibility =
         nose.visibility > 0.5 &&
-        leftShoulder.visibility > 0.5 && 
+        leftShoulder.visibility > 0.5 &&
         rightShoulder.visibility > 0.5;
-      
+
       if (hasGoodVisibility) {
         this.noDetectionCount = 0;
         this.lastDetectionTime = Date.now(); // 감지 시간 업데이트
-        
+
         // 자세 분석
         currentStatus = this.analyzePosture(results.poseLandmarks);
-        
+
         // 집중도 분석기에 포즈 데이터 전달
         if (this.focusAnalyzer) {
           this.focusAnalyzer.analyzePoseLandmarks(results.poseLandmarks);
@@ -157,7 +160,7 @@ class PoseAnalyzer {
     } else {
       this.noDetectionCount++;
     }
-    
+
     // 프레임 기반 자리비움 체크 (30프레임 이상 감지 실패)
     if (this.noDetectionCount > 30) {
       currentStatus = STATUS.AWAY;
@@ -202,14 +205,14 @@ class PoseAnalyzer {
 
     // 신뢰도 체크
     if (leftShoulder.visibility < CONFIG.pose.minConfidence ||
-        rightShoulder.visibility < CONFIG.pose.minConfidence) {
+      rightShoulder.visibility < CONFIG.pose.minConfidence) {
       return STATUS.UNKNOWN;
     }
 
     // 손들기 감지 (손목이 머리(코) 위에 있으면)
     const leftHandRaised = leftWrist.visibility > 0.5 && leftWrist.y < nose.y - 0.05;
     const rightHandRaised = rightWrist.visibility > 0.5 && rightWrist.y < nose.y - 0.05;
-    
+
     if (leftHandRaised || rightHandRaised) {
       return STATUS.HAND_RAISED;
     }
@@ -229,7 +232,7 @@ class PoseAnalyzer {
     // 비율로 서있음/앉음 판단
     // 서있을 때: 상체와 하체 비율이 비슷하거나 하체가 더 김
     // 앉아있을 때: 상체가 하체보다 상대적으로 김 (무릎이 접혀있음)
-    
+
     const ratio = torsoLength / (torsoLength + legLength);
 
     if (ratio < CONFIG.pose.sittingRatio) {
