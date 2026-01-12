@@ -53,25 +53,19 @@ class StudentApp {
       statusText: document.getElementById('status-text'),
       statusIcon: document.getElementById('status-icon'),
       connectionStatus: document.getElementById('connection-status'),
-      myPeerId: document.getElementById('my-peer-id'),
+      studentNameDisplay: document.getElementById('student-name-display'), // 이름 표시
+      myPeerId: document.getElementById('my-peer-id'), // Peer ID (Hidden)
       awayTimer: document.getElementById('away-timer'),
       // 집중도 관련
       focusScore: document.getElementById('focus-score'),
       focusLevel: document.getElementById('focus-level'),
       focusBar: document.getElementById('focus-bar'),
-      // 메시지 관련
+      // 메시지 관련 (교사 공지)
       teacherMessageContainer: document.getElementById('teacher-message-container'),
       teacherMessageBox: document.getElementById('teacher-message-box'),
       teacherMessageText: document.getElementById('teacher-message-text'),
       teacherMessageTime: document.getElementById('teacher-message-time'),
       closeTeacherMessage: document.getElementById('close-teacher-message'),
-      // 학생 → 교사 메시지
-      sendMessageToTeacherBtn: document.getElementById('send-message-to-teacher-btn'),
-      studentMessageModal: document.getElementById('student-message-modal'),
-      studentMessageInput: document.getElementById('student-message-input'),
-      closeStudentMessageModal: document.getElementById('close-student-message-modal'),
-      cancelStudentMessage: document.getElementById('cancel-student-message'),
-      sendStudentMessage: document.getElementById('send-student-message'),
       // 화면 공유 상태
       screenShareStatus: document.getElementById('screen-share-status')
     };
@@ -80,12 +74,6 @@ class StudentApp {
     this.elements.startBtn.addEventListener('click', () => this.start());
     this.elements.stopBtn.addEventListener('click', () => this.stop());
     this.elements.closeTeacherMessage.addEventListener('click', () => this.hideTeacherMessage());
-
-    // 학생 → 교사 메시지 이벤트
-    this.elements.sendMessageToTeacherBtn.addEventListener('click', () => this.openMessageModal());
-    this.elements.closeStudentMessageModal.addEventListener('click', () => this.closeMessageModal());
-    this.elements.cancelStudentMessage.addEventListener('click', () => this.closeMessageModal());
-    this.elements.sendStudentMessage.addEventListener('click', () => this.sendMessageToTeacher());
 
     // 저장된 설정 불러오기
     this.loadSettings();
@@ -139,9 +127,12 @@ class StudentApp {
         연결 중...
       `;
 
+      // 이름 표시
+      this.elements.studentNameDisplay.textContent = this.studentName;
+
       // PeerJS 초기화
       const myId = await this.peerManager.init('student');
-      this.elements.myPeerId.textContent = myId;
+      this.elements.myPeerId.textContent = myId; // (Hidden)
 
       // 교사에게 연결
       const conn = this.peerManager.connect(this.teacherId);
@@ -617,65 +608,7 @@ class StudentApp {
     }
   }
 
-  /**
-   * 메시지 모달 열기
-   */
-  openMessageModal() {
-    this.elements.studentMessageInput.value = '';
-    this.elements.studentMessageModal.style.display = 'flex';
-    this.elements.studentMessageInput.focus();
-  }
 
-  /**
-   * 메시지 모달 닫기
-   */
-  closeMessageModal() {
-    this.elements.studentMessageModal.style.display = 'none';
-    this.elements.studentMessageInput.value = '';
-  }
-
-  /**
-   * 교사에게 메시지 전송
-   */
-  sendMessageToTeacher() {
-    const message = this.elements.studentMessageInput.value.trim();
-    if (!message) {
-      alert('메시지를 입력해주세요.');
-      return;
-    }
-
-    this.peerManager.send(this.teacherId, {
-      type: 'student_message',
-      name: this.studentName,
-      message: message,
-      timestamp: Date.now()
-    });
-
-    this.closeMessageModal();
-
-    // 전송 완료 피드백
-    this.showSentConfirmation();
-  }
-
-  /**
-   * 전송 완료 확인 표시
-   */
-  showSentConfirmation() {
-    const btn = this.elements.sendMessageToTeacherBtn;
-    const originalHTML = btn.innerHTML;
-    btn.innerHTML = `
-      <span class="material-symbols-rounded">check</span>
-      전송됨
-    `;
-    btn.classList.remove('bg-primary', 'hover:bg-primary-dark');
-    btn.classList.add('bg-green-500');
-
-    setTimeout(() => {
-      btn.innerHTML = originalHTML;
-      btn.classList.remove('bg-green-500');
-      btn.classList.add('bg-primary', 'hover:bg-primary-dark');
-    }, 2000);
-  }
 
   /**
    * PTT 인디케이터 표시
