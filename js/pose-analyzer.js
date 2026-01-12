@@ -163,9 +163,45 @@ class PoseAnalyzer {
     this.canvasCtx.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
     this.canvasCtx.drawImage(results.image, 0, 0, this.canvasElement.width, this.canvasElement.height);
 
-    // Face Mesh 시각화 그리기 (Pose보다 위에, 혹은 아래에? - 보통 화면 위에 오버레이)
+    // Face Mesh 시각화 그리기
+    let faceMeshDrawn = false;
     if (this.faceMeshVisualizer) {
+      // FaceMeshVisualizer 내부적으로 lastResults가 있을 때만 그림
+      // draw 메서드가 무언가를 그렸는지 확인할 방법이 없으나, 호출은 함
       this.faceMeshVisualizer.draw(this.canvasElement);
+
+      // FaceMesh가 준비되었는지 확인 (간접적으로 lastResults 체크를 FaceMeshVisualizer에 getter 추가하면 좋겠지만, 
+      // 여기서는 FaceMeshVisualizer가 준비 안되었을 때를 대비해 간단한 Fallback을 추가)
+      if (this.faceMeshVisualizer.lastResults && this.faceMeshVisualizer.lastResults.multiFaceLandmarks && this.faceMeshVisualizer.lastResults.multiFaceLandmarks.length > 0) {
+        faceMeshDrawn = true;
+      }
+    }
+
+    // Fallback: Face Mesh가 아직 로딩 중이거나 감지 실패 시, Pose 랜드마크로라도 "인식 중" 효과 표시
+    if (!faceMeshDrawn && results.poseLandmarks) {
+      const nose = results.poseLandmarks[0];
+      const leftEye = results.poseLandmarks[2]; // Pose에는 눈 랜드마크가 있음
+      const rightEye = results.poseLandmarks[5];
+
+      if (nose.visibility > 0.5) {
+        const x = nose.x * this.canvasElement.width;
+        const y = nose.y * this.canvasElement.height;
+        const eyeDist = Math.abs(leftEye.x - rightEye.x) * this.canvasElement.width;
+        const radius = eyeDist * 3 || 50; // 눈 사이 거리 기반으로 원 크기 추정
+
+        this.canvasCtx.beginPath();
+        this.canvasCtx.arc(x, y - radius / 3, radius, 0, 2 * Math.PI);
+        this.canvasCtx.strokeStyle = 'rgba(0, 251, 255, 0.5)'; // Cyan
+        this.canvasCtx.lineWidth = 2;
+        this.canvasCtx.setLineDash([5, 5]); // 점선
+        this.canvasCtx.stroke();
+        this.canvasCtx.setLineDash([]); // 복구
+
+        // "SCANNING..." 텍스트
+        this.canvasCtx.fillStyle = '#00FBFF';
+        this.canvasCtx.font = '10px "Outfit", sans-serif';
+        this.canvasCtx.fillText('FACE RECOGNITION INITIALIZING...', x - radius + 10, y + radius + 20);
+      }
     }
 
     let currentStatus = STATUS.UNKNOWN;

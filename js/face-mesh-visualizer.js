@@ -15,7 +15,7 @@ class FaceMeshVisualizer {
             this.faceMesh = new window.FaceMesh({
                 locateFile: (file) => {
                     // console.log('[FaceMeshVisualizer] Loading file:', file);
-                    return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
+                    return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633559619/${file}`;
                 }
             });
         } catch (e) {
