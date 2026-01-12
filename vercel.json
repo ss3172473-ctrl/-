@@ -1,0 +1,19 @@
+{
+  "name": "antigravity-edu-web",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/student",
+      "destination": "/student.html"
+    },
+    {
+      "source": "/teacher",
+      "destination": "/teacher.html"
+    },
+    {
+      "source": "/parent",
+      "destination": "/teacher.html"
+    }
+  ]
+}

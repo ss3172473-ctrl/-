@@ -29,7 +29,7 @@ class StudentApp {
     this.isStopping = false; // 중지 중 플래그
     this.teacherAudioElement = null; // 교사 오디오 재생용
     this.isScreenSharing = false; // 화면 공유 상태
-    
+
     // 수업 시간 관련
     this.classMode = null;
     this.classRemainingSeconds = 0;
@@ -80,7 +80,7 @@ class StudentApp {
     this.elements.startBtn.addEventListener('click', () => this.start());
     this.elements.stopBtn.addEventListener('click', () => this.stop());
     this.elements.closeTeacherMessage.addEventListener('click', () => this.hideTeacherMessage());
-    
+
     // 학생 → 교사 메시지 이벤트
     this.elements.sendMessageToTeacherBtn.addEventListener('click', () => this.openMessageModal());
     this.elements.closeStudentMessageModal.addEventListener('click', () => this.closeMessageModal());
@@ -126,7 +126,7 @@ class StudentApp {
     }
 
     if (!this.teacherId) {
-      alert('교사 ID를 입력해주세요.');
+      alert('학부모 ID를 입력해주세요.');
       return;
     }
 
@@ -145,13 +145,13 @@ class StudentApp {
 
       // 교사에게 연결
       const conn = this.peerManager.connect(this.teacherId);
-      
+
       this.peerManager.setOnConnectionChange((type, peerId) => {
         console.log(`[StudentApp] 연결 변경: ${type}, ${peerId}`);
         if (type === 'connected') {
           // 재연결 성공 시 타이머 중단
           this.stopReconnect();
-          
+
           this.elements.connectionStatus.innerHTML = `
             <span class="relative flex h-2.5 w-2.5">
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
@@ -160,7 +160,7 @@ class StudentApp {
             연결됨
           `;
           this.elements.connectionStatus.className = 'hidden sm:flex items-center gap-2 px-3 py-1.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full text-sm font-medium border border-green-200 dark:border-green-800';
-          
+
           // 교사에게 연결된 경우에만 등록 메시지 전송
           if (peerId === this.teacherId) {
             this.peerManager.send(this.teacherId, {
@@ -175,7 +175,7 @@ class StudentApp {
             연결 끊김 (재연결 중...)
           `;
           this.elements.connectionStatus.className = 'hidden sm:flex items-center gap-2 px-3 py-1.5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-full text-sm font-medium border border-red-200 dark:border-red-800';
-          
+
           // 교사 연결이 끊어지면 재연결 시도 시작
           if (peerId === this.teacherId) {
             this.startReconnect();
@@ -229,7 +229,7 @@ class StudentApp {
 
       // MediaPipe 초기화
       await this.poseAnalyzer.init(this.elements.video, this.elements.canvas);
-      
+
       // 집중도 분석기 초기화 (실패해도 계속 진행)
       try {
         await this.focusAnalyzer.init(this.elements.video);
@@ -237,14 +237,14 @@ class StudentApp {
           this.currentFocusData = focusData;
           this.updateFocusDisplay(focusData);
         });
-        
+
         // PoseAnalyzer에 FocusAnalyzer 연결
         this.poseAnalyzer.setFocusAnalyzer(this.focusAnalyzer);
         console.log('[StudentApp] 집중도 분석기 초기화 완료');
       } catch (e) {
         console.warn('[StudentApp] 집중도 분석기 초기화 실패, 기본 기능만 사용:', e);
       }
-      
+
       // 카메라 스트림을 PeerManager에 즉시 전달
       const stream = this.poseAnalyzer.getStream();
       if (stream) {
@@ -253,7 +253,7 @@ class StudentApp {
       } else {
         console.error('[StudentApp] 스트림 획득 실패!');
       }
-      
+
       this.poseAnalyzer.setOnStatusChange((status) => {
         this.updateStatus(status);
       });
@@ -271,7 +271,7 @@ class StudentApp {
       this.elements.stopBtn.classList.add('flex');
       this.elements.sendMessageToTeacherBtn.classList.remove('hidden');
       this.elements.sendMessageToTeacherBtn.classList.add('flex');
-      
+
       // 화면 공유 자동 시작
       await this.startScreenShareAuto();
 
@@ -288,7 +288,7 @@ class StudentApp {
 
   updateStatus(status) {
     this.currentStatus = status;
-    
+
     // 자리비움 타이머
     if (status === STATUS.AWAY) {
       if (!this.awayStartTime) {
@@ -307,7 +307,7 @@ class StudentApp {
     let bgColor = 'bg-slate-100 dark:bg-slate-800';
     let textColor = 'text-slate-500';
     let borderColor = 'border-slate-200 dark:border-slate-700';
-    
+
     if (status === STATUS.STANDING) {
       icon = 'accessibility_new';
       iconColor = 'text-green-600 dark:text-green-400';
@@ -333,7 +333,7 @@ class StudentApp {
       textColor = 'text-purple-600 dark:text-purple-400';
       borderColor = 'border-purple-100 dark:border-purple-800';
     }
-    
+
     statusBadge.className = `w-28 h-28 rounded-xl ${bgColor} flex flex-col items-center justify-center border ${borderColor} transition-colors duration-300`;
     this.elements.statusIcon.className = `material-symbols-rounded text-5xl mb-1 ${iconColor}`;
     this.elements.statusIcon.textContent = icon;
@@ -346,19 +346,19 @@ class StudentApp {
       const seconds = Math.floor((Date.now() - this.awayStartTime) / 1000);
       const mins = Math.floor(seconds / 60);
       const secs = seconds % 60;
-      this.elements.awayTimer.textContent = 
+      this.elements.awayTimer.textContent =
         `자리비움: ${mins}분 ${secs.toString().padStart(2, '0')}초`;
     }
   }
 
   startStatusBroadcast() {
     this.sendFailCount = 0; // 전송 실패 카운터
-    
+
     this.statusInterval = setInterval(() => {
       if (this.awayStartTime) {
         this.updateAwayTimer();
       }
-      
+
       const success = this.peerManager.send(this.teacherId, {
         type: 'status',
         name: this.studentName,
@@ -367,12 +367,12 @@ class StudentApp {
         timestamp: Date.now(),
         focus: this.currentFocusData
       });
-      
+
       // 전송 실패 시 카운터 증가
       if (!success) {
         this.sendFailCount++;
         console.log(`[StudentApp] 전송 실패 ${this.sendFailCount}회`);
-        
+
         // 3회 연속 실패하면 연결 끊김으로 처리
         if (this.sendFailCount >= 3) {
           console.log('[StudentApp] 교사 연결 끊김 감지');
@@ -390,10 +390,10 @@ class StudentApp {
   handleTeacherDisconnect() {
     this.elements.connectionStatus.innerHTML = `
       <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
-      교사 연결 끊김
+      학부모 연결 끊김
     `;
     this.elements.connectionStatus.className = 'hidden sm:flex items-center gap-2 px-3 py-1.5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-full text-sm font-medium border border-red-200 dark:border-red-800';
-    
+
     // 재연결 시도 시작
     this.startReconnect();
   }
@@ -404,27 +404,27 @@ class StudentApp {
   startReconnect() {
     // 중지 중이면 재연결 안 함
     if (this.isStopping) return;
-    
+
     // 이미 재연결 중이면 무시
     if (this.reconnectInterval) return;
-    
+
     this.reconnectAttempts = 0;
     console.log('[StudentApp] 교사 재연결 시도 시작');
-    
+
     this.reconnectInterval = setInterval(() => {
       this.reconnectAttempts++;
       console.log(`[StudentApp] 재연결 시도 #${this.reconnectAttempts}`);
-      
+
       // UI 업데이트
       this.elements.connectionStatus.innerHTML = `
         <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
         재연결 중... (${this.reconnectAttempts})
       `;
       this.elements.connectionStatus.className = 'hidden sm:flex items-center gap-2 px-3 py-1.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-full text-sm font-medium border border-amber-200 dark:border-amber-800';
-      
+
       // 교사에게 다시 연결 시도
       const conn = this.peerManager.connect(this.teacherId);
-      
+
       // 60회 시도 후 (약 5분) 중단
       if (this.reconnectAttempts >= 60) {
         this.stopReconnect();
@@ -432,7 +432,7 @@ class StudentApp {
           <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
           연결 실패
         `;
-        alert('교사와의 연결이 끊어졌습니다. 다시 참여해주세요.');
+        alert('학부모와의 연결이 끊어졌습니다. 다시 참여해주세요.');
       }
     }, 5000); // 5초마다 재시도
   }
@@ -451,24 +451,24 @@ class StudentApp {
   stop() {
     // 중지 플래그 설정 (재연결 방지)
     this.isStopping = true;
-    
+
     // 재연결 중단
     this.stopReconnect();
-    
+
     // 화면 공유 중지
     this.screenCaptureManager.stopCapture();
     this.isScreenSharing = false;
-    
+
     // 분석 중지
     this.poseAnalyzer.stop();
     this.focusAnalyzer.stop();
-    
+
     // 상태 전송 중지
     if (this.statusInterval) {
       clearInterval(this.statusInterval);
       this.statusInterval = null;
     }
-    
+
     // 수업 타이머 중지 및 인디케이터 제거
     if (this.classTimerInterval) {
       clearInterval(this.classTimerInterval);
@@ -477,29 +477,29 @@ class StudentApp {
     this.classMode = null;
     this.classRemainingSeconds = 0;
     this.classLessonCount = 0;
-    
+
     // 수업 모드 인디케이터 제거
     const classIndicator = document.getElementById('class-mode-indicator');
     if (classIndicator) classIndicator.remove();
-    
+
     // 큰 알림도 제거
     const bigAlert = document.getElementById('class-mode-big-alert');
     if (bigAlert) bigAlert.remove();
 
     // 연결 해제
     this.peerManager.disconnect();
-    
+
     // 상태 초기화
     this.currentStatus = STATUS.UNKNOWN;
     this.awayStartTime = null;
-    
+
     // 새 인스턴스 생성 (재시작 시 깨끗한 상태로)
     this.poseAnalyzer = new PoseAnalyzer();
     this.peerManager = new PeerManager();
     this.focusAnalyzer = new FocusAnalyzer();
     this.screenCaptureManager = new ScreenCaptureManager();
     this.currentFocusData = null;
-    
+
     // 중지 플래그 해제
     this.isStopping = false;
 
@@ -513,12 +513,12 @@ class StudentApp {
     `;
     this.elements.stopBtn.classList.add('hidden');
     this.elements.sendMessageToTeacherBtn.classList.add('hidden');
-    
+
     // 화면 공유 상태 초기화
     if (this.elements.screenShareStatus) {
       this.elements.screenShareStatus.classList.add('hidden');
     }
-    
+
     this.elements.connectionStatus.innerHTML = `
       <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
       연결 대기
@@ -531,19 +531,19 @@ class StudentApp {
    */
   updateFocusDisplay(focusData) {
     if (!this.elements.focusScore || !focusData) return;
-    
+
     const score = focusData.score;
     const level = focusData.level;
-    
+
     // 점수 표시
     this.elements.focusScore.textContent = score;
-    
+
     // 레벨 텍스트
     this.elements.focusLevel.textContent = FOCUS_LABEL[level];
-    
+
     // 프로그레스 바 업데이트
     this.elements.focusBar.style.width = `${score}%`;
-    
+
     // 색상 업데이트
     const color = FOCUS_COLOR[level];
     this.elements.focusBar.style.backgroundColor = color;
@@ -562,13 +562,13 @@ class StudentApp {
 
     // 메시지 표시
     this.elements.teacherMessageText.textContent = message;
-    this.elements.teacherMessageTime.textContent = 
-      (isBroadcast ? '📢 전체 공지 • ' : '💬 개인 메시지 • ') + 
+    this.elements.teacherMessageTime.textContent =
+      (isBroadcast ? '📢 전체 공지 • ' : '💬 개인 메시지 • ') +
       new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
-    
+
     this.elements.teacherMessageContainer.classList.remove('hidden');
     this.elements.teacherMessageBox.classList.add('animate-pulse');
-    
+
     // 3초 후 애니메이션 제거
     setTimeout(() => {
       this.elements.teacherMessageBox.classList.remove('animate-pulse');
@@ -602,14 +602,14 @@ class StudentApp {
       const audioContext = new (window.AudioContext || window.webkitAudioContext)();
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
-      
+
       oscillator.connect(gainNode);
       gainNode.connect(audioContext.destination);
-      
+
       oscillator.frequency.value = 800;
       oscillator.type = 'sine';
       gainNode.gain.value = 0.3;
-      
+
       oscillator.start();
       oscillator.stop(audioContext.currentTime + 0.2);
     } catch (e) {
@@ -652,7 +652,7 @@ class StudentApp {
     });
 
     this.closeMessageModal();
-    
+
     // 전송 완료 피드백
     this.showSentConfirmation();
   }
@@ -669,7 +669,7 @@ class StudentApp {
     `;
     btn.classList.remove('bg-primary', 'hover:bg-primary-dark');
     btn.classList.add('bg-green-500');
-    
+
     setTimeout(() => {
       btn.innerHTML = originalHTML;
       btn.classList.remove('bg-green-500');
@@ -682,7 +682,7 @@ class StudentApp {
    */
   showPTTIndicator(show) {
     let indicator = document.getElementById('ptt-indicator');
-    
+
     if (show) {
       if (!indicator) {
         indicator = document.createElement('div');
@@ -690,7 +690,7 @@ class StudentApp {
         indicator.className = 'fixed top-20 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-full shadow-lg animate-pulse';
         indicator.innerHTML = `
           <span class="material-symbols-rounded">mic</span>
-          <span class="font-medium">선생님이 말하고 있습니다...</span>
+          <span class="font-medium">학부모님이 말하고 있습니다...</span>
         `;
         document.body.appendChild(indicator);
       }
@@ -706,21 +706,21 @@ class StudentApp {
    */
   playTeacherAudio(stream) {
     console.log('[StudentApp] 교사 오디오 재생 시작');
-    
+
     // 기존 오디오 요소 제거
     this.stopTeacherAudio();
-    
+
     // 새 오디오 요소 생성
     this.teacherAudioElement = document.createElement('audio');
     this.teacherAudioElement.srcObject = stream;
     this.teacherAudioElement.autoplay = true;
     this.teacherAudioElement.volume = 1.0;
-    
+
     // 재생 시작
     this.teacherAudioElement.play().catch(err => {
       console.error('[StudentApp] 오디오 재생 실패:', err);
     });
-    
+
     // PTT 인디케이터 표시
     this.showPTTIndicator(true);
   }
@@ -730,13 +730,13 @@ class StudentApp {
    */
   stopTeacherAudio() {
     console.log('[StudentApp] 교사 오디오 중지');
-    
+
     if (this.teacherAudioElement) {
       this.teacherAudioElement.pause();
       this.teacherAudioElement.srcObject = null;
       this.teacherAudioElement = null;
     }
-    
+
     // PTT 인디케이터 숨김
     this.showPTTIndicator(false);
   }
@@ -747,24 +747,24 @@ class StudentApp {
   handleClassModeChange(data) {
     console.log('[StudentApp] 수업 모드 변경 수신:', data);
     const { mode, remainingSeconds, lessonCount } = data;
-    
+
     // 모드가 실제로 변경되었는지 확인
     const modeChanged = this.classMode !== mode;
-    
+
     // 로컬 타이머 상태 저장
     this.classMode = mode;
     this.classRemainingSeconds = remainingSeconds;
     this.classLessonCount = lessonCount;
-    
+
     // 기존 로컬 타이머 정리
     if (this.classTimerInterval) {
       clearInterval(this.classTimerInterval);
       this.classTimerInterval = null;
     }
-    
+
     // 기존 인디케이터 제거
     let indicator = document.getElementById('class-mode-indicator');
-    
+
     if (mode === 'stopped') {
       if (indicator) indicator.remove();
       // 큰 알림도 제거
@@ -772,17 +772,17 @@ class StudentApp {
       if (bigAlert) bigAlert.remove();
       return;
     }
-    
+
     // 인디케이터 생성
     if (!indicator) {
       indicator = document.createElement('div');
       indicator.id = 'class-mode-indicator';
       document.body.appendChild(indicator);
     }
-    
+
     // 초기 UI 업데이트
     this.updateClassModeIndicator();
-    
+
     // 모드가 실제로 변경되었을 때만 큰 알림 표시
     if (modeChanged) {
       if (mode === 'break') {
@@ -792,7 +792,7 @@ class StudentApp {
         this.showClassModeBigAlert('lesson', lessonCount);
       }
     }
-    
+
     // 로컬 타이머 시작 (1초마다 UI 업데이트)
     this.classTimerInterval = setInterval(() => {
       this.classRemainingSeconds--;
@@ -809,11 +809,11 @@ class StudentApp {
   updateClassModeIndicator() {
     const indicator = document.getElementById('class-mode-indicator');
     if (!indicator) return;
-    
+
     const mins = Math.floor(this.classRemainingSeconds / 60);
     const secs = this.classRemainingSeconds % 60;
     const timeStr = `${mins}:${secs.toString().padStart(2, '0')}`;
-    
+
     if (this.classMode === 'lesson') {
       indicator.className = 'fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-5 py-2.5 rounded-full shadow-lg bg-emerald-100 dark:bg-emerald-900/80 border-2 border-emerald-400 dark:border-emerald-600';
       indicator.innerHTML = `
@@ -840,11 +840,11 @@ class StudentApp {
     // 기존 알림 제거
     const existing = document.getElementById('class-mode-big-alert');
     if (existing) existing.remove();
-    
+
     const alert = document.createElement('div');
     alert.id = 'class-mode-big-alert';
     alert.className = 'fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity duration-500';
-    
+
     if (mode === 'break') {
       alert.innerHTML = `
         <div class="bg-amber-100 dark:bg-amber-900 rounded-3xl p-8 shadow-2xl border-4 border-amber-400 dark:border-amber-600 text-center transform scale-100 animate-bounce-once">
@@ -862,9 +862,9 @@ class StudentApp {
         </div>
       `;
     }
-    
+
     document.body.appendChild(alert);
-    
+
     // 3초 후 자동으로 사라짐
     setTimeout(() => {
       alert.style.opacity = '0';
@@ -880,22 +880,22 @@ class StudentApp {
       const audioContext = new (window.AudioContext || window.webkitAudioContext)();
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
-      
+
       oscillator.connect(gainNode);
       gainNode.connect(audioContext.destination);
-      
+
       // 밝은 종소리 느낌
       oscillator.frequency.value = 1000;
       oscillator.type = 'sine';
       gainNode.gain.value = 0.3;
-      
+
       oscillator.start();
-      
+
       // 두 번 울림
       setTimeout(() => {
         oscillator.frequency.value = 1200;
       }, 150);
-      
+
       oscillator.stop(audioContext.currentTime + 0.3);
     } catch (e) {
       // 오디오 재생 실패 무시
@@ -923,11 +923,11 @@ class StudentApp {
     });
 
     const success = await this.screenCaptureManager.startCapture();
-    
+
     if (success) {
       this.isScreenSharing = true;
       this.updateScreenShareUI(true);
-      
+
       // 교사에게 화면 공유 시작 알림
       this.peerManager.send(this.teacherId, {
         type: 'screen_share_status',
@@ -935,7 +935,7 @@ class StudentApp {
         sharing: true,
         timestamp: Date.now()
       });
-      
+
       console.log('[StudentApp] 화면 공유 자동 시작 완료');
     } else {
       // 화면 공유 거부해도 수업은 계속 진행
@@ -954,11 +954,11 @@ class StudentApp {
     });
 
     const success = await this.screenCaptureManager.startCapture();
-    
+
     if (success) {
       this.isScreenSharing = true;
       this.updateScreenShareUI(true);
-      
+
       // 교사에게 화면 공유 시작 알림
       this.peerManager.send(this.teacherId, {
         type: 'screen_share_status',
@@ -978,7 +978,7 @@ class StudentApp {
     this.screenCaptureManager.stopCapture();
     this.isScreenSharing = false;
     this.updateScreenShareUI(false);
-    
+
     // 교사에게 화면 공유 중지 알림
     this.peerManager.send(this.teacherId, {
       type: 'screen_share_status',
@@ -993,7 +993,7 @@ class StudentApp {
    */
   sendScreenThumbnail(thumbnail) {
     if (!this.isScreenSharing) return;
-    
+
     this.peerManager.send(this.teacherId, {
       type: 'screen_thumbnail',
       name: this.studentName,
@@ -1007,7 +1007,7 @@ class StudentApp {
    */
   updateScreenShareUI(isSharing) {
     const status = this.elements.screenShareStatus;
-    
+
     if (status) {
       if (isSharing) {
         status.classList.remove('hidden');
@@ -1037,58 +1037,58 @@ class StudentApp {
    */
   showUnderstandingCheck(data) {
     const { question, timeLimit } = data;
-    
+
     // 모달 요소
     const modal = document.getElementById('understanding-check-modal');
     const questionText = document.getElementById('understanding-question-text');
     const timerEl = document.getElementById('understanding-timer');
     const yesBtn = document.getElementById('understanding-yes-btn');
     const noBtn = document.getElementById('understanding-no-btn');
-    
+
     if (!modal) return;
-    
+
     // 질문 텍스트 설정
     if (questionText) {
       questionText.textContent = question;
     }
-    
+
     // 타이머 설정
     let remaining = timeLimit;
     if (timerEl) {
       timerEl.textContent = remaining;
     }
-    
+
     // 모달 표시
     modal.style.display = 'flex';
-    
+
     // 알림음 재생
     this.playNotificationSound();
-    
+
     // 기존 타이머 정리
     if (this.understandingTimerInterval) {
       clearInterval(this.understandingTimerInterval);
     }
-    
+
     // 타이머 시작
     this.understandingTimerInterval = setInterval(() => {
       remaining--;
       if (timerEl) {
         timerEl.textContent = remaining;
       }
-      
+
       if (remaining <= 0) {
         clearInterval(this.understandingTimerInterval);
         this.understandingTimerInterval = null;
         this.closeUnderstandingCheck();
       }
     }, 1000);
-    
+
     // 버튼 이벤트 (기존 이벤트 제거 후 새로 등록)
     const newYesBtn = yesBtn.cloneNode(true);
     const newNoBtn = noBtn.cloneNode(true);
     yesBtn.parentNode.replaceChild(newYesBtn, yesBtn);
     noBtn.parentNode.replaceChild(newNoBtn, noBtn);
-    
+
     newYesBtn.addEventListener('click', () => this.sendUnderstandingResponse('yes'));
     newNoBtn.addEventListener('click', () => this.sendUnderstandingResponse('no'));
   }
@@ -1102,7 +1102,7 @@ class StudentApp {
       clearInterval(this.understandingTimerInterval);
       this.understandingTimerInterval = null;
     }
-    
+
     // 응답 전송
     this.peerManager.send(this.teacherId, {
       type: 'understanding_response',
@@ -1110,10 +1110,10 @@ class StudentApp {
       name: this.studentName,
       timestamp: Date.now()
     });
-    
+
     // 모달 닫기
     this.closeUnderstandingCheck();
-    
+
     // 피드백 표시
     this.showUnderstandingFeedback(answer);
   }
@@ -1136,7 +1136,7 @@ class StudentApp {
     const icon = isYes ? 'check_circle' : 'cancel';
     const color = isYes ? 'emerald' : 'red';
     const text = isYes ? '응답 완료: 예' : '응답 완료: 아니요';
-    
+
     // 피드백 토스트 생성
     const toast = document.createElement('div');
     toast.className = `fixed top-20 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-3 bg-${color}-100 dark:bg-${color}-900/80 text-${color}-700 dark:text-${color}-300 rounded-xl shadow-lg border border-${color}-200 dark:border-${color}-700 animate-bounce-once`;
@@ -1144,9 +1144,9 @@ class StudentApp {
       <span class="material-symbols-rounded text-xl">${icon}</span>
       <span class="font-medium">${text}</span>
     `;
-    
+
     document.body.appendChild(toast);
-    
+
     // 2초 후 제거
     setTimeout(() => {
       toast.style.opacity = '0';

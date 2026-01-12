@@ -123,8 +123,8 @@ const FOCUS_LABEL = {
 };
 
 const FOCUS_COLOR = {
-  high: '#10B981',
-  medium: '#F59E0B', 
+  high: '#69D29D',
+  medium: '#F59E0B',
   low: '#F97316',
   very_low: '#EF4444'
 };
@@ -142,15 +142,15 @@ const CLASS_MODE_LABEL = {
   stopped: '정지'
 };
 
-export { 
-  CONFIG, 
-  STATUS, 
-  STATUS_LABEL, 
-  STATUS_COLOR, 
-  NO_RESPONSE_THRESHOLD, 
-  FOCUS_LEVEL, 
-  FOCUS_LABEL, 
-  FOCUS_COLOR, 
-  CLASS_MODE, 
-  CLASS_MODE_LABEL 
+export {
+  CONFIG,
+  STATUS,
+  STATUS_LABEL,
+  STATUS_COLOR,
+  NO_RESPONSE_THRESHOLD,
+  FOCUS_LEVEL,
+  FOCUS_LABEL,
+  FOCUS_COLOR,
+  CLASS_MODE,
+  CLASS_MODE_LABEL
 };

@@ -9,16 +9,16 @@ export class UIRenderer {
   constructor(options = {}) {
     this.elements = options.elements || {};
     this.studentManager = options.studentManager || null;
-    
+
     // 콜백
-    this.onOpenVideoModal = options.onOpenVideoModal || (() => {});
-    this.onOpenFocusDetailModal = options.onOpenFocusDetailModal || (() => {});
-    this.onOpenMessageModal = options.onOpenMessageModal || (() => {});
-    this.onOpenAttendanceModal = options.onOpenAttendanceModal || (() => {});
-    this.onOpenFocusReportModal = options.onOpenFocusReportModal || (() => {});
-    this.onStartPTT = options.onStartPTT || (() => {});
-    this.onStopPTT = options.onStopPTT || (() => {});
-    this.onOpenScreenModal = options.onOpenScreenModal || (() => {});
+    this.onOpenVideoModal = options.onOpenVideoModal || (() => { });
+    this.onOpenFocusDetailModal = options.onOpenFocusDetailModal || (() => { });
+    this.onOpenMessageModal = options.onOpenMessageModal || (() => { });
+    this.onOpenAttendanceModal = options.onOpenAttendanceModal || (() => { });
+    this.onOpenFocusReportModal = options.onOpenFocusReportModal || (() => { });
+    this.onStartPTT = options.onStartPTT || (() => { });
+    this.onStopPTT = options.onStopPTT || (() => { });
+    this.onOpenScreenModal = options.onOpenScreenModal || (() => { });
   }
 
   /**
@@ -27,9 +27,9 @@ export class UIRenderer {
   renderStudentGrid(students) {
     const grid = this.elements.studentGrid;
     if (!grid) return;
-    
+
     grid.innerHTML = '';
-    
+
     if (students.size === 0) {
       grid.innerHTML = `
         <div class="col-span-full flex flex-col items-center justify-center py-6 text-gray-400 dark:text-gray-500">
@@ -39,7 +39,7 @@ export class UIRenderer {
       `;
       return;
     }
-    
+
     students.forEach((student) => {
       const card = this.createStudentCard(student);
       grid.appendChild(card);
@@ -52,47 +52,72 @@ export class UIRenderer {
   createStudentCard(student) {
     const card = document.createElement('div');
     const statusStyle = this.getStatusStyle(student.status);
-    
-    card.className = `p-3 rounded-xl border ${statusStyle.bg} ${statusStyle.border} transition-all hover:shadow-card shadow-soft`;
+
+    // Premium Card Design: Glass-like background, deep soft shadow, no border, floating hover effect
+    card.className = `group relative bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] hover:-translate-y-1.5 transition-all duration-300 overflow-hidden ring-1 ring-black/5 dark:ring-white/5`;
     card.setAttribute('data-peer-id', student.peerId);
-    
+
     const statusInfo = this.getStatusInfo(student);
     const focusDisplay = this.getFocusDisplay(student);
-    
+
+    // Gradient top bar based on status
+    const statusGradient = statusStyle.bg.includes('green') ? 'from-green-400 to-emerald-500' :
+      statusStyle.bg.includes('blue') ? 'from-blue-400 to-indigo-500' :
+        statusStyle.bg.includes('red') ? 'from-red-400 to-rose-500' :
+          statusStyle.bg.includes('purple') ? 'from-purple-400 to-violet-500' :
+            statusStyle.bg.includes('amber') ? 'from-amber-400 to-orange-500' :
+              'from-gray-300 to-gray-400';
+
     card.innerHTML = `
-      <div class="flex items-start justify-between mb-2">
-        <span class="material-symbols-rounded text-2xl ${statusStyle.iconColor}">${statusStyle.icon}</span>
-        <div class="flex gap-0.5">
-          <button class="btn-ptt p-1 rounded-md bg-white/80 dark:bg-gray-700/80 hover:bg-white dark:hover:bg-gray-600 text-gray-500 dark:text-gray-400 transition-colors" title="말하기 (꾹 누르기)">
-            <span class="material-symbols-rounded text-sm">mic</span>
-          </button>
-          <button class="btn-focus-report p-1 rounded-md bg-white/80 dark:bg-gray-700/80 hover:bg-white dark:hover:bg-gray-600 text-gray-500 dark:text-gray-400 transition-colors" title="집중도 보고서">
-            <span class="material-symbols-rounded text-sm">assessment</span>
-          </button>
-          <button class="btn-attendance p-1 rounded-md bg-white/80 dark:bg-gray-700/80 hover:bg-white dark:hover:bg-gray-600 text-gray-500 dark:text-gray-400 transition-colors" title="출석 현황">
-            <span class="material-symbols-rounded text-sm">calendar_month</span>
-          </button>
-          <button class="btn-focus-detail p-1 rounded-md bg-white/80 dark:bg-gray-700/80 hover:bg-white dark:hover:bg-gray-600 text-gray-500 dark:text-gray-400 transition-colors" title="집중도 상세">
-            <span class="material-symbols-rounded text-sm">analytics</span>
-          </button>
-          <button class="btn-send-message p-1 rounded-md bg-white/80 dark:bg-gray-700/80 hover:bg-white dark:hover:bg-gray-600 text-gray-500 dark:text-gray-400 transition-colors" title="메시지 전송">
-            <span class="material-symbols-rounded text-sm">chat</span>
-          </button>
-          <button class="btn-view-video p-1 rounded-md bg-white/80 dark:bg-gray-700/80 hover:bg-white dark:hover:bg-gray-600 text-gray-500 dark:text-gray-400 transition-colors" title="영상 확인">
-            <span class="material-symbols-rounded text-sm">videocam</span>
+      <!-- Top Status Stripe (Gradient) -->
+      <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r ${statusGradient} opacity-80"></div>
+
+      <div class="p-6">
+        <!-- Header: Name & Status -->
+        <div class="flex items-start justify-between mb-5">
+          <div>
+            <div class="flex items-center gap-2.5 mb-1">
+              <h3 class="font-bold text-xl text-gray-900 dark:text-gray-100 tracking-tight">${student.name}</h3>
+              <span class="text-[11px] text-gray-500 font-semibold px-2 py-0.5 bg-gray-100/80 dark:bg-gray-700/80 rounded-full border border-gray-200/50 dark:border-gray-600/50">${student.grade ? student.grade + '학년' : '학생'}</span>
+            </div>
+            <div class="flex items-center gap-2 mt-1">
+               <div class="flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50">
+                <span class="material-symbols-rounded text-sm ${statusStyle.textColor}">${statusStyle.icon}</span>
+                <span class="text-xs font-semibold ${statusStyle.textColor}">${STATUS_LABEL[student.status]}</span>
+              </div>
+              ${statusInfo}
+            </div>
+          </div>
+          
+          <!-- Quick Action -->
+           <button class="btn-view-video p-2.5 rounded-full bg-gray-50 dark:bg-gray-800 text-gray-400 hover:text-white hover:bg-gradient-to-br hover:from-emerald-400 hover:to-emerald-500 transition-all shadow-sm hover:shadow-lg hover:shadow-emerald-500/30 group-hover:opacity-100 opacity-0 transform translate-x-2 group-hover:translate-x-0 transition-all duration-300 delay-75" title="영상 확인">
+            <span class="material-symbols-rounded text-[20px]">videocam</span>
           </button>
         </div>
-      </div>
-      <div class="text-center">
-        <p class="font-semibold text-sm text-gray-800 dark:text-gray-200 truncate">${student.name}</p>
-        <p class="text-[10px] text-gray-400">${student.grade ? student.grade + '학년' : ''}</p>
-        <p class="text-[10px] ${statusStyle.textColor} font-medium">${STATUS_LABEL[student.status]}</p>
-        ${statusInfo}
-        ${focusDisplay}
-        <p class="text-[10px] text-gray-400 mt-1 last-update">${this.formatLastUpdate(student.lastUpdate)}</p>
+
+        <!-- Body: Focus & Activity -->
+        <div class="space-y-4">
+          ${focusDisplay}
+        </div>
+
+        <!-- Footer: Actions (Hidden by default, shown on hover) -->
+        <div class="absolute bottom-0 left-0 w-full bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm border-t border-gray-100 dark:border-gray-700/50 p-3 flex items-center justify-around translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+            <button class="btn-ptt p-2 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-emerald-500 transition-colors" title="음성 메시지">
+              <span class="material-symbols-rounded">mic</span>
+            </button>
+            <button class="btn-send-message p-2 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-indigo-500 transition-colors" title="메시지 전송">
+              <span class="material-symbols-rounded">chat</span>
+            </button>
+            <button class="btn-focus-report p-2 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-orange-500 transition-colors" title="집중도 보고서">
+              <span class="material-symbols-rounded">assessment</span>
+            </button>
+            <button class="btn-attendance p-2 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-teal-500 transition-colors" title="출석 현황">
+              <span class="material-symbols-rounded">calendar_month</span>
+            </button>
+        </div>
       </div>
     `;
-    
+
     this.bindCardEvents(card, student);
     return card;
   }
@@ -106,31 +131,31 @@ export class UIRenderer {
       e.stopPropagation();
       this.onOpenVideoModal(student.peerId, student.name);
     });
-    
+
     // 집중도 상세
     card.querySelector('.btn-focus-detail')?.addEventListener('click', (e) => {
       e.stopPropagation();
       this.onOpenFocusDetailModal(student.peerId);
     });
-    
+
     // 메시지
     card.querySelector('.btn-send-message')?.addEventListener('click', (e) => {
       e.stopPropagation();
       this.onOpenMessageModal(student.peerId, student.name);
     });
-    
+
     // 출석
     card.querySelector('.btn-attendance')?.addEventListener('click', (e) => {
       e.stopPropagation();
       this.onOpenAttendanceModal(student.name);
     });
-    
+
     // 집중도 보고서
     card.querySelector('.btn-focus-report')?.addEventListener('click', (e) => {
       e.stopPropagation();
       this.onOpenFocusReportModal(student.name, student.grade);
     });
-    
+
     // 화면 썸네일 클릭
     card.querySelector('.screen-thumbnail')?.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -140,7 +165,7 @@ export class UIRenderer {
       e.stopPropagation();
       this.onOpenScreenModal(student.peerId);
     });
-    
+
     // PTT
     const pttBtn = card.querySelector('.btn-ptt');
     if (pttBtn) {
@@ -216,7 +241,7 @@ export class UIRenderer {
         textColor: 'text-gray-500'
       }
     };
-    
+
     return styles[status] || {
       bg: 'bg-white dark:bg-gray-800',
       border: 'border-gray-200 dark:border-gray-700',
@@ -248,7 +273,7 @@ export class UIRenderer {
    */
   getFocusDisplay(student) {
     let html = '';
-    
+
     // 화면 공유 중이면 썸네일 표시
     if (student.isScreenSharing && student.screenThumbnail) {
       html += `
@@ -273,17 +298,20 @@ export class UIRenderer {
         </div>
       `;
     }
-    
+
     if (student.focus && student.status !== STATUS.DISCONNECTED && student.status !== STATUS.NO_RESPONSE) {
       const focusColor = FOCUS_COLOR[student.focus.level] || '#9CA3AF';
+      // Use brand color for high focus
+      const displayColor = student.focus.level === 'high' ? '#69D29D' : focusColor;
+
       html += `
         <div class="mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
           <div class="flex items-center justify-between text-[10px] mb-1">
             <span class="text-gray-400">집중도</span>
-            <span class="font-bold focus-score" style="color: ${focusColor}">${student.focus.score}%</span>
+            <span class="font-bold focus-score" style="color: ${displayColor}">${student.focus.score}%</span>
           </div>
           <div class="w-full h-1.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
-            <div class="h-full rounded-full transition-all duration-300 focus-bar" style="width: ${student.focus.score}%; background-color: ${focusColor}"></div>
+            <div class="h-full rounded-full transition-all duration-300 focus-bar" style="width: ${student.focus.score}%; background-color: ${displayColor}"></div>
           </div>
         </div>
       `;

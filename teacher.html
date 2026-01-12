@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
-  <meta charset="utf-8"/>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>교사 대시보드 - 학생 모니터링</title>
-  <link href="https://fonts.googleapis.com" rel="preconnect"/>
-  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet"/>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>학부모 대시보드 - 학생 모니터링</title>
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0"
+    rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -17,7 +21,7 @@
       theme: {
         extend: {
           colors: {
-            primary: "#0D9488",
+            primary: "#69D29D",
             "background-light": "#F3F4F6",
             "background-dark": "#111827",
             "surface-light": "#FFFFFF",
@@ -30,9 +34,9 @@
             body: ["'Noto Sans KR'", "'Inter'", "sans-serif"],
           },
           borderRadius: {
-            DEFAULT: "0.75rem",
-            "xl": "1rem",
-            "2xl": "1.5rem",
+            DEFAULT: "1rem",
+            "xl": "1.5rem",
+            "2xl": "2rem",
           },
           boxShadow: {
             'soft': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
@@ -43,20 +47,83 @@
     };
   </script>
   <style>
-    body { font-family: 'Noto Sans KR', sans-serif; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+    }
+
     .glass-panel {
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
     }
   </style>
 </head>
-<body class="bg-background-light dark:bg-background-dark text-gray-800 dark:text-gray-100 min-h-screen transition-colors duration-300 font-body">
 
-  <header class="bg-surface-light dark:bg-surface-dark border-b border-border-light dark:border-border-dark sticky top-0 z-50">
+<body
+  class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 min-h-screen transition-colors duration-300 font-body antialiased selection:bg-primary/30 selection:text-primary-dark relative overflow-x-hidden">
+
+  <!-- Background Gradient Mesh -->
+  <div class="fixed inset-0 z-[-1] pointer-events-none opacity-60 dark:opacity-20 overflow-hidden">
+    <div
+      class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-purple-200/40 rounded-full blur-[120px] mix-blend-multiply filter animate-blob">
+    </div>
+    <div
+      class="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-emerald-200/40 rounded-full blur-[120px] mix-blend-multiply filter animate-blob animation-delay-2000">
+    </div>
+    <div
+      class="absolute bottom-[-20%] left-[20%] w-[50%] h-[50%] bg-blue-200/40 rounded-full blur-[120px] mix-blend-multiply filter animate-blob animation-delay-4000">
+    </div>
+  </div>
+
+  <style>
+    @keyframes blob {
+      0% {
+        transform: translate(0px, 0px) scale(1);
+      }
+
+      33% {
+        transform: translate(30px, -50px) scale(1.1);
+      }
+
+      66% {
+        transform: translate(-20px, 20px) scale(0.9);
+      }
+
+      100% {
+        transform: translate(0px, 0px) scale(1);
+      }
+    }
+
+    .animate-blob {
+      animation: blob 7s infinite;
+    }
+
+    .animation-delay-2000 {
+      animation-delay: 2s;
+    }
+
+    .animation-delay-4000 {
+      animation-delay: 4s;
+    }
+
+    .glass-header {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+    }
+
+    .dark .glass-header {
+      background: rgba(17, 24, 39, 0.7);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+  </style>
+
+  <header class="glass-header sticky top-0 z-50 transition-all duration-300">
     <div class="max-w-7xl mx-auto px-4 sm:px-6">
       <div class="flex justify-between h-12 items-center">
         <div class="flex items-center gap-3">
-          <a href="./index.html" class="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-400">
+          <a href="./index.html"
+            class="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-400">
             <span class="material-symbols-rounded text-xl">arrow_back</span>
           </a>
           <div class="flex items-center gap-2">
@@ -64,20 +131,23 @@
               <span class="material-symbols-rounded text-lg">school</span>
             </div>
             <div class="flex flex-col">
-              <h1 class="text-sm font-bold text-gray-900 dark:text-white leading-tight">교사 대시보드</h1>
+              <h1 class="text-sm font-bold text-gray-900 dark:text-white leading-tight">학부모 대시보드</h1>
               <span class="text-[10px] text-gray-500 dark:text-gray-400">실시간 모니터링</span>
             </div>
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <div id="connection-badge" class="hidden items-center px-2 py-1 rounded-full bg-green-50 dark:bg-green-900/30 border border-green-100 dark:border-green-800">
+          <div id="connection-badge"
+            class="hidden items-center px-2 py-1 rounded-full bg-green-50 dark:bg-green-900/30 border border-green-100 dark:border-green-800">
             <span class="relative flex h-2 w-2 mr-1.5">
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
               <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
             </span>
             <span class="text-xs font-medium text-green-700 dark:text-green-300">실행 중</span>
           </div>
-          <button onclick="document.documentElement.classList.toggle('dark'); localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';" class="p-1.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+          <button
+            onclick="document.documentElement.classList.toggle('dark'); localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';"
+            class="p-1.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
             <span class="material-symbols-rounded text-lg dark:hidden">dark_mode</span>
             <span class="material-symbols-rounded text-lg hidden dark:block">light_mode</span>
           </button>
@@ -87,25 +157,31 @@
   </header>
 
   <main class="max-w-7xl mx-auto px-4 sm:px-6 py-3 space-y-3">
-    
+
     <!-- Setup Section -->
-    <section id="setup-section" class="flex justify-center">
-      <div class="w-full max-w-md bg-surface-light dark:bg-surface-dark rounded-xl shadow-soft p-5 border border-border-light dark:border-border-dark text-center">
+    <section id="setup-section" class="flex justify-center pt-8">
+      <div
+        class="w-full max-w-md bg-white/70 dark:bg-gray-800/60 backdrop-blur-xl rounded-3xl shadow-2xl shadow-indigo-500/10 p-8 border border-white/50 dark:border-gray-700/50 text-center ring-1 ring-black/5 dark:ring-white/5">
         <div id="setup-content">
-          <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-            <span class="material-symbols-rounded text-2xl text-primary">cast</span>
+          <div
+            class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-400/20 to-emerald-500/20 flex items-center justify-center mx-auto mb-6 shadow-inner ring-1 ring-emerald-500/20">
+            <span class="material-symbols-rounded text-3xl text-emerald-600 dark:text-emerald-400">cast</span>
           </div>
-          <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-1">모니터링 서버 시작</h2>
-          <p class="text-gray-500 dark:text-gray-400 mb-4 text-sm">고정 ID를 사용하면 재접속 시에도 학생들이 자동 연결됩니다.</p>
-          
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2 tracking-tight">모니터링 시작</h2>
+          <p class="text-gray-500 dark:text-gray-400 mb-8 text-sm leading-relaxed">학생들의 학습 상태를 실시간으로 확인하고<br>집중도를 분석할 수
+            있습니다.</p>
+
           <!-- 저장된 ID 히스토리 -->
-          <div id="saved-id-box" class="hidden mb-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+          <div id="saved-id-box"
+            class="hidden mb-6 p-4 bg-amber-50/80 dark:bg-amber-900/10 border border-amber-200/50 dark:border-amber-800/30 rounded-2xl backdrop-blur-sm">
             <div class="flex items-center justify-between mb-2">
               <div class="flex items-center gap-2 text-amber-700 dark:text-amber-400">
                 <span class="material-symbols-rounded text-sm">history</span>
                 <span class="text-xs font-medium">최근 사용한 서버 ID</span>
               </div>
-              <button id="clear-id-history-btn" class="text-[10px] text-amber-600 dark:text-amber-500 hover:text-amber-800 dark:hover:text-amber-300 transition-colors">전체 삭제</button>
+              <button id="clear-id-history-btn"
+                class="text-[10px] text-amber-600 dark:text-amber-500 hover:text-amber-800 dark:hover:text-amber-300 transition-colors">전체
+                삭제</button>
             </div>
             <div id="saved-id-list" class="space-y-1.5 max-h-32 overflow-y-auto"></div>
             <p class="text-[10px] text-amber-600 dark:text-amber-500 mt-2">클릭하면 고정 ID로 자동 입력됩니다</p>
@@ -116,27 +192,34 @@
               <input type="checkbox" id="use-custom-id" class="rounded border-gray-300 text-primary focus:ring-primary">
               <span>고정 ID 사용</span>
             </label>
-            <input type="text" id="custom-id-input" class="hidden w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-primary" placeholder="예: math-class-1 (영문, 숫자, 하이픈만)">
+            <input type="text" id="custom-id-input"
+              class="hidden w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-primary"
+              placeholder="예: math-class-1 (영문, 숫자, 하이픈만)">
             <p id="custom-id-hint" class="hidden text-xs text-gray-400 mt-1">이전에 사용한 ID로 접속하면 학생들이 자동 재연결됩니다.</p>
           </div>
-          
-          <button id="start-server-btn" class="w-full py-2.5 px-4 bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-2 text-sm">
+
+          <button id="start-server-btn"
+            class="w-full py-2.5 px-4 bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-2 text-sm">
             <span class="material-symbols-rounded text-lg">rocket_launch</span>
             서버 시작
           </button>
         </div>
-        
+
         <!-- Teacher ID Box -->
         <div id="teacher-id-box" class="hidden">
-          <h3 class="text-gray-500 dark:text-gray-400 text-xs font-medium mb-3 uppercase tracking-wide">학생들에게 아래 ID를 공유하세요</h3>
+          <h3 class="text-gray-500 dark:text-gray-400 text-xs font-medium mb-3 uppercase tracking-wide">학생들에게 아래 ID를
+            공유하세요</h3>
           <div class="flex gap-2 items-center justify-center">
             <div class="relative flex-1">
               <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
                 <span class="material-symbols-rounded text-primary opacity-60 text-lg">link</span>
               </div>
-              <input id="teacher-id-display" class="block w-full pl-9 pr-2 py-2 rounded-lg border-2 border-primary/20 text-center font-mono font-bold text-sm text-primary bg-primary/5 focus:ring-0 focus:border-primary transition-colors cursor-pointer hover:bg-primary/10" readonly type="text" value="-"/>
+              <input id="teacher-id-display"
+                class="block w-full pl-9 pr-2 py-2 rounded-lg border-2 border-primary/20 text-center font-mono font-bold text-sm text-primary bg-primary/5 focus:ring-0 focus:border-primary transition-colors cursor-pointer hover:bg-primary/10"
+                readonly type="text" value="-" />
             </div>
-            <button id="copy-id-btn" class="p-2 bg-primary hover:bg-primary/90 text-white rounded-lg shadow-md transition-all active:scale-95 flex items-center justify-center">
+            <button id="copy-id-btn"
+              class="p-2 bg-primary hover:bg-primary/90 text-white rounded-lg shadow-md transition-all active:scale-95 flex items-center justify-center">
               <span class="material-symbols-rounded text-lg">content_copy</span>
             </button>
           </div>
@@ -146,51 +229,60 @@
 
     <!-- Dashboard Section -->
     <section id="dashboard-section" class="hidden space-y-3">
-      
+
       <!-- Class Timer Bar -->
-      <div class="bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark shadow-soft p-3">
+      <div
+        class="bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark shadow-soft p-3">
         <div class="flex items-center justify-between gap-4">
           <!-- Timer Display -->
-          <div id="class-timer-bar" class="hidden items-center gap-3 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-xl flex-1">
+          <div id="class-timer-bar"
+            class="hidden items-center gap-3 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-xl flex-1">
             <div id="class-timer-status" class="flex items-center gap-2">
               <span class="material-symbols-rounded text-gray-400 text-lg">timer_off</span>
               <span class="font-bold text-gray-500">대기 중</span>
             </div>
             <div class="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-              <div id="class-timer-progress" class="h-full bg-gray-400 rounded-full transition-all duration-1000" style="width: 0%"></div>
+              <div id="class-timer-progress" class="h-full bg-gray-400 rounded-full transition-all duration-1000"
+                style="width: 0%"></div>
             </div>
             <div id="class-timer-time" class="font-mono font-bold text-lg text-gray-500">00:00</div>
           </div>
-          
+
           <!-- Timer not started message -->
           <div id="class-timer-idle" class="flex items-center gap-2 text-gray-400 flex-1">
             <span class="material-symbols-rounded text-lg">schedule</span>
             <span class="text-sm">수업 타이머를 시작하면 수업/쉬는시간이 자동으로 전환됩니다</span>
           </div>
-          
+
           <!-- Controls -->
           <div class="flex items-center gap-2">
-            <button id="class-timer-toggle" onclick="window.toggleClassTimer()" class="px-3 py-1.5 bg-primary hover:bg-primary/90 text-white text-xs font-medium rounded-lg transition-colors flex items-center gap-1">
+            <button id="class-timer-toggle" onclick="window.toggleClassTimer()"
+              class="px-3 py-1.5 bg-primary hover:bg-primary/90 text-white text-xs font-medium rounded-lg transition-colors flex items-center gap-1">
               <span class="material-symbols-rounded text-sm">play_arrow</span>
               수업 시작
             </button>
             <div class="relative group">
-              <button onclick="window.openClassSettings()" class="p-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 rounded-lg transition-colors">
+              <button onclick="window.openClassSettings()"
+                class="p-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 rounded-lg transition-colors">
                 <span class="material-symbols-rounded text-lg">settings</span>
               </button>
               <!-- Quick Actions Dropdown -->
               <div class="absolute right-0 top-full pt-1 hidden group-hover:block z-10">
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 min-w-[140px]">
-                  <button onclick="window.forceLesson()" class="w-full px-3 py-2 text-left text-xs hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2">
+                <div
+                  class="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 min-w-[140px]">
+                  <button onclick="window.forceLesson()"
+                    class="w-full px-3 py-2 text-left text-xs hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2">
                     <span class="material-symbols-rounded text-emerald-500 text-sm">school</span>
                     수업으로 전환
                   </button>
-                  <button onclick="window.forceBreak()" class="w-full px-3 py-2 text-left text-xs hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2">
+                  <button onclick="window.forceBreak()"
+                    class="w-full px-3 py-2 text-left text-xs hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2">
                     <span class="material-symbols-rounded text-amber-500 text-sm">coffee</span>
                     쉬는시간 전환
                   </button>
                   <hr class="my-1 border-gray-200 dark:border-gray-700">
-                  <button onclick="window.openClassSettings()" class="w-full px-3 py-2 text-left text-xs hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2">
+                  <button onclick="window.openClassSettings()"
+                    class="w-full px-3 py-2 text-left text-xs hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2">
                     <span class="material-symbols-rounded text-gray-500 text-sm">tune</span>
                     시간 설정
                   </button>
@@ -200,10 +292,11 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Stats Bar -->
       <div class="grid grid-cols-6 gap-2">
-        <div class="bg-surface-light dark:bg-surface-dark p-2 rounded-lg border border-border-light dark:border-border-dark shadow-soft">
+        <div
+          class="bg-surface-light dark:bg-surface-dark p-2 rounded-lg border border-border-light dark:border-border-dark shadow-soft">
           <div class="flex items-center gap-1.5 mb-0.5">
             <div class="p-1 rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
               <span class="material-symbols-rounded text-sm">people</span>
@@ -212,7 +305,9 @@
           </div>
           <div id="total-students" class="text-xl font-bold text-gray-900 dark:text-white pl-1">0</div>
         </div>
-        <div id="today-attendance-card" class="bg-surface-light dark:bg-surface-dark p-2 rounded-lg border border-border-light dark:border-border-dark shadow-soft cursor-pointer hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-colors" title="클릭하여 출석자 명단 보기">
+        <div id="today-attendance-card"
+          class="bg-surface-light dark:bg-surface-dark p-2 rounded-lg border border-border-light dark:border-border-dark shadow-soft cursor-pointer hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-colors"
+          title="클릭하여 출석자 명단 보기">
           <div class="flex items-center gap-1.5 mb-0.5">
             <div class="p-1 rounded bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-300">
               <span class="material-symbols-rounded text-sm">event_available</span>
@@ -222,7 +317,8 @@
           </div>
           <div id="today-attendance-count" class="text-xl font-bold text-teal-600 dark:text-teal-400 pl-1">0</div>
         </div>
-        <div class="bg-surface-light dark:bg-surface-dark p-2 rounded-lg border border-border-light dark:border-border-dark shadow-soft">
+        <div
+          class="bg-surface-light dark:bg-surface-dark p-2 rounded-lg border border-border-light dark:border-border-dark shadow-soft">
           <div class="flex items-center gap-1.5 mb-0.5">
             <div class="p-1 rounded bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300">
               <span class="material-symbols-rounded text-sm">pan_tool</span>
@@ -231,7 +327,8 @@
           </div>
           <div id="hand-raised-count" class="text-xl font-bold text-purple-600 dark:text-purple-400 pl-1">0</div>
         </div>
-        <div class="bg-surface-light dark:bg-surface-dark p-2 rounded-lg border border-border-light dark:border-border-dark shadow-soft">
+        <div
+          class="bg-surface-light dark:bg-surface-dark p-2 rounded-lg border border-border-light dark:border-border-dark shadow-soft">
           <div class="flex items-center gap-1.5 mb-0.5">
             <div class="p-1 rounded bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-300">
               <span class="material-symbols-rounded text-sm">accessibility_new</span>
@@ -240,7 +337,8 @@
           </div>
           <div id="standing-count" class="text-xl font-bold text-green-600 dark:text-green-400 pl-1">0</div>
         </div>
-        <div class="bg-surface-light dark:bg-surface-dark p-2 rounded-lg border border-border-light dark:border-border-dark shadow-soft">
+        <div
+          class="bg-surface-light dark:bg-surface-dark p-2 rounded-lg border border-border-light dark:border-border-dark shadow-soft">
           <div class="flex items-center gap-1.5 mb-0.5">
             <div class="p-1 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300">
               <span class="material-symbols-rounded text-sm">weekend</span>
@@ -249,7 +347,8 @@
           </div>
           <div id="sitting-count" class="text-xl font-bold text-blue-600 dark:text-blue-400 pl-1">0</div>
         </div>
-        <div class="bg-surface-light dark:bg-surface-dark p-2 rounded-lg border border-border-light dark:border-border-dark shadow-soft">
+        <div
+          class="bg-surface-light dark:bg-surface-dark p-2 rounded-lg border border-border-light dark:border-border-dark shadow-soft">
           <div class="flex items-center gap-1.5 mb-0.5">
             <div class="p-1 rounded bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-300">
               <span class="material-symbols-rounded text-sm">person_off</span>
@@ -262,26 +361,33 @@
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
         <!-- Student Grid -->
-        <div class="lg:col-span-2 bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark shadow-soft overflow-hidden flex flex-col">
-          <div class="px-3 py-2 border-b border-border-light dark:border-border-dark flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/50">
+        <div
+          class="lg:col-span-2 bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark shadow-soft overflow-hidden flex flex-col">
+          <div
+            class="px-3 py-2 border-b border-border-light dark:border-border-dark flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/50">
             <div class="flex items-center gap-2">
               <span class="material-symbols-rounded text-primary text-base">bar_chart</span>
               <h3 class="font-bold text-sm text-gray-900 dark:text-white">학생 현황</h3>
             </div>
             <div class="flex items-center gap-2">
-              <button id="understanding-check-btn" class="px-2 py-1 bg-amber-100 dark:bg-amber-900/30 hover:bg-amber-200 dark:hover:bg-amber-800/50 text-amber-700 dark:text-amber-400 text-xs font-medium rounded-lg transition-colors flex items-center gap-1">
+              <button id="understanding-check-btn"
+                class="px-2 py-1 bg-amber-100 dark:bg-amber-900/30 hover:bg-amber-200 dark:hover:bg-amber-800/50 text-amber-700 dark:text-amber-400 text-xs font-medium rounded-lg transition-colors flex items-center gap-1">
                 <span class="material-symbols-rounded text-sm">help</span>
                 이해도 체크
               </button>
-              <button id="broadcast-btn" class="px-2 py-1 bg-indigo-100 dark:bg-indigo-900/30 hover:bg-indigo-200 dark:hover:bg-indigo-800/50 text-indigo-700 dark:text-indigo-400 text-xs font-medium rounded-lg transition-colors flex items-center gap-1">
+              <button id="broadcast-btn"
+                class="px-2 py-1 bg-indigo-100 dark:bg-indigo-900/30 hover:bg-indigo-200 dark:hover:bg-indigo-800/50 text-indigo-700 dark:text-indigo-400 text-xs font-medium rounded-lg transition-colors flex items-center gap-1">
                 <span class="material-symbols-rounded text-sm">campaign</span>
                 전체 공지
               </button>
-              <span class="text-[10px] text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">실시간</span>
+              <span
+                class="text-[10px] text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">실시간</span>
             </div>
           </div>
-          <div id="student-grid" class="flex-1 min-h-[200px] max-h-[45vh] overflow-y-auto p-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 content-start">
-            <div class="col-span-full flex flex-col items-center justify-center py-6 text-center text-gray-400 dark:text-gray-500">
+          <div id="student-grid"
+            class="flex-1 min-h-[200px] max-h-[45vh] overflow-y-auto p-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 content-start">
+            <div
+              class="col-span-full flex flex-col items-center justify-center py-6 text-center text-gray-400 dark:text-gray-500">
               <div class="w-12 h-12 mb-2 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
                 <span class="material-symbols-rounded text-xl opacity-50">hourglass_empty</span>
               </div>
@@ -292,8 +398,10 @@
         </div>
 
         <!-- Alert List -->
-        <div class="bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark shadow-soft overflow-hidden flex flex-col">
-          <div class="px-3 py-2 border-b border-border-light dark:border-border-dark flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/50">
+        <div
+          class="bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark shadow-soft overflow-hidden flex flex-col">
+          <div
+            class="px-3 py-2 border-b border-border-light dark:border-border-dark flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/50">
             <div class="flex items-center gap-2">
               <span class="material-symbols-rounded text-yellow-500 text-base">notifications</span>
               <h3 class="font-bold text-sm text-gray-900 dark:text-white">알림</h3>
@@ -333,8 +441,10 @@
 
   <!-- Focus Detail Modal -->
   <div id="focus-detail-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 overflow-y-auto">
-    <div class="absolute inset-0 bg-gray-900/40 dark:bg-black/60 backdrop-blur-sm" onclick="window.closeFocusModal && window.closeFocusModal()"></div>
-    <div class="relative z-20 w-full max-w-xl my-4 bg-surface-light dark:bg-surface-dark rounded-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700 transition-all duration-300">
+    <div class="absolute inset-0 bg-gray-900/40 dark:bg-black/60 backdrop-blur-sm"
+      onclick="window.closeFocusModal && window.closeFocusModal()"></div>
+    <div
+      class="relative z-20 w-full max-w-xl my-4 bg-surface-light dark:bg-surface-dark rounded-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700 transition-all duration-300">
       <!-- Header -->
       <div class="bg-primary px-4 py-3 flex items-center justify-between sticky top-0 z-10">
         <div class="flex items-center space-x-2">
@@ -343,11 +453,12 @@
           </div>
           <h1 class="text-white text-base font-bold"><span id="focus-detail-name">학생</span> 집중도 분석</h1>
         </div>
-        <button id="close-focus-detail-btn" class="text-white hover:bg-white/10 rounded-full p-1 transition-colors focus:outline-none">
+        <button id="close-focus-detail-btn"
+          class="text-white hover:bg-white/10 rounded-full p-1 transition-colors focus:outline-none">
           <span class="material-symbols-rounded text-xl">close</span>
         </button>
       </div>
-      
+
       <!-- Content -->
       <div class="p-4 space-y-4 max-h-[70vh] overflow-y-auto">
         <!-- Current Score Display -->
@@ -368,22 +479,28 @@
             </div>
           </div>
         </div>
-        
+
         <!-- Chart Section -->
         <div class="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 border border-gray-100 dark:border-gray-700/50">
           <div class="flex justify-between items-center mb-3">
             <h3 class="text-sm font-semibold text-gray-800 dark:text-gray-100">집중도 추이</h3>
             <div class="flex items-center gap-1">
-              <button onclick="window.setChartRange(60)" class="chart-range-btn px-2 py-1 text-xs rounded-md bg-primary text-white font-medium transition-all" data-range="60">1분</button>
-              <button onclick="window.setChartRange(180)" class="chart-range-btn px-2 py-1 text-xs rounded-md bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 font-medium transition-all" data-range="180">3분</button>
-              <button onclick="window.setChartRange(300)" class="chart-range-btn px-2 py-1 text-xs rounded-md bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 font-medium transition-all" data-range="300">5분</button>
+              <button onclick="window.setChartRange(60)"
+                class="chart-range-btn px-2 py-1 text-xs rounded-md bg-primary text-white font-medium transition-all"
+                data-range="60">1분</button>
+              <button onclick="window.setChartRange(180)"
+                class="chart-range-btn px-2 py-1 text-xs rounded-md bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 font-medium transition-all"
+                data-range="180">3분</button>
+              <button onclick="window.setChartRange(300)"
+                class="chart-range-btn px-2 py-1 text-xs rounded-md bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 font-medium transition-all"
+                data-range="300">5분</button>
             </div>
           </div>
           <div class="relative h-40 w-full">
             <canvas id="focus-chart"></canvas>
           </div>
         </div>
-        
+
         <!-- Stats Cards -->
         <div class="grid grid-cols-3 gap-2">
           <div class="bg-emerald-50 dark:bg-emerald-900/10 rounded-lg p-3 text-center">
@@ -402,7 +519,7 @@
             <p id="focus-max-score" class="text-lg font-bold text-gray-900 dark:text-white">-</p>
           </div>
         </div>
-        
+
         <!-- Analysis Info -->
         <div class="grid grid-cols-3 gap-2">
           <div class="bg-blue-50 dark:bg-blue-900/10 rounded-lg p-2 text-center">
@@ -419,7 +536,7 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Footer -->
       <div class="px-4 py-2 text-center border-t border-gray-100 dark:border-gray-700">
         <p id="focus-last-update" class="text-[10px] text-gray-400">마지막 업데이트: -</p>
@@ -431,40 +548,48 @@
   <div id="message-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
     <!-- Backdrop -->
     <div class="absolute inset-0 bg-gray-900/40 dark:bg-black/60 backdrop-blur-sm"></div>
-    
+
     <!-- Modal Content -->
-    <div class="relative z-20 w-full max-w-lg bg-surface-light dark:bg-surface-dark rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-300 border border-gray-100 dark:border-gray-700 ring-1 ring-black/5 dark:ring-white/10">
+    <div
+      class="relative z-20 w-full max-w-lg bg-surface-light dark:bg-surface-dark rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-300 border border-gray-100 dark:border-gray-700 ring-1 ring-black/5 dark:ring-white/10">
       <!-- Header -->
       <div class="bg-gradient-to-r from-indigo-500 to-indigo-600 px-6 py-5 flex items-center justify-between shadow-md">
         <div class="flex items-center space-x-3 text-white">
           <span class="material-symbols-rounded text-2xl">campaign</span>
           <h2 id="message-modal-title" class="text-lg font-bold tracking-wide">전체 공지</h2>
         </div>
-        <button id="close-message-modal-btn" class="text-white/80 hover:text-white hover:bg-white/10 p-1.5 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-white/50">
+        <button id="close-message-modal-btn"
+          class="text-white/80 hover:text-white hover:bg-white/10 p-1.5 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-white/50">
           <span class="material-symbols-rounded text-xl">close</span>
         </button>
       </div>
-      
+
       <!-- Body -->
       <div class="p-6 md:p-8 space-y-6">
         <div class="flex items-start space-x-3 text-gray-600 dark:text-gray-300">
           <span class="material-symbols-rounded text-indigo-500 mt-0.5 text-lg">info</span>
           <p id="message-target-info" class="text-sm font-medium leading-relaxed"></p>
         </div>
-        
+
         <div class="relative group">
-          <textarea id="message-input" rows="5" class="w-full p-4 bg-gray-50 dark:bg-gray-800/50 border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all resize-none text-base leading-relaxed" placeholder="메시지를 입력하세요..."></textarea>
-          <div class="absolute bottom-4 right-4 text-xs text-gray-400 dark:text-gray-500 pointer-events-none">Enter로 줄바꿈</div>
+          <textarea id="message-input" rows="5"
+            class="w-full p-4 bg-gray-50 dark:bg-gray-800/50 border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all resize-none text-base leading-relaxed"
+            placeholder="메시지를 입력하세요..."></textarea>
+          <div class="absolute bottom-4 right-4 text-xs text-gray-400 dark:text-gray-500 pointer-events-none">Enter로 줄바꿈
+          </div>
         </div>
       </div>
-      
+
       <!-- Footer -->
       <div class="px-6 py-5 bg-gray-50 dark:bg-gray-800/30 border-t border-gray-100 dark:border-gray-700 flex gap-4">
-        <button id="cancel-message-btn" class="flex-1 py-3 px-4 rounded-xl font-semibold text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 hover:text-gray-800 dark:hover:text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-500 shadow-sm">
+        <button id="cancel-message-btn"
+          class="flex-1 py-3 px-4 rounded-xl font-semibold text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 hover:text-gray-800 dark:hover:text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-500 shadow-sm">
           취소
         </button>
-        <button id="send-message-btn" class="flex-1 py-3 px-4 rounded-xl font-semibold text-white bg-indigo-500 hover:bg-indigo-600 active:scale-[0.98] transition-all duration-200 shadow-lg shadow-indigo-500/30 dark:shadow-indigo-500/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 flex items-center justify-center space-x-2 group">
-          <span class="material-symbols-rounded text-lg group-hover:-rotate-12 transition-transform duration-300">send</span>
+        <button id="send-message-btn"
+          class="flex-1 py-3 px-4 rounded-xl font-semibold text-white bg-indigo-500 hover:bg-indigo-600 active:scale-[0.98] transition-all duration-200 shadow-lg shadow-indigo-500/30 dark:shadow-indigo-500/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 flex items-center justify-center space-x-2 group">
+          <span
+            class="material-symbols-rounded text-lg group-hover:-rotate-12 transition-transform duration-300">send</span>
           <span>전송</span>
         </button>
       </div>
@@ -473,13 +598,17 @@
 
   <!-- Alert Sound -->
   <audio id="alert-sound" preload="auto">
-    <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleQYAQKPd7KlmBgBBqeHvqGQGAEKu5fKnYgYAQ7Pp9aZgBgBEuO34pV4GAEa98NqjXAYAR8Lz3aJaBgBIx/bgoFgGAEnM+eOeVgYASdH85JxUBgBK1v/nmVIGAEvb/+qXUAYATOD/7ZVOBgBN5f/wk0wGAE7q//OSSwYAT+///5FJBgBQ9P/+j0cGAFH5//6NRQYAUv7//4tDBgBT////iUEGAFT///+HPwYAVf///4U9BgBW////gzsGAFf///+BOQYAVv///4E3BgBV////gTUGAFT///+BMwYAU////4ExBgBS////gS8GAFH///+BLQYAUf///4ErBgBQ////gSkGAE////+BJwYATv///4ElBgBN////gSMGAEz///+BIQYASv///4EfBgBJ////gR0GAEj///+BGwYAR////4EZBgBG////gRcGAEX///+BFQYARf///4ETBgBE////gREGAEP///+BDwYAQv///4ENBgBB////gQsGAED///+BCQYAPv///4EHBgA9////gQUGADz///+BAwYAO////4EBBQA6////fwAFADn///99/wQAOP///3v+BAA3////ef0EADX///93/AQANP///3X7BAA0////c/oEADP///9x+QQAM////2/4BAAy////bfcEADH///9r9gQAMP///2n1BAA=" type="audio/wav">
+    <source
+      src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleQYAQKPd7KlmBgBBqeHvqGQGAEKu5fKnYgYAQ7Pp9aZgBgBEuO34pV4GAEa98NqjXAYAR8Lz3aJaBgBIx/bgoFgGAEnM+eOeVgYASdH85JxUBgBK1v/nmVIGAEvb/+qXUAYATOD/7ZVOBgBN5f/wk0wGAE7q//OSSwYAT+///5FJBgBQ9P/+j0cGAFH5//6NRQYAUv7//4tDBgBT////iUEGAFT///+HPwYAVf///4U9BgBW////gzsGAFf///+BOQYAVv///4E3BgBV////gTUGAFT///+BMwYAU////4ExBgBS////gS8GAFH///+BLQYAUf///4ErBgBQ////gSkGAE////+BJwYATv///4ElBgBN////gSMGAEz///+BIQYASv///4EfBgBJ////gR0GAEj///+BGwYAR////4EZBgBG////gRcGAEX///+BFQYARf///4ETBgBE////gREGAEP///+BDwYAQv///4ENBgBB////gQsGAED///+BCQYAPv///4EHBgA9////gQUGADz///+BAwYAO////4EBBQA6////fwAFADn///99/wQAOP///3v+BAA3////ef0EADX///93/AQANP///3X7BAA0////c/oEADP///9x+QQAM////2/4BAAy////bfcEADH///9r9gQAMP///2n1BAA="
+      type="audio/wav">
   </audio>
 
   <!-- Attendance Modal -->
   <div id="attendance-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 overflow-y-auto">
-    <div class="absolute inset-0 bg-gray-900/40 dark:bg-black/60 backdrop-blur-sm" onclick="window.closeAttendanceModal && window.closeAttendanceModal()"></div>
-    <div class="relative z-20 w-full max-w-md my-4 bg-surface-light dark:bg-surface-dark rounded-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700">
+    <div class="absolute inset-0 bg-gray-900/40 dark:bg-black/60 backdrop-blur-sm"
+      onclick="window.closeAttendanceModal && window.closeAttendanceModal()"></div>
+    <div
+      class="relative z-20 w-full max-w-md my-4 bg-surface-light dark:bg-surface-dark rounded-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700">
       <!-- Header -->
       <div class="bg-teal-500 px-4 py-3 flex items-center justify-between">
         <div class="flex items-center space-x-2">
@@ -488,11 +617,12 @@
           </div>
           <h1 class="text-white text-base font-bold"><span id="attendance-student-name">학생</span> 출석 현황</h1>
         </div>
-        <button id="close-attendance-modal-btn" onclick="window.closeAttendanceModal && window.closeAttendanceModal()" class="text-white hover:bg-white/10 rounded-full p-1 transition-colors">
+        <button id="close-attendance-modal-btn" onclick="window.closeAttendanceModal && window.closeAttendanceModal()"
+          class="text-white hover:bg-white/10 rounded-full p-1 transition-colors">
           <span class="material-symbols-rounded text-xl">close</span>
         </button>
       </div>
-      
+
       <!-- Content -->
       <div class="p-4 space-y-4">
         <!-- 주간/월간 통계 -->
@@ -518,9 +648,10 @@
               </div>
             </div>
           </div>
-          
+
           <!-- 월간 -->
-          <div class="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-3 border border-purple-100 dark:border-purple-800">
+          <div
+            class="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-3 border border-purple-100 dark:border-purple-800">
             <div class="flex items-center gap-2 mb-2">
               <span class="material-symbols-rounded text-purple-500 text-lg">calendar_month</span>
               <span class="font-bold text-sm text-purple-700 dark:text-purple-300">이번 달</span>
@@ -528,7 +659,8 @@
             <div class="space-y-1.5">
               <div class="flex justify-between items-center">
                 <span class="text-xs text-gray-500">출석일</span>
-                <span id="attendance-monthly-days" class="font-bold text-sm text-gray-800 dark:text-gray-200">0/0일</span>
+                <span id="attendance-monthly-days"
+                  class="font-bold text-sm text-gray-800 dark:text-gray-200">0/0일</span>
               </div>
               <div class="flex justify-between items-center">
                 <span class="text-xs text-gray-500">출석률</span>
@@ -541,7 +673,7 @@
             </div>
           </div>
         </div>
-        
+
         <!-- 캘린더 -->
         <div class="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3 border border-gray-100 dark:border-gray-700">
           <div id="attendance-calendar">
@@ -549,11 +681,14 @@
           </div>
           <div class="flex items-center justify-center gap-4 mt-3 pt-2 border-t border-gray-200 dark:border-gray-700">
             <div class="flex items-center gap-1.5">
-              <div class="w-3 h-3 rounded bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700"></div>
+              <div
+                class="w-3 h-3 rounded bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700">
+              </div>
               <span class="text-[10px] text-gray-500">출석</span>
             </div>
             <div class="flex items-center gap-1.5">
-              <div class="w-3 h-3 rounded bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600"></div>
+              <div class="w-3 h-3 rounded bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600">
+              </div>
               <span class="text-[10px] text-gray-500">결석</span>
             </div>
             <div class="flex items-center gap-1.5">
@@ -562,14 +697,16 @@
             </div>
           </div>
         </div>
-        
+
         <!-- 다운로드 버튼 -->
         <div class="flex gap-2">
-          <button onclick="window.downloadAttendanceCSV && window.downloadAttendanceCSV()" class="flex-1 py-2.5 px-4 bg-teal-500 hover:bg-teal-600 text-white font-semibold rounded-lg transition-all flex items-center justify-center gap-2 text-sm">
+          <button onclick="window.downloadAttendanceCSV && window.downloadAttendanceCSV()"
+            class="flex-1 py-2.5 px-4 bg-teal-500 hover:bg-teal-600 text-white font-semibold rounded-lg transition-all flex items-center justify-center gap-2 text-sm">
             <span class="material-symbols-rounded text-lg">table_chart</span>
             CSV
           </button>
-          <button onclick="window.downloadAttendancePDF && window.downloadAttendancePDF()" class="flex-1 py-2.5 px-4 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition-all flex items-center justify-center gap-2 text-sm">
+          <button onclick="window.downloadAttendancePDF && window.downloadAttendancePDF()"
+            class="flex-1 py-2.5 px-4 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition-all flex items-center justify-center gap-2 text-sm">
             <span class="material-symbols-rounded text-lg">picture_as_pdf</span>
             PDF
           </button>
@@ -580,8 +717,10 @@
 
   <!-- Focus Report Modal -->
   <div id="focus-report-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 overflow-y-auto">
-    <div class="absolute inset-0 bg-gray-900/40 dark:bg-black/60 backdrop-blur-sm" onclick="window.closeFocusReportModal && window.closeFocusReportModal()"></div>
-    <div class="relative z-20 w-full max-w-md my-4 bg-surface-light dark:bg-surface-dark rounded-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700">
+    <div class="absolute inset-0 bg-gray-900/40 dark:bg-black/60 backdrop-blur-sm"
+      onclick="window.closeFocusReportModal && window.closeFocusReportModal()"></div>
+    <div
+      class="relative z-20 w-full max-w-md my-4 bg-surface-light dark:bg-surface-dark rounded-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700">
       <!-- Header -->
       <div class="bg-gradient-to-r from-orange-500 to-amber-500 px-4 py-3 flex items-center justify-between">
         <div class="flex items-center space-x-2">
@@ -593,39 +732,46 @@
             <span id="focus-report-student-grade" class="text-white/80 text-xs"></span>
           </div>
         </div>
-        <button id="close-focus-report-modal-btn" onclick="window.closeFocusReportModal && window.closeFocusReportModal()" class="text-white hover:bg-white/10 rounded-full p-1 transition-colors">
+        <button id="close-focus-report-modal-btn"
+          onclick="window.closeFocusReportModal && window.closeFocusReportModal()"
+          class="text-white hover:bg-white/10 rounded-full p-1 transition-colors">
           <span class="material-symbols-rounded text-xl">close</span>
         </button>
       </div>
-      
+
       <!-- Period Selector -->
       <div class="px-4 py-3 bg-gray-50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-700">
         <div class="flex items-center justify-center gap-2">
-          <button onclick="window.setFocusReportType('daily')" data-type="daily" class="focus-report-type-btn px-3 py-1.5 text-xs rounded-lg bg-orange-500 text-white font-medium transition-all">
+          <button onclick="window.setFocusReportType('daily')" data-type="daily"
+            class="focus-report-type-btn px-3 py-1.5 text-xs rounded-lg bg-orange-500 text-white font-medium transition-all">
             일간
           </button>
-          <button onclick="window.setFocusReportType('weekly')" data-type="weekly" class="focus-report-type-btn px-3 py-1.5 text-xs rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 font-medium transition-all hover:bg-gray-300 dark:hover:bg-gray-600">
+          <button onclick="window.setFocusReportType('weekly')" data-type="weekly"
+            class="focus-report-type-btn px-3 py-1.5 text-xs rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 font-medium transition-all hover:bg-gray-300 dark:hover:bg-gray-600">
             주간
           </button>
-          <button onclick="window.setFocusReportType('monthly')" data-type="monthly" class="focus-report-type-btn px-3 py-1.5 text-xs rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 font-medium transition-all hover:bg-gray-300 dark:hover:bg-gray-600">
+          <button onclick="window.setFocusReportType('monthly')" data-type="monthly"
+            class="focus-report-type-btn px-3 py-1.5 text-xs rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 font-medium transition-all hover:bg-gray-300 dark:hover:bg-gray-600">
             월간
           </button>
         </div>
       </div>
-      
+
       <!-- Content -->
       <div id="focus-report-content" class="p-4">
         <!-- 보고서 내용이 여기에 렌더링됨 -->
       </div>
-      
+
       <!-- Download Buttons -->
       <div class="px-4 pb-4">
         <div class="flex gap-2">
-          <button onclick="window.downloadFocusReportCSV && window.downloadFocusReportCSV()" class="flex-1 py-2.5 px-4 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg transition-all flex items-center justify-center gap-2 text-sm">
+          <button onclick="window.downloadFocusReportCSV && window.downloadFocusReportCSV()"
+            class="flex-1 py-2.5 px-4 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg transition-all flex items-center justify-center gap-2 text-sm">
             <span class="material-symbols-rounded text-lg">table_chart</span>
             CSV
           </button>
-          <button onclick="window.downloadFocusReportPDF && window.downloadFocusReportPDF()" class="flex-1 py-2.5 px-4 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition-all flex items-center justify-center gap-2 text-sm">
+          <button onclick="window.downloadFocusReportPDF && window.downloadFocusReportPDF()"
+            class="flex-1 py-2.5 px-4 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition-all flex items-center justify-center gap-2 text-sm">
             <span class="material-symbols-rounded text-lg">picture_as_pdf</span>
             PDF
           </button>
@@ -636,8 +782,10 @@
 
   <!-- Today Attendance List Modal -->
   <div id="today-attendance-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 overflow-y-auto">
-    <div class="absolute inset-0 bg-gray-900/40 dark:bg-black/60 backdrop-blur-sm" onclick="window.closeTodayAttendanceModal && window.closeTodayAttendanceModal()"></div>
-    <div class="relative z-20 w-full max-w-md my-4 bg-surface-light dark:bg-surface-dark rounded-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700">
+    <div class="absolute inset-0 bg-gray-900/40 dark:bg-black/60 backdrop-blur-sm"
+      onclick="window.closeTodayAttendanceModal && window.closeTodayAttendanceModal()"></div>
+    <div
+      class="relative z-20 w-full max-w-md my-4 bg-surface-light dark:bg-surface-dark rounded-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700">
       <!-- Header -->
       <div class="bg-teal-500 px-4 py-3 flex items-center justify-between">
         <div class="flex items-center space-x-2">
@@ -649,11 +797,12 @@
             <span id="today-attendance-date" class="text-white/80 text-xs"></span>
           </div>
         </div>
-        <button onclick="window.closeTodayAttendanceModal && window.closeTodayAttendanceModal()" class="text-white hover:bg-white/10 rounded-full p-1 transition-colors">
+        <button onclick="window.closeTodayAttendanceModal && window.closeTodayAttendanceModal()"
+          class="text-white hover:bg-white/10 rounded-full p-1 transition-colors">
           <span class="material-symbols-rounded text-xl">close</span>
         </button>
       </div>
-      
+
       <!-- Summary -->
       <div class="px-4 py-3 bg-teal-50 dark:bg-teal-900/20 border-b border-teal-100 dark:border-teal-800">
         <div class="flex items-center justify-between">
@@ -664,7 +813,7 @@
           <span id="today-attendance-total" class="text-xl font-bold text-teal-600 dark:text-teal-400">0명</span>
         </div>
       </div>
-      
+
       <!-- Student List -->
       <div id="today-attendance-list" class="p-4 max-h-[50vh] overflow-y-auto">
         <!-- 출석자 목록이 여기에 렌더링됨 -->
@@ -678,8 +827,10 @@
 
   <!-- Class Settings Modal -->
   <div id="class-settings-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
-    <div class="absolute inset-0 bg-gray-900/40 dark:bg-black/60 backdrop-blur-sm" onclick="window.closeClassSettings && window.closeClassSettings()"></div>
-    <div class="relative z-20 w-full max-w-sm bg-surface-light dark:bg-surface-dark rounded-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700">
+    <div class="absolute inset-0 bg-gray-900/40 dark:bg-black/60 backdrop-blur-sm"
+      onclick="window.closeClassSettings && window.closeClassSettings()"></div>
+    <div
+      class="relative z-20 w-full max-w-sm bg-surface-light dark:bg-surface-dark rounded-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700">
       <!-- Header -->
       <div class="bg-primary px-4 py-3 flex items-center justify-between">
         <div class="flex items-center space-x-2">
@@ -688,11 +839,12 @@
           </div>
           <h1 class="text-white text-base font-bold">수업 시간 설정</h1>
         </div>
-        <button onclick="window.closeClassSettings && window.closeClassSettings()" class="text-white hover:bg-white/10 rounded-full p-1 transition-colors">
+        <button onclick="window.closeClassSettings && window.closeClassSettings()"
+          class="text-white hover:bg-white/10 rounded-full p-1 transition-colors">
           <span class="material-symbols-rounded text-xl">close</span>
         </button>
       </div>
-      
+
       <!-- Content -->
       <div class="p-5 space-y-4">
         <div>
@@ -703,12 +855,13 @@
             </span>
           </label>
           <div class="flex items-center gap-2">
-            <input type="number" id="lesson-duration-input" min="1" max="180" value="50" class="flex-1 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-center font-bold text-lg focus:ring-2 focus:ring-primary focus:border-primary">
+            <input type="number" id="lesson-duration-input" min="1" max="180" value="50"
+              class="flex-1 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-center font-bold text-lg focus:ring-2 focus:ring-primary focus:border-primary">
             <span class="text-gray-500 dark:text-gray-400 font-medium">분</span>
           </div>
           <p class="text-xs text-gray-400 mt-1">1~180분 사이로 설정</p>
         </div>
-        
+
         <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             <span class="flex items-center gap-2">
@@ -717,12 +870,13 @@
             </span>
           </label>
           <div class="flex items-center gap-2">
-            <input type="number" id="break-duration-input" min="1" max="60" value="10" class="flex-1 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-center font-bold text-lg focus:ring-2 focus:ring-primary focus:border-primary">
+            <input type="number" id="break-duration-input" min="1" max="60" value="10"
+              class="flex-1 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-center font-bold text-lg focus:ring-2 focus:ring-primary focus:border-primary">
             <span class="text-gray-500 dark:text-gray-400 font-medium">분</span>
           </div>
           <p class="text-xs text-gray-400 mt-1">1~60분 사이로 설정</p>
         </div>
-        
+
         <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 border border-blue-100 dark:border-blue-800">
           <div class="flex items-start gap-2">
             <span class="material-symbols-rounded text-blue-500 text-lg mt-0.5">info</span>
@@ -737,10 +891,11 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Footer -->
       <div class="px-5 pb-5">
-        <button id="save-class-settings-btn" onclick="window.saveClassSettings && window.saveClassSettings()" class="w-full py-2.5 px-4 bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg transition-all flex items-center justify-center gap-2">
+        <button id="save-class-settings-btn" onclick="window.saveClassSettings && window.saveClassSettings()"
+          class="w-full py-2.5 px-4 bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg transition-all flex items-center justify-center gap-2">
           <span class="material-symbols-rounded text-lg">save</span>
           저장
         </button>
@@ -750,34 +905,41 @@
 
   <!-- Understanding Check Question Modal (이해도 체크 질문 입력) -->
   <div id="understanding-question-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
-    <div class="absolute inset-0 bg-gray-900/40 dark:bg-black/60 backdrop-blur-sm" onclick="window.closeUnderstandingQuestionModal && window.closeUnderstandingQuestionModal()"></div>
-    <div class="relative z-20 w-full max-w-md bg-surface-light dark:bg-surface-dark rounded-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700">
+    <div class="absolute inset-0 bg-gray-900/40 dark:bg-black/60 backdrop-blur-sm"
+      onclick="window.closeUnderstandingQuestionModal && window.closeUnderstandingQuestionModal()"></div>
+    <div
+      class="relative z-20 w-full max-w-md bg-surface-light dark:bg-surface-dark rounded-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700">
       <!-- Header -->
       <div class="bg-gradient-to-r from-amber-500 to-orange-500 px-5 py-4 flex items-center justify-between">
         <div class="flex items-center gap-3 text-white">
           <span class="material-symbols-rounded text-2xl">help</span>
           <h2 class="text-lg font-bold">이해도 체크</h2>
         </div>
-        <button onclick="window.closeUnderstandingQuestionModal && window.closeUnderstandingQuestionModal()" class="text-white/80 hover:text-white hover:bg-white/10 p-1.5 rounded-full transition-colors">
+        <button onclick="window.closeUnderstandingQuestionModal && window.closeUnderstandingQuestionModal()"
+          class="text-white/80 hover:text-white hover:bg-white/10 p-1.5 rounded-full transition-colors">
           <span class="material-symbols-rounded text-xl">close</span>
         </button>
       </div>
-      
+
       <!-- Content -->
       <div class="p-5 space-y-4">
         <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">질문 내용</label>
-          <textarea id="understanding-question-input" rows="3" class="w-full p-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all resize-none" placeholder="지금 설명한 내용이 이해가 되나요?"></textarea>
+          <textarea id="understanding-question-input" rows="3"
+            class="w-full p-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all resize-none"
+            placeholder="지금 설명한 내용이 이해가 되나요?"></textarea>
         </div>
-        
+
         <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">응답 시간 제한</label>
           <div class="flex items-center gap-3">
-            <input type="range" id="understanding-time-limit" min="5" max="30" value="10" class="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-amber-500">
-            <span id="understanding-time-display" class="w-12 text-center font-bold text-amber-600 dark:text-amber-400">10초</span>
+            <input type="range" id="understanding-time-limit" min="5" max="30" value="10"
+              class="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-amber-500">
+            <span id="understanding-time-display"
+              class="w-12 text-center font-bold text-amber-600 dark:text-amber-400">10초</span>
           </div>
         </div>
-        
+
         <div class="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-3 border border-amber-100 dark:border-amber-800">
           <div class="flex items-start gap-2">
             <span class="material-symbols-rounded text-amber-500 text-lg">info</span>
@@ -787,13 +949,15 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Footer -->
       <div class="px-5 pb-5 flex gap-3">
-        <button onclick="window.closeUnderstandingQuestionModal && window.closeUnderstandingQuestionModal()" class="flex-1 py-2.5 px-4 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-lg transition-all">
+        <button onclick="window.closeUnderstandingQuestionModal && window.closeUnderstandingQuestionModal()"
+          class="flex-1 py-2.5 px-4 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-lg transition-all">
           취소
         </button>
-        <button onclick="window.sendUnderstandingCheck && window.sendUnderstandingCheck()" class="flex-1 py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-lg transition-all flex items-center justify-center gap-2">
+        <button onclick="window.sendUnderstandingCheck && window.sendUnderstandingCheck()"
+          class="flex-1 py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-lg transition-all flex items-center justify-center gap-2">
           <span class="material-symbols-rounded text-lg">send</span>
           전송
         </button>
@@ -804,7 +968,8 @@
   <!-- Understanding Check Result Modal (이해도 체크 결과) -->
   <div id="understanding-result-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
     <div class="absolute inset-0 bg-gray-900/40 dark:bg-black/60 backdrop-blur-sm"></div>
-    <div class="relative z-20 w-full max-w-lg bg-surface-light dark:bg-surface-dark rounded-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700">
+    <div
+      class="relative z-20 w-full max-w-lg bg-surface-light dark:bg-surface-dark rounded-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700">
       <!-- Header -->
       <div class="bg-gradient-to-r from-amber-500 to-orange-500 px-5 py-4 flex items-center justify-between">
         <div class="flex items-center gap-3 text-white">
@@ -814,38 +979,44 @@
             <p id="understanding-result-question" class="text-white/80 text-xs truncate max-w-[250px]"></p>
           </div>
         </div>
-        <button onclick="window.closeUnderstandingResultModal && window.closeUnderstandingResultModal()" class="text-white/80 hover:text-white hover:bg-white/10 p-1.5 rounded-full transition-colors">
+        <button onclick="window.closeUnderstandingResultModal && window.closeUnderstandingResultModal()"
+          class="text-white/80 hover:text-white hover:bg-white/10 p-1.5 rounded-full transition-colors">
           <span class="material-symbols-rounded text-xl">close</span>
         </button>
       </div>
-      
+
       <!-- Stats -->
       <div class="p-5 space-y-4">
         <!-- Timer / Status -->
-        <div id="understanding-result-status" class="flex items-center justify-center gap-2 py-2 px-4 bg-amber-100 dark:bg-amber-900/30 rounded-lg">
+        <div id="understanding-result-status"
+          class="flex items-center justify-center gap-2 py-2 px-4 bg-amber-100 dark:bg-amber-900/30 rounded-lg">
           <span class="material-symbols-rounded text-amber-600 animate-pulse">timer</span>
-          <span class="font-medium text-amber-700 dark:text-amber-400">응답 대기 중... <span id="understanding-result-timer">10</span>초</span>
+          <span class="font-medium text-amber-700 dark:text-amber-400">응답 대기 중... <span
+              id="understanding-result-timer">10</span>초</span>
         </div>
-        
+
         <!-- Summary Cards -->
         <div class="grid grid-cols-3 gap-3">
-          <div class="bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-4 text-center border border-emerald-100 dark:border-emerald-800">
+          <div
+            class="bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-4 text-center border border-emerald-100 dark:border-emerald-800">
             <span class="material-symbols-rounded text-emerald-500 text-2xl">check_circle</span>
             <p class="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1" id="understanding-yes-count">0</p>
             <p class="text-xs text-emerald-600 dark:text-emerald-500">예</p>
           </div>
-          <div class="bg-red-50 dark:bg-red-900/20 rounded-xl p-4 text-center border border-red-100 dark:border-red-800">
+          <div
+            class="bg-red-50 dark:bg-red-900/20 rounded-xl p-4 text-center border border-red-100 dark:border-red-800">
             <span class="material-symbols-rounded text-red-500 text-2xl">cancel</span>
             <p class="text-2xl font-bold text-red-600 dark:text-red-400 mt-1" id="understanding-no-count">0</p>
             <p class="text-xs text-red-600 dark:text-red-500">아니요</p>
           </div>
-          <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 text-center border border-gray-200 dark:border-gray-700">
+          <div
+            class="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 text-center border border-gray-200 dark:border-gray-700">
             <span class="material-symbols-rounded text-gray-400 text-2xl">hourglass_empty</span>
             <p class="text-2xl font-bold text-gray-600 dark:text-gray-400 mt-1" id="understanding-pending-count">0</p>
             <p class="text-xs text-gray-500">미응답</p>
           </div>
         </div>
-        
+
         <!-- Progress Bar -->
         <div>
           <div class="flex justify-between text-xs text-gray-500 mb-1">
@@ -853,11 +1024,13 @@
             <span id="understanding-response-rate">0%</span>
           </div>
           <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden flex">
-            <div id="understanding-yes-bar" class="h-full bg-emerald-500 transition-all duration-300" style="width: 0%"></div>
-            <div id="understanding-no-bar" class="h-full bg-red-500 transition-all duration-300" style="width: 0%"></div>
+            <div id="understanding-yes-bar" class="h-full bg-emerald-500 transition-all duration-300" style="width: 0%">
+            </div>
+            <div id="understanding-no-bar" class="h-full bg-red-500 transition-all duration-300" style="width: 0%">
+            </div>
           </div>
         </div>
-        
+
         <!-- Response List -->
         <div>
           <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">응답 현황</h4>
@@ -866,10 +1039,11 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Footer -->
       <div class="px-5 pb-5">
-        <button onclick="window.closeUnderstandingResultModal && window.closeUnderstandingResultModal()" class="w-full py-2.5 px-4 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-lg transition-all">
+        <button onclick="window.closeUnderstandingResultModal && window.closeUnderstandingResultModal()"
+          class="w-full py-2.5 px-4 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-lg transition-all">
           닫기
         </button>
       </div>
@@ -884,4 +1058,5 @@
   </script>
   <script type="module" src="js/teacher-app.js"></script>
 </body>
+
 </html>
