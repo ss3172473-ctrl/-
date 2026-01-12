@@ -3,7 +3,7 @@
  * 학생의 자세를 분석하여 서있음/앉음/자리비움 판단
  */
 import { CONFIG, STATUS } from './config.js';
-import { FaceMeshVisualizer } from './face-mesh-visualizer.js';
+// import { FaceMeshVisualizer } from './face-mesh-visualizer.js';
 
 class PoseAnalyzer {
   constructor() {
@@ -20,7 +20,7 @@ class PoseAnalyzer {
     this.lastDetectionTime = Date.now(); // 마지막 감지 시간
     this.awayCheckInterval = null; // 자리비움 체크 타이머
     this.focusAnalyzer = null; // 집중도 분석기 연결
-    this.faceMeshVisualizer = null; // 페이스 메쉬 시각화
+    // this.faceMeshVisualizer = null; // 페이스 메쉬 시각화
   }
 
   async init(videoElement, canvasElement) {
@@ -61,8 +61,8 @@ class PoseAnalyzer {
 
     this.pose.onResults((results) => this.onResults(results));
 
-    // Face Mesh Visualizer 초기화
-    this.faceMeshVisualizer = new FaceMeshVisualizer(this.canvasCtx);
+    // Face Mesh Visualizer 초기화 제거
+    // this.faceMeshVisualizer = new FaceMeshVisualizer(this.canvasCtx);
 
     // 카메라 초기화 (window.Camera 제거 - 스트림 충돌 방지)
     // 대신 requestAnimationFrame 루프 사용
@@ -121,13 +121,8 @@ class PoseAnalyzer {
         // 1. Pose 분석 (핵심 기능 - 우선 처리)
         await this.pose.send({ image: this.videoElement });
 
-        // 2. Face Mesh 분석 (시각화 전용 - 에러나 지연이 핵심 로직을 방해하지 않도록 분리)
-        if (this.faceMeshVisualizer) {
-          // 비동기로 실행하고 결과 기다리지 않음 (Fire-and-forget style)
-          this.faceMeshVisualizer.send(this.videoElement).catch(e => {
-            // FaceMesh 에러는 조용히 무시 혹은 디버그용
-          });
-        }
+        // 2. Face Mesh 분석 제거
+        // if (this.faceMeshVisualizer) { ... }
       } catch (e) {
         console.warn('[PoseAnalyzer] Pose 분석 중 에러 (일시적):', e);
       }
@@ -163,44 +158,23 @@ class PoseAnalyzer {
     this.canvasCtx.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
     this.canvasCtx.drawImage(results.image, 0, 0, this.canvasElement.width, this.canvasElement.height);
 
-    // Face Mesh 시각화 그리기
-    let faceMeshDrawn = false;
-    if (this.faceMeshVisualizer) {
-      // FaceMeshVisualizer 내부적으로 lastResults가 있을 때만 그림
-      const currentScore = this.focusAnalyzer ? (this.focusAnalyzer.focusScore ?? 100) : 100;
-      this.faceMeshVisualizer.draw(this.canvasElement, currentScore);
+    // === Premium Focus HUD Visualization ===
+    // Face Mesh 대신 Pose Landmark를 활용한 고품질 HUD 렌더링
 
-      // FaceMesh가 준비되었는지 확인 (간접적으로 lastResults 체크를 FaceMeshVisualizer에 getter 추가하면 좋겠지만, 
-      // 여기서는 FaceMeshVisualizer가 준비 안되었을 때를 대비해 간단한 Fallback을 추가)
-      if (this.faceMeshVisualizer.lastResults && this.faceMeshVisualizer.lastResults.multiFaceLandmarks && this.faceMeshVisualizer.lastResults.multiFaceLandmarks.length > 0) {
-        faceMeshDrawn = true;
-      }
-    }
+    // 현재 집중도 점수 가져오기
+    const score = this.focusAnalyzer ? (this.focusAnalyzer.focusScore ?? 100) : 100;
 
-    // Fallback: Face Mesh가 아직 로딩 중이거나 감지 실패 시, Pose 랜드마크로라도 "인식 중" 효과 표시
-    if (!faceMeshDrawn && results.poseLandmarks) {
+    // 랜드마크 데이터가 있을 때만 그리기
+    if (results.poseLandmarks) {
       const nose = results.poseLandmarks[0];
-      const leftEye = results.poseLandmarks[2]; // Pose에는 눈 랜드마크가 있음
+      const leftEye = results.poseLandmarks[2];
       const rightEye = results.poseLandmarks[5];
+      // 귀 데이터도 활용하여 고개 돌림 시 시각 효과 변형 가능
+      // const leftEar = results.poseLandmarks[7];
+      // const rightEar = results.poseLandmarks[8];
 
-      if (nose.visibility > 0.5) {
-        const x = nose.x * this.canvasElement.width;
-        const y = nose.y * this.canvasElement.height;
-        const eyeDist = Math.abs(leftEye.x - rightEye.x) * this.canvasElement.width;
-        const radius = eyeDist * 3 || 50; // 눈 사이 거리 기반으로 원 크기 추정
-
-        this.canvasCtx.beginPath();
-        this.canvasCtx.arc(x, y - radius / 3, radius, 0, 2 * Math.PI);
-        this.canvasCtx.strokeStyle = 'rgba(0, 251, 255, 0.5)'; // Cyan
-        this.canvasCtx.lineWidth = 2;
-        this.canvasCtx.setLineDash([5, 5]); // 점선
-        this.canvasCtx.stroke();
-        this.canvasCtx.setLineDash([]); // 복구
-
-        // "SCANNING..." 텍스트
-        this.canvasCtx.fillStyle = '#00FBFF';
-        this.canvasCtx.font = '10px "Outfit", sans-serif';
-        this.canvasCtx.fillText('FACE RECOGNITION INITIALIZING...', x - radius + 10, y + radius + 20);
+      if (nose.visibility > 0.5 && leftEye.visibility > 0.5 && rightEye.visibility > 0.5) {
+        this.drawFocusHUD(nose, leftEye, rightEye, score);
       }
     }
 
@@ -339,6 +313,111 @@ class PoseAnalyzer {
    */
   getStream() {
     return this.mediaStream;
+  }
+  /**
+   * Premium Focus HUD Drawing System
+   * Draws a high-tech UI overlay around the user's face
+   */
+  drawFocusHUD(nose, leftEye, rightEye, score) {
+    const ctx = this.canvasCtx;
+    const width = this.canvasElement.width;
+    const height = this.canvasElement.height;
+
+    const x = nose.x * width;
+    const y = nose.y * height;
+
+    // Calculate size based on eye distance
+    const eyeDist = Math.abs((leftEye.x - rightEye.x) * width);
+    // Base radius is responsive to face distance
+    const baseRadius = Math.max(eyeDist * 2.5, 60);
+
+    // Determine Theme Color based on Score
+    let mainColor, glowColor;
+    if (score >= 80) {
+      // High Focus: Electric Cyan
+      mainColor = '#00FBFF';
+      glowColor = 'rgba(0, 251, 255, 0.6)';
+    } else if (score >= 50) {
+      // Medium Focus: Gold
+      mainColor = '#FFD700';
+      glowColor = 'rgba(255, 215, 0, 0.6)';
+    } else {
+      // Low Focus: Warning Red
+      mainColor = '#FF0055';
+      glowColor = 'rgba(255, 0, 85, 0.6)';
+    }
+
+    ctx.save();
+
+    // Animation Time
+    const time = Date.now() / 1000;
+
+    // 1. Core Center Dot (Nose)
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = mainColor;
+    ctx.fillStyle = mainColor;
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 2. Inner Rotating Ring (Broken Segments)
+    // Rotate slowly
+    const rotationSpeed = 0.5;
+    const rotation = time * rotationSpeed;
+
+    ctx.strokeStyle = mainColor;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    // Draw 3 segments
+    for (let i = 0; i < 3; i++) {
+      const start = rotation + (i * (Math.PI * 2 / 3));
+      const end = start + (Math.PI / 2); // Quarter circle length
+      ctx.arc(x, y, baseRadius, start, end);
+      // Don't close path to allow gaps
+      ctx.stroke();
+      ctx.beginPath(); // Reset for next segment
+    }
+
+    // 3. Outer Static Ring (Thin)
+    ctx.strokeStyle = glowColor;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(x, y, baseRadius * 1.2, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // 4. Focus Score Gauge
+    // Arc representing 0-100 score
+    const scoreAngle = (score / 100) * Math.PI * 1.5; // Max 270 degrees
+    const startAngle = -Math.PI / 2 - (Math.PI * 1.5) / 2; // Start from top-ish, symmetrical
+    // Actually let's just make it a circle progress bar
+    const gaugeRadius = baseRadius * 1.4;
+
+    // Gauge Background
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.arc(x, y, gaugeRadius, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Gauge Value
+    ctx.strokeStyle = mainColor;
+    ctx.lineWidth = 4;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    // Start from top (-90deg)
+    ctx.arc(x, y, gaugeRadius, -Math.PI / 2, -Math.PI / 2 + (score / 100 * Math.PI * 2));
+    ctx.stroke();
+
+    // 5. Text Label
+    ctx.font = 'bold 14px "Outfit", sans-serif';
+    ctx.fillStyle = mainColor;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    // Score Text below
+    ctx.fillText(`FOCUS ${Math.round(score)}%`, x, y + baseRadius + 30);
+
+    ctx.restore();
   }
 }
 
