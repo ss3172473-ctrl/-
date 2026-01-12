@@ -167,8 +167,8 @@ class PoseAnalyzer {
     let faceMeshDrawn = false;
     if (this.faceMeshVisualizer) {
       // FaceMeshVisualizer 내부적으로 lastResults가 있을 때만 그림
-      // draw 메서드가 무언가를 그렸는지 확인할 방법이 없으나, 호출은 함
-      this.faceMeshVisualizer.draw(this.canvasElement);
+      const currentScore = this.focusAnalyzer ? (this.focusAnalyzer.focusScore ?? 100) : 100;
+      this.faceMeshVisualizer.draw(this.canvasElement, currentScore);
 
       // FaceMesh가 준비되었는지 확인 (간접적으로 lastResults 체크를 FaceMeshVisualizer에 getter 추가하면 좋겠지만, 
       // 여기서는 FaceMeshVisualizer가 준비 안되었을 때를 대비해 간단한 Fallback을 추가)

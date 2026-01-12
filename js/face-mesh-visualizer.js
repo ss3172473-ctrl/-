@@ -79,6 +79,24 @@ class FaceMeshVisualizer {
 
         // 6. 입술
         this.lipsPath = [61, 185, 40, 39, 37, 0, 267, 269, 270, 409, 291, 146, 91, 181, 84, 17, 314, 405, 321, 375, 291, 61];
+
+        // 7. 콧대 (Nose Bridge) - 복잡도 추가
+        this.noseBridgePath = [168, 6, 197, 195, 5, 4];
+
+        // 8. 이마 라인 (Forehead)
+        this.foreheadPath = [103, 104, 108, 69, 66, 296, 299, 337, 338];
+
+        // 9. 뺨 라인 (Cheek Lines) - 사이버틱한 느낌 추가
+        this.leftCheekPath = [234, 227, 116, 117, 118, 100, 126, 209, 198];
+        this.rightCheekPath = [454, 447, 345, 346, 347, 329, 355, 429, 420];
+    }
+
+    // 색상 결정 헬퍼
+    getThemeColor(score) {
+        if (score === undefined || score === null) return '#00FBFF'; // Default Cyan
+        if (score >= 80) return '#00FBFF'; // High - Cyan (유지)
+        if (score >= 50) return '#FFD700'; // Medium - Gold
+        return '#FF0055'; // Low - Neon Red
     }
 
     // 비디오 프레임 처리
@@ -95,7 +113,7 @@ class FaceMeshVisualizer {
     }
 
     // 캔버스에 그리기 (애니메이션 루프에서 호출)
-    draw(canvasElement) {
+    draw(canvasElement, score = 100) {
         if (!this.lastResults || !this.lastResults.multiFaceLandmarks || this.lastResults.multiFaceLandmarks.length === 0) {
             return;
         }
@@ -104,9 +122,11 @@ class FaceMeshVisualizer {
         const width = canvasElement.width;
         const height = canvasElement.height;
 
+        // 점수에 따른 테마 색상 결정
+        const themeColor = this.getThemeColor(score);
+
         // 시간 기반 애니메이션 값
         const time = performance.now() / 1000;
-        const flowOffset = (time * 2) % 10; // 흐르는 효과용
 
         this.ctx.save();
 
@@ -121,33 +141,34 @@ class FaceMeshVisualizer {
             this.rightEyebrowPath,
             this.leftEyePath,
             this.rightEyePath,
-            this.lipsPath
+            this.lipsPath,
+            this.noseBridgePath,
+            this.foreheadPath,
+            this.leftCheekPath,
+            this.rightCheekPath
         ];
 
         allPaths.forEach(path => {
             if (!path || path.length < 2) return;
 
-            // Gradient 생성 (Electric Cyan + Transparent ends)
-            // 패스의 시작점과 끝점을 기준으로 그라데이션 생성 시도? 
-            // 복잡한 패스라 선형 그라데이션은 어렵고, StrokeStyle을 글로우로 설정하자.
-
-            // 1. 기본 글로우 효과 (화이트 골드/사이언)
-            this.ctx.shadowBlur = 4;
-            this.ctx.shadowColor = '#00FBFF'; // Cyan Glow
-            this.ctx.strokeStyle = `rgba(0, 251, 255, 0.4)`; // Base Cyan with low opacity
-            this.ctx.lineWidth = 1.5; // 배경용 약간 두꺼운 선 (블러 효과)
+            // 1. 기본 글로우 효과 (블러 처리를 위해 두껍게)
+            this.ctx.shadowBlur = 15; // 더 강한 글로우
+            this.ctx.shadowColor = themeColor;
+            this.ctx.strokeStyle = themeColor;
+            this.ctx.globalAlpha = 0.6; // 약간 투명하게
+            this.ctx.lineWidth = 4; // 훨씬 두껍게 (4px)
 
             this.drawPath(path, landmarks, width, height);
 
-            // 2. 중심의 얇은 선 (선명함) - 미세 두께 0.5pt
+            // 2. 중심의 얇은 선 (선명함) - Core Line
             this.ctx.shadowBlur = 0;
-            this.ctx.strokeStyle = '#FFFFFF'; // 중심은 흰색에 가까움
-            this.ctx.lineWidth = 0.5;
+            this.ctx.globalAlpha = 1.0;
+            this.ctx.strokeStyle = '#FFFFFF'; // 중심은 흰색
+            this.ctx.lineWidth = 1.5; // 중심선도 0.5 -> 1.5로 굵게 변경
             this.drawPath(path, landmarks, width, height);
 
             // 3. 흐르는 파티클 효과 (Flowing Effect)
-            // 패스 위를 움직이는 하이라이트 점들
-            this.drawFlowingEffect(path, landmarks, width, height, time);
+            this.drawFlowingEffect(path, landmarks, width, height, time, themeColor);
         });
 
         this.ctx.restore();
@@ -172,33 +193,34 @@ class FaceMeshVisualizer {
         this.ctx.stroke();
     }
 
-    drawFlowingEffect(path, landmarks, width, height, time) {
-        // 패스 전체 길이를 따라 점이 이동하는 효과
-        // 간단하게 패스 포인트 인덱스를 시간으로 나눈 나머지로 하이라이트
-
+    drawFlowingEffect(path, landmarks, width, height, time, color) {
         const pathLength = path.length;
-        const speed = 8; // 이동 속도
-        const activeIndex = (time * speed) % pathLength;
+        const speed = 5; // 속도 조절
 
-        // 보간된 위치를 찾으면 더 부드럽겠지만, 성능상 인덱스 근처 점들을 밝게 처리
-        const idx = Math.floor(activeIndex);
-        const nextIdx = (idx + 1) % pathLength;
-        const progress = activeIndex - idx;
+        // 여러 개의 파티클이 흐르도록
+        for (let i = 0; i < 2; i++) {
+            const offset = (pathLength / 2) * i;
+            const activeIndex = (time * speed + offset) % pathLength;
 
-        const currentPt = landmarks[path[idx]];
-        const nextPt = landmarks[path[nextIdx]];
+            const idx = Math.floor(activeIndex);
+            const nextIdx = (idx + 1) % pathLength;
+            const progress = activeIndex - idx;
 
-        if (currentPt && nextPt) {
-            const x = (currentPt.x + (nextPt.x - currentPt.x) * progress) * width;
-            const y = (currentPt.y + (nextPt.y - currentPt.y) * progress) * height;
+            const currentPt = landmarks[path[idx]];
+            const nextPt = landmarks[path[nextIdx]];
 
-            // 빛나는 입자 그리기
-            this.ctx.beginPath();
-            this.ctx.arc(x, y, 2, 0, 2 * Math.PI);
-            this.ctx.fillStyle = '#00FBFF';
-            this.ctx.shadowColor = '#00FBFF';
-            this.ctx.shadowBlur = 8;
-            this.ctx.fill();
+            if (currentPt && nextPt) {
+                const x = (currentPt.x + (nextPt.x - currentPt.x) * progress) * width;
+                const y = (currentPt.y + (nextPt.y - currentPt.y) * progress) * height;
+
+                // 빛나는 입자
+                this.ctx.beginPath();
+                this.ctx.arc(x, y, 3, 0, 2 * Math.PI); // 입자 크기도 2 -> 3
+                this.ctx.fillStyle = color; // 테마 색상상
+                this.ctx.shadowColor = '#FFFFFF';
+                this.ctx.shadowBlur = 10;
+                this.ctx.fill();
+            }
         }
     }
 }
