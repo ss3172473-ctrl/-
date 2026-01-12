@@ -315,8 +315,8 @@ class PoseAnalyzer {
     return this.mediaStream;
   }
   /**
-   * Premium Focus HUD Drawing System
-   * Draws a high-tech UI overlay around the user's face
+   * "Flow Tech" (Zen Mode) Focus HUD
+   * A calming, breathing visualization of the user's concentration zone
    */
   drawFocusHUD(nose, leftEye, rightEye, score) {
     const ctx = this.canvasCtx;
@@ -326,96 +326,104 @@ class PoseAnalyzer {
     const x = nose.x * width;
     const y = nose.y * height;
 
-    // Calculate size based on eye distance
     const eyeDist = Math.abs((leftEye.x - rightEye.x) * width);
-    // Base radius is responsive to face distance
-    const baseRadius = Math.max(eyeDist * 2.5, 60);
+    const baseRadius = Math.max(eyeDist * 2.8, 65); // Slightly larger for "Space"
 
-    // Determine Theme Color based on Score
-    let mainColor, glowColor;
+    // Theme Colors (Zen/Flow Palette)
+    let mainColor, glowColor, secondaryColor;
     if (score >= 80) {
-      // High Focus: Electric Cyan
-      mainColor = '#00FBFF';
-      glowColor = 'rgba(0, 251, 255, 0.6)';
+      // High Focus: Brand Mint Green + Cyan Mix
+      mainColor = '#69D29D'; // Brand Primary
+      secondaryColor = '#00FBFF';
+      glowColor = 'rgba(105, 210, 157, 0.4)';
     } else if (score >= 50) {
-      // Medium Focus: Gold
-      mainColor = '#FFD700';
-      glowColor = 'rgba(255, 215, 0, 0.6)';
+      // Medium Focus: Warm Gold (Calm Alertness)
+      mainColor = '#FCD34D';
+      secondaryColor = '#F59E0B';
+      glowColor = 'rgba(252, 211, 77, 0.4)';
     } else {
-      // Low Focus: Warning Red
-      mainColor = '#FF0055';
-      glowColor = 'rgba(255, 0, 85, 0.6)';
+      // Low Focus: Soft Rose (Gentle Nudge, not Alarm Red)
+      mainColor = '#FB7185';
+      secondaryColor = '#F43F5E';
+      glowColor = 'rgba(251, 113, 133, 0.4)';
     }
 
     ctx.save();
 
-    // Animation Time
+    // Animation: Breathing (Slow Pulse)
     const time = Date.now() / 1000;
+    const breath = (Math.sin(time * 2) + 1) * 0.5; // 0 to 1 smooth
+    const pulseRadius = baseRadius + (breath * 5);
 
-    // 1. Core Center Dot (Nose)
-    ctx.shadowBlur = 15;
+    // 1. Core Focus Dot (Soft Glow)
+    ctx.shadowBlur = 20;
     ctx.shadowColor = mainColor;
     ctx.fillStyle = mainColor;
     ctx.beginPath();
-    ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.arc(x, y, 5, 0, Math.PI * 2);
     ctx.fill();
 
-    // 2. Inner Rotating Ring (Broken Segments)
-    // Rotate slowly
-    const rotationSpeed = 0.5;
-    const rotation = time * rotationSpeed;
-
+    // 2. The "Zone" Ring (Inner Breathing Ring)
     ctx.strokeStyle = mainColor;
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 2;
+    ctx.globalAlpha = 0.8 + (breath * 0.2); // Opacity pulse
     ctx.beginPath();
-    // Draw 3 segments
-    for (let i = 0; i < 3; i++) {
-      const start = rotation + (i * (Math.PI * 2 / 3));
-      const end = start + (Math.PI / 2); // Quarter circle length
-      ctx.arc(x, y, baseRadius, start, end);
-      // Don't close path to allow gaps
-      ctx.stroke();
-      ctx.beginPath(); // Reset for next segment
-    }
-
-    // 3. Outer Static Ring (Thin)
-    ctx.strokeStyle = glowColor;
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.arc(x, y, baseRadius * 1.2, 0, Math.PI * 2);
+    ctx.arc(x, y, pulseRadius, 0, Math.PI * 2);
     ctx.stroke();
 
-    // 4. Focus Score Gauge
-    // Arc representing 0-100 score
-    const scoreAngle = (score / 100) * Math.PI * 1.5; // Max 270 degrees
-    const startAngle = -Math.PI / 2 - (Math.PI * 1.5) / 2; // Start from top-ish, symmetrical
-    // Actually let's just make it a circle progress bar
-    const gaugeRadius = baseRadius * 1.4;
+    // 3. The "Flow" Ring (Outer Static Ring - Thin)
+    ctx.strokeStyle = secondaryColor;
+    ctx.lineWidth = 1;
+    ctx.globalAlpha = 0.5;
+    ctx.beginPath();
+    ctx.arc(x, y, baseRadius * 1.3, 0, Math.PI * 2);
+    ctx.stroke();
 
-    // Gauge Background
+    // 4. Ripple Effect (Emitting Focus) - Only when high focus
+    if (score >= 80) {
+      const rippleSize = (time * 50) % 50; // Expand 0 to 50px
+      const rippleAlpha = 1 - (rippleSize / 50); // Fade out
+
+      ctx.strokeStyle = mainColor;
+      ctx.lineWidth = 1;
+      ctx.globalAlpha = rippleAlpha * 0.5;
+      ctx.beginPath();
+      ctx.arc(x, y, baseRadius * 1.3 + rippleSize, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    // 5. Focus Gauge (Smooth Arc)
+    const gaugeRadius = baseRadius * 1.5;
+    ctx.globalAlpha = 1;
+
+    // Background Arc
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-    ctx.lineWidth = 4;
+    ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.arc(x, y, gaugeRadius, 0, Math.PI * 2);
     ctx.stroke();
 
-    // Gauge Value
-    ctx.strokeStyle = mainColor;
-    ctx.lineWidth = 4;
+    // Active Score Arc
+    // Smooth transition cap
     ctx.lineCap = 'round';
+    ctx.strokeStyle = mainColor;
+    ctx.lineWidth = 3;
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = mainColor;
     ctx.beginPath();
     // Start from top (-90deg)
-    ctx.arc(x, y, gaugeRadius, -Math.PI / 2, -Math.PI / 2 + (score / 100 * Math.PI * 2));
+    const endAngle = -Math.PI / 2 + (score / 100 * Math.PI * 2);
+    ctx.arc(x, y, gaugeRadius, -Math.PI / 2, endAngle);
     ctx.stroke();
 
-    // 5. Text Label
-    ctx.font = 'bold 14px "Outfit", sans-serif';
+    // 6. Text Label (Elegant & Minimal)
+    ctx.font = '500 14px "Outfit", sans-serif'; // Lighter weight
     ctx.fillStyle = mainColor;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
+    ctx.shadowBlur = 0; // Clean text
 
-    // Score Text below
-    ctx.fillText(`FOCUS ${Math.round(score)}%`, x, y + baseRadius + 30);
+    ctx.fillText(`${Math.round(score)}%`, x, y + baseRadius + 40);
 
     ctx.restore();
   }
