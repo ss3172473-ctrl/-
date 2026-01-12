@@ -54,16 +54,8 @@ class PoseAnalyzer {
 
     this.pose.onResults((results) => this.onResults(results));
 
-    // 카메라 초기화 (기존 스트림 사용)
-    this.camera = new window.Camera(this.videoElement, {
-      onFrame: async () => {
-        if (this.isRunning) {
-          await this.pose.send({ image: this.videoElement });
-        }
-      },
-      width: 640,
-      height: 480
-    });
+    // 카메라 초기화 (window.Camera 제거 - 스트림 충돌 방지)
+    // 대신 requestAnimationFrame 루프 사용
   }
 
   start() {
@@ -71,7 +63,9 @@ class PoseAnalyzer {
     this.noDetectionCount = 0;
     this.lastStatus = STATUS.UNKNOWN;
     this.lastDetectionTime = Date.now();
-    this.camera.start();
+
+    // 커스텀 루프 시작
+    this.processVideo();
 
     // 자리비움 체크 타이머 시작 (5초 후부터, 초기화 시간 확보)
     setTimeout(() => {
@@ -83,10 +77,8 @@ class PoseAnalyzer {
 
   stop() {
     this.isRunning = false;
-    if (this.camera) {
-      this.camera.stop();
-      this.camera = null;
-    }
+    // window.Camera 관련 코드 제거
+
     if (this.awayCheckInterval) {
       clearInterval(this.awayCheckInterval);
       this.awayCheckInterval = null;
@@ -104,6 +96,28 @@ class PoseAnalyzer {
     this.pose = null;
     this.lastStatus = STATUS.UNKNOWN;
     this.noDetectionCount = 0;
+  }
+
+  /**
+   * 커스텀 비디오 처리 루프
+   * window.Camera 대신 사용하여 스트림 제어권 확보
+   */
+  async processVideo() {
+    if (!this.isRunning || !this.videoElement) return;
+
+    // 비디오 데이터가 준비되었을 때만 처리
+    if (this.videoElement.readyState >= 2) {
+      try {
+        await this.pose.send({ image: this.videoElement });
+      } catch (e) {
+        console.warn('[PoseAnalyzer] Pose 분석 중 에러 (일시적):', e);
+      }
+    }
+
+    // 다음 프레임 요청
+    if (this.isRunning) {
+      requestAnimationFrame(() => this.processVideo());
+    }
   }
 
   /**
