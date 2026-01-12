@@ -164,8 +164,8 @@
         </div>
       </div>
 
-      <!-- Hidden Connection Status Element (Required for logic) -->
-      <div id="connection-status"></div>
+      <!-- Hidden Connection Status Element (Required for logic, but kept hidden) -->
+      <div id="connection-status" class="hidden"></div>
 
       <div class="flex items-center gap-2">
         <!-- Dark mode button removed -->
@@ -249,7 +249,7 @@
             <span id="my-peer-id" class="hidden"></span>
           </div>
           <div id="away-timer"
-            class="text-sm font-bold text-red-500 animate-pulse bg-red-50 px-3 py-1.5 rounded-lg border border-red-100">
+            class="hidden text-sm font-bold text-red-500 animate-pulse bg-red-50 px-3 py-1.5 rounded-lg border border-red-100">
           </div>
           <div id="screen-share-status"
             class="hidden px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-xs font-bold border border-indigo-100 flex items-center gap-1.5">
@@ -333,6 +333,19 @@
             </div>
 
             <p class="text-xs text-slate-400 text-center mt-4">AI가 실시간 분석 중입니다</p>
+          </div>
+
+          <!-- 10-Minute Average Focus Card -->
+          <div
+            class="glass-card rounded-[2rem] p-6 flex flex-col items-center justify-center h-40 relative overflow-hidden">
+            <h3 class="text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">최근 10분 평균</h3>
+            <div class="flex items-baseline gap-1">
+              <span id="avg-focus-score" class="text-4xl font-black text-slate-800 tracking-tight">-</span>
+              <span class="text-lg font-bold text-slate-400">점</span>
+            </div>
+            <div class="mt-2 text-[10px] text-slate-400 text-center">
+              최근 학습 흐름을 분석합니다
+            </div>
           </div>
 
           <!-- Status Card -->
