@@ -61,7 +61,7 @@ class StudentApp {
       awayTimer: document.getElementById('away-timer'),
       focusScore: document.getElementById('focus-score'),
       focusLevel: document.getElementById('focus-level'),
-      focusBar: document.getElementById('focus-bar'),
+      focusRing: document.getElementById('focus-ring'),
       avgFocusScore: document.getElementById('avg-focus-score'), // 평균 점수 엘리먼트
       // 메시지 관련 (교사 공지)
       teacherMessageContainer: document.getElementById('teacher-message-container'),
@@ -330,10 +330,15 @@ class StudentApp {
       borderColor = 'border-purple-100 dark:border-purple-800';
     }
 
-    statusBadge.className = `w-28 h-28 rounded-xl ${bgColor} flex flex-col items-center justify-center border ${borderColor} transition-colors duration-300`;
-    this.elements.statusIcon.className = `material-symbols-rounded text-5xl mb-1 ${iconColor}`;
-    this.elements.statusIcon.textContent = icon;
-    this.elements.statusText.className = `font-bold text-sm ${textColor}`;
+    // Premium Status Badge Styling
+    // Larger, softer, more cohesive
+    statusBadge.className = `w-full h-full rounded-2xl ${bgColor} flex flex-col items-center justify-center border-0 transition-all duration-500`;
+
+    // Icon larger and clearer
+    this.elements.statusIcon.className = `material-symbols-rounded text-6xl mb-3 transform transition-transform duration-500 ${iconColor}`;
+
+    // Text more distinct
+    this.elements.statusText.className = `font-display font-bold text-lg tracking-tight ${textColor}`;
     this.elements.statusText.textContent = STATUS_LABEL[status];
   }
 
@@ -539,14 +544,21 @@ class StudentApp {
     // 레벨 텍스트
     this.elements.focusLevel.textContent = FOCUS_LABEL[level];
 
-    // 프로그레스 바 업데이트
-    this.elements.focusBar.style.width = `${score}%`;
+    // SVG Ring Update
+    // Circumference C = 2 * pi * r. For r=54, C ~ 339.292.
+    // Offset = C - (C * score / 100)
+    const circumference = 339.292;
+    const offset = circumference - (circumference * score / 100);
 
-    // 색상 업데이트
-    const color = FOCUS_COLOR[level];
-    this.elements.focusBar.style.backgroundColor = color;
+    if (this.elements.focusRing) {
+      this.elements.focusRing.style.strokeDashoffset = offset;
+      this.elements.focusRing.style.color = color; // Uses currentColor
+    }
+
+    // Apply colors to text interactively
     this.elements.focusScore.style.color = color;
     this.elements.focusLevel.style.color = color;
+    // this.elements.focusLevel.style.backgroundColor = color.replace('rgb', 'rgba').replace(')', ', 0.1)'); // Soft background
 
     // --- 10분 평균 계산 로직 ---
     const now = Date.now();

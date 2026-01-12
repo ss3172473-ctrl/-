@@ -167,9 +167,7 @@
       <!-- Hidden Connection Status Element (Required for logic, but kept hidden) -->
       <div id="connection-status" class="hidden"></div>
 
-      <div class="flex items-center gap-2">
-        <!-- Dark mode button removed -->
-      </div>
+
     </div>
   </header>
 
@@ -319,26 +317,29 @@
             class="glass-card rounded-[2rem] p-6 flex flex-col items-center justify-center flex-1 min-h-[240px] relative overflow-hidden">
             <h3 class="text-sm font-bold text-slate-500 mb-6 uppercase tracking-wider">실시간 집중도</h3>
 
-            <div class="relative w-40 h-40 flex items-center justify-center mb-6">
-              <!-- Simple Background Circle -->
-              <div class="absolute inset-0 rounded-full border-[12px] border-slate-100"></div>
+            <div class="relative w-48 h-48 flex items-center justify-center mb-2">
+              <!-- SVG Progress Ring -->
+              <svg class="w-full h-full -rotate-90 transform" viewBox="0 0 120 120">
+                <!-- Background Ring -->
+                <circle cx="60" cy="60" r="54" fill="none" stroke="#e2e8f0" stroke-width="8"
+                  class="dark:stroke-slate-700" />
+                <!-- Focus Ring (Progress) -->
+                <!-- Circumference = 2 * pi * 54 ≈ 339.292 -->
+                <circle id="focus-ring" cx="60" cy="60" r="54" fill="none" stroke="currentColor" stroke-width="8"
+                  stroke-dasharray="339.292" stroke-dashoffset="0" stroke-linecap="round"
+                  class="text-indigo-500 transition-all duration-1000 ease-out" />
+              </svg>
 
-              <!-- Score Display -->
-              <div class="flex flex-col items-center justify-center z-10">
-                <span id="focus-score" class="text-5xl font-black text-slate-800 tracking-tight">100</span>
+              <!-- Centered Score Text -->
+              <div class="absolute inset-0 flex flex-col items-center justify-center">
+                <span id="focus-score"
+                  class="text-6xl font-display font-black text-slate-800 tracking-tighter">100</span>
                 <span id="focus-level"
                   class="text-sm font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full mt-2">최고</span>
               </div>
             </div>
 
-            <!-- Focus Bar (Hidden visual used by JS logic if needed, but we rely on text above too) -->
-            <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
-              <div id="focus-bar" class="h-full bg-primary rounded-full transition-all duration-500"
-                style="width: 100%">
-              </div>
-            </div>
-
-            <p class="text-xs text-slate-400 text-center mt-4">AI가 실시간 분석 중입니다</p>
+            <p class="text-xs text-slate-400 text-center mt-2">AI가 실시간 분석 중입니다</p>
           </div>
 
           <!-- 10-Minute Average Focus Card -->
