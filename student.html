@@ -269,14 +269,14 @@
       </div>
 
       <!-- Main Monitor Area -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 flex-1 min-h-[500px]">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1 min-h-[500px]">
 
         <!-- Camera Feed & Poses -->
         <div
-          class="lg:col-span-2 relative bg-black rounded-3xl overflow-hidden shadow-2xl border border-slate-800 group h-full min-h-[300px] flex items-center justify-center">
+          class="md:col-span-2 relative bg-black rounded-3xl overflow-hidden shadow-2xl border border-slate-800 group h-full min-h-[300px] flex flex-col justify-center">
 
           <!-- Aspect Ratio Wrapper -->
-          <div class="relative w-full aspect-video max-h-full">
+          <div class="relative w-full aspect-video max-h-full mx-auto">
             <video id="video" class="absolute inset-0 w-full h-full object-cover video-mirrored opacity-90" autoplay
               playsinline muted></video>
             <canvas id="canvas" class="absolute inset-0 w-full h-full video-mirrored"></canvas>
