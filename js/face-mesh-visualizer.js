@@ -9,21 +9,31 @@ class FaceMeshVisualizer {
         this.faceMesh = null;
         this.isReady = false;
 
+        console.log('[FaceMeshVisualizer] Initializing...');
         // Face Mesh 설정
-        this.faceMesh = new window.FaceMesh({
-            locateFile: (file) => {
-                return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
-            }
-        });
+        try {
+            this.faceMesh = new window.FaceMesh({
+                locateFile: (file) => {
+                    // console.log('[FaceMeshVisualizer] Loading file:', file);
+                    return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
+                }
+            });
+        } catch (e) {
+            console.error('[FaceMeshVisualizer] Failed to create FaceMesh instance:', e);
+            return;
+        }
 
         this.faceMesh.setOptions({
             maxNumFaces: 1,
-            refineLandmarks: true,
+            refineLandmarks: false, // 리소스 로딩 이슈 방지를 위해 우선 false (홍채 데이터 불필요)
             minDetectionConfidence: 0.5,
             minTrackingConfidence: 0.5
         });
 
-        this.faceMesh.onResults(this.onResults.bind(this));
+        this.faceMesh.onResults((results) => {
+            // console.log('[FaceMeshVisualizer] Results received'); 
+            this.onResults(results);
+        });
 
         // 마지막 인식 결과 저장용
         this.lastResults = null;
