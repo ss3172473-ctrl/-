@@ -550,14 +550,20 @@ class StudentApp {
     const circumference = 339.292;
     const offset = circumference - (circumference * score / 100);
 
+    // 1. Dynamic Color Calculation (Red -> Yellow -> Teal)
+    const hue = Math.floor(score * 1.5);
+    const color = `hsl(${hue}, 75%, 45%)`;
+    const bgColor = `hsla(${hue}, 75%, 45%, 0.1)`;
+
     if (this.elements.focusRing) {
       this.elements.focusRing.style.strokeDashoffset = offset;
       this.elements.focusRing.style.color = color; // Uses currentColor
     }
 
-    // Apply colors to text interactively
+    // Apply dynamic colors
     this.elements.focusScore.style.color = color;
     this.elements.focusLevel.style.color = color;
+    this.elements.focusLevel.style.backgroundColor = bgColor;
     // this.elements.focusLevel.style.backgroundColor = color.replace('rgb', 'rgba').replace(')', ', 0.1)'); // Soft background
 
     // --- 10분 평균 계산 로직 ---
@@ -579,6 +585,14 @@ class StudentApp {
     // 4. UI 업데이트
     if (this.elements.avgFocusScore) {
       this.elements.avgFocusScore.textContent = this.focusHistory.length > 0 ? avg : '-';
+
+      if (this.focusHistory.length > 0) {
+        // 평균 점수 색상도 옅게 따라가기
+        const avgHue = Math.floor(avg * 1.5);
+        this.elements.avgFocusScore.style.color = `hsl(${avgHue}, 60%, 40%)`;
+      } else {
+        this.elements.avgFocusScore.style.color = '';
+      }
     }
   }
 
