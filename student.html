@@ -273,97 +273,103 @@
 
         <!-- Camera Feed & Poses -->
         <div
-          class="lg:col-span-2 relative bg-black rounded-3xl overflow-hidden shadow-2xl border border-slate-800 group h-full min-h-[300px]">
-          <video id="video" class="w-full h-full object-cover video-mirrored opacity-90" autoplay playsinline
-            muted></video>
-          <canvas id="canvas" class="absolute top-0 left-0 w-full h-full video-mirrored"></canvas>
+          class="lg:col-span-2 relative bg-black rounded-3xl overflow-hidden shadow-2xl border border-slate-800 group h-full min-h-[300px] flex items-center justify-center">
 
-          <!-- Overlay Gradient -->
-          <div
-            class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none">
-          </div>
+          <!-- Aspect Ratio Wrapper -->
+          <div class="relative w-full aspect-video max-h-full">
+            <video id="video" class="absolute inset-0 w-full h-full object-cover video-mirrored opacity-90" autoplay
+              playsinline muted></video>
+            <canvas id="canvas" class="absolute inset-0 w-full h-full video-mirrored"></canvas>
 
-          <!-- Teacher Message Overlay -->
-          <div id="teacher-message-container"
-            class="absolute top-6 left-1/2 -translate-x-1/2 z-20 hidden w-[90%] max-w-lg">
-            <div id="teacher-message-box"
-              class="bg-white/90 backdrop-blur-xl text-slate-900 px-5 py-4 rounded-2xl shadow-xl flex items-start gap-4 ring-1 ring-black/5">
-              <div class="p-2 bg-indigo-100 rounded-xl text-indigo-600">
-                <span class="material-symbols-rounded text-xl">campaign</span>
-              </div>
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center justify-between mb-1">
-                  <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">공지사항</span>
-                  <span id="teacher-message-time" class="text-xs text-slate-400"></span>
+            <!-- Overlay Gradient -->
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none">
+            </div>
+
+            <!-- Teacher Message Overlay -->
+            <!-- Teacher Message Overlay -->
+            <div id="teacher-message-container"
+              class="absolute top-6 left-1/2 -translate-x-1/2 z-20 hidden w-[90%] max-w-lg">
+              <div id="teacher-message-box"
+                class="bg-white/90 backdrop-blur-xl text-slate-900 px-5 py-4 rounded-2xl shadow-xl flex items-start gap-4 ring-1 ring-black/5">
+                <div class="p-2 bg-indigo-100 rounded-xl text-indigo-600">
+                  <span class="material-symbols-rounded text-xl">campaign</span>
                 </div>
-                <p id="teacher-message-text" class="text-sm font-medium text-slate-800 leading-relaxed">아직 등록된 공지사항이
-                  없습니다.</p>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center justify-between mb-1">
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">공지사항</span>
+                    <span id="teacher-message-time" class="text-xs text-slate-400"></span>
+                  </div>
+                  <p id="teacher-message-text" class="text-sm font-medium text-slate-800 leading-relaxed">아직 등록된 공지사항이
+                    없습니다.</p>
+                </div>
+                <button id="close-teacher-message" class="text-slate-400 hover:text-slate-600 transition-colors">
+                  <span class="material-symbols-rounded">close</span>
+                </button>
               </div>
-              <button id="close-teacher-message" class="text-slate-400 hover:text-slate-600 transition-colors">
-                <span class="material-symbols-rounded">close</span>
-              </button>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- Right Side Panel: Focus & Status -->
-        <div class="flex flex-col gap-4">
+      <!-- Right Side Panel: Focus & Status -->
+      <div class="flex flex-col gap-4">
 
-          <!-- Focus Score Card -->
-          <div
-            class="glass-card rounded-[2rem] p-6 flex flex-col items-center justify-center flex-1 min-h-[240px] relative overflow-hidden">
-            <h3 class="text-sm font-bold text-slate-500 mb-6 uppercase tracking-wider">실시간 집중도</h3>
+        <!-- Focus Score Card -->
+        <div
+          class="glass-card rounded-[2rem] p-6 flex flex-col items-center justify-center flex-1 min-h-[240px] relative overflow-hidden">
+          <h3 class="text-sm font-bold text-slate-500 mb-6 uppercase tracking-wider">실시간 집중도</h3>
 
-            <div class="relative w-40 h-40 flex items-center justify-center mb-6">
-              <!-- Simple Background Circle -->
-              <div class="absolute inset-0 rounded-full border-[12px] border-slate-100"></div>
+          <div class="relative w-40 h-40 flex items-center justify-center mb-6">
+            <!-- Simple Background Circle -->
+            <div class="absolute inset-0 rounded-full border-[12px] border-slate-100"></div>
 
-              <!-- Score Display -->
-              <div class="flex flex-col items-center justify-center z-10">
-                <span id="focus-score" class="text-5xl font-black text-slate-800 tracking-tight">100</span>
-                <span id="focus-level"
-                  class="text-sm font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full mt-2">최고</span>
-              </div>
-            </div>
-
-            <!-- Focus Bar (Hidden visual used by JS logic if needed, but we rely on text above too) -->
-            <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
-              <div id="focus-bar" class="h-full bg-primary rounded-full transition-all duration-500"
-                style="width: 100%"></div>
-            </div>
-
-            <p class="text-xs text-slate-400 text-center mt-4">AI가 실시간 분석 중입니다</p>
-          </div>
-
-          <!-- 10-Minute Average Focus Card -->
-          <div
-            class="glass-card rounded-[2rem] p-6 flex flex-col items-center justify-center h-40 relative overflow-hidden">
-            <h3 class="text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">최근 10분 평균</h3>
-            <div class="flex items-baseline gap-1">
-              <span id="avg-focus-score" class="text-4xl font-black text-slate-800 tracking-tight">-</span>
-              <span class="text-lg font-bold text-slate-400">점</span>
-            </div>
-            <div class="mt-2 text-[10px] text-slate-400 text-center">
-              최근 학습 흐름을 분석합니다
+            <!-- Score Display -->
+            <div class="flex flex-col items-center justify-center z-10">
+              <span id="focus-score" class="text-5xl font-black text-slate-800 tracking-tight">100</span>
+              <span id="focus-level"
+                class="text-sm font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full mt-2">최고</span>
             </div>
           </div>
 
-          <!-- Status Card -->
-          <div class="glass-card rounded-[2rem] p-1 flex items-center justify-center h-48">
-            <div id="status-display" class="flex items-center justify-center w-full h-full">
-              <!-- Inner div manipulated by JS -->
-              <div
-                class="w-32 h-32 rounded-xl bg-slate-100 flex flex-col items-center justify-center border border-slate-200 transition-colors duration-300">
-                <span id="status-icon"
-                  class="material-symbols-rounded text-5xl mb-2 text-slate-400">hourglass_empty</span>
-                <span id="status-text" class="font-bold text-sm text-slate-500">대기 중</span>
-              </div>
+          <!-- Focus Bar (Hidden visual used by JS logic if needed, but we rely on text above too) -->
+          <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
+            <div id="focus-bar" class="h-full bg-primary rounded-full transition-all duration-500" style="width: 100%">
             </div>
           </div>
 
+          <p class="text-xs text-slate-400 text-center mt-4">AI가 실시간 분석 중입니다</p>
+        </div>
+
+        <!-- 10-Minute Average Focus Card -->
+        <div
+          class="glass-card rounded-[2rem] p-6 flex flex-col items-center justify-center h-40 relative overflow-hidden">
+          <h3 class="text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">최근 10분 평균</h3>
+          <div class="flex items-baseline gap-1">
+            <span id="avg-focus-score" class="text-4xl font-black text-slate-800 tracking-tight">-</span>
+            <span class="text-lg font-bold text-slate-400">점</span>
+          </div>
+          <div class="mt-2 text-[10px] text-slate-400 text-center">
+            최근 학습 흐름을 분석합니다
+          </div>
+        </div>
+
+        <!-- Status Card -->
+        <div class="glass-card rounded-[2rem] p-1 flex items-center justify-center h-48">
+          <div id="status-display" class="flex items-center justify-center w-full h-full">
+            <!-- Inner div manipulated by JS -->
+            <div
+              class="w-32 h-32 rounded-xl bg-slate-100 flex flex-col items-center justify-center border border-slate-200 transition-colors duration-300">
+              <span id="status-icon"
+                class="material-symbols-rounded text-5xl mb-2 text-slate-400">hourglass_empty</span>
+              <span id="status-text" class="font-bold text-sm text-slate-500">대기 중</span>
+            </div>
+          </div>
         </div>
 
       </div>
+
+    </div>
 
     </div>
   </main>

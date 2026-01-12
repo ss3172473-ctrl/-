@@ -36,6 +36,8 @@ class PoseAnalyzer {
     });
     this.videoElement.srcObject = this.mediaStream;
     this.videoElement.onloadedmetadata = () => {
+      this.canvasElement.width = this.videoElement.videoWidth;
+      this.canvasElement.height = this.videoElement.videoHeight;
       this.videoElement.play();
     };
     console.log('[PoseAnalyzer] 카메라 스트림 획득 완료');
