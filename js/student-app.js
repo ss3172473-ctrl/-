@@ -260,8 +260,6 @@ class StudentApp {
       this.elements.monitorSection.classList.remove('hidden');
       this.elements.stopBtn.classList.remove('hidden');
       this.elements.stopBtn.classList.add('flex');
-      this.elements.sendMessageToTeacherBtn.classList.remove('hidden');
-      this.elements.sendMessageToTeacherBtn.classList.add('flex');
 
       // 화면 공유 자동 시작
       await this.startScreenShareAuto();
@@ -503,7 +501,6 @@ class StudentApp {
       카메라 시작 & 연결
     `;
     this.elements.stopBtn.classList.add('hidden');
-    this.elements.sendMessageToTeacherBtn.classList.add('hidden');
 
     // 화면 공유 상태 초기화
     if (this.elements.screenShareStatus) {
