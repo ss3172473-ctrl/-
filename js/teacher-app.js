@@ -1758,45 +1758,56 @@ class TeacherApp {
   /**
    * 카드 내 썸네일 업데이트
    */
+  /**
+   * 카드 내 썸네일 업데이트
+   */
   updateScreenThumbnailInCard(peerId, thumbnail) {
     const card = document.querySelector(`[data-peer-id="${peerId}"]`);
     if (!card) return;
 
-    let thumbnailContainer = card.querySelector('.screen-thumbnail-container');
+    // Use slot provided by UIRenderer
+    let thumbnailContainer = card.querySelector('.screen-thumbnail-slot');
 
+    // If generic slot not found (fallback), try finding previously created container
     if (!thumbnailContainer) {
-      // 썸네일 컨테이너 생성
-      thumbnailContainer = document.createElement('div');
-      thumbnailContainer.className = 'screen-thumbnail-container mt-2 pt-2 border-t border-gray-100 dark:border-gray-700';
+      thumbnailContainer = card.querySelector('.screen-thumbnail-container');
+    }
+
+    if (!thumbnailContainer) return; // Should exist if renderer is correct
+
+    // Initialize content if Empty
+    if (!thumbnailContainer.querySelector('.screen-thumbnail')) {
       thumbnailContainer.innerHTML = `
-        <div class="flex items-center justify-between mb-1">
+        <div class="flex items-center justify-between mb-1 gap-2">
           <span class="text-[10px] text-gray-400 flex items-center gap-1">
             <span class="material-symbols-rounded text-xs">screen_share</span>
             화면
           </span>
-          <button class="btn-view-screen text-[10px] text-indigo-500 hover:text-indigo-600 font-medium">확대</button>
+          <button class="btn-view-screen text-[10px] text-indigo-500 hover:text-indigo-600 font-medium whitespace-nowrap">확대</button>
         </div>
-        <img class="screen-thumbnail w-full rounded-md border border-gray-200 dark:border-gray-600 cursor-pointer hover:opacity-90 transition-opacity" />
+        <img class="screen-thumbnail w-full aspect-video object-cover rounded-md border border-gray-200 dark:border-gray-600 cursor-pointer hover:opacity-90 transition-opacity" />
       `;
 
-      const centerDiv = card.querySelector('.text-center');
-      if (centerDiv) {
-        centerDiv.appendChild(thumbnailContainer);
-      }
-
-      // 클릭 이벤트 바인딩
+      // Event Binding
       const img = thumbnailContainer.querySelector('.screen-thumbnail');
       const viewBtn = thumbnailContainer.querySelector('.btn-view-screen');
 
-      const openModal = () => this.openScreenModal(peerId);
+      const openModal = (e) => {
+        e.stopPropagation();
+        this.openScreenModal(peerId);
+      };
+
       img?.addEventListener('click', openModal);
       viewBtn?.addEventListener('click', openModal);
     }
 
-    // 이미지 업데이트
-    const img = thumbnailContainer.querySelector('.screen-thumbnail');
-    if (img && thumbnail) {
-      img.src = thumbnail;
+    // Update Image & Visibility
+    if (thumbnail) {
+      thumbnailContainer.classList.remove('hidden');
+      const img = thumbnailContainer.querySelector('.screen-thumbnail');
+      if (img) img.src = thumbnail;
+    } else {
+      thumbnailContainer.classList.add('hidden');
     }
   }
 

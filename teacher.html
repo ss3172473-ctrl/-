@@ -64,16 +64,6 @@
       backdrop-filter: blur(12px);
       border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     }
-
-    .logo-accent {
-      width: 6px;
-      height: 6px;
-      background-color: #E30000;
-      border-radius: 50%;
-      display: inline-block;
-      margin-left: 2px;
-      margin-bottom: 4px;
-    }
   </style>
 </head>
 
@@ -89,8 +79,7 @@
             <span class="material-symbols-rounded text-xl">arrow_back</span>
           </a>
           <div class="flex items-center gap-1">
-            <span class="text-xl font-display font-bold tracking-tight text-slate-900">순공시간<span
-                class="logo-accent"></span></span>
+            <img src="img/logo.png" alt="순공시간" class="h-6">
             <span class="ml-2 px-2 py-0.5 rounded-full bg-slate-100 text-[10px] font-bold text-slate-500">TEACHER</span>
           </div>
         </div>
@@ -171,112 +160,150 @@
     </section>
 
     <!-- Dashboard Section -->
-    <section id="dashboard-section" class="hidden space-y-4">
+    <section id="dashboard-section" class="hidden space-y-6 max-w-7xl mx-auto pb-20 pt-6">
 
-      <!-- Class Timer Bar -->
-      <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-2 flex items-center justify-between gap-4">
-        <!-- Timer Display -->
-        <div id="class-timer-bar" class="hidden items-center gap-3 px-4 py-2 bg-slate-50 rounded-lg flex-1">
-          <div id="class-timer-status" class="flex items-center gap-2">
-            <span class="material-symbols-rounded text-slate-400 text-lg">timer_off</span>
-            <span class="font-bold text-slate-500 text-sm">대기 중</span>
-          </div>
-          <div class="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden">
-            <div id="class-timer-progress" class="h-full bg-slate-900 rounded-full transition-all duration-1000"
-              style="width: 0%"></div>
-          </div>
-          <div id="class-timer-time" class="font-mono font-bold text-lg text-slate-700">00:00</div>
-        </div>
-
-        <!-- Timer not started message -->
-
-
-        <!-- Controls -->
-        <div class="flex items-center gap-2">
-          <button id="class-timer-toggle" onclick="window.toggleClassTimer()"
-            class="px-4 py-2 bg-primary hover:bg-red-700 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5 shadow-sm shadow-red-500/20">
-            <span class="material-symbols-rounded text-sm">play_arrow</span>
-            수업 시작
-          </button>
-          <div class="relative group">
-            <button onclick="window.openClassSettings()"
-              class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg transition-colors">
-              <span class="material-symbols-rounded text-lg">settings</span>
-            </button>
-            <!-- Quick Actions Dropdown -->
-            <div class="absolute right-0 top-full pt-2 hidden group-hover:block z-10">
-              <div class="bg-white rounded-lg shadow-xl border border-slate-100 py-1 min-w-[140px]">
-                <button onclick="window.forceLesson()"
-                  class="w-full px-3 py-2 text-left text-xs hover:bg-slate-50 flex items-center gap-2 text-slate-600 font-medium">
-                  <span class="material-symbols-rounded text-primary text-sm">school</span>
-                  수업으로 전환
-                </button>
-                <button onclick="window.forceBreak()"
-                  class="w-full px-3 py-2 text-left text-xs hover:bg-slate-50 flex items-center gap-2 text-slate-600 font-medium">
-                  <span class="material-symbols-rounded text-slate-400 text-sm">coffee</span>
-                  쉬는시간 전환
-                </button>
-                <hr class="my-1 border-slate-100">
-                <button onclick="window.openClassSettings()"
-                  class="w-full px-3 py-2 text-left text-xs hover:bg-slate-50 flex items-center gap-2 text-slate-600 font-medium">
-                  <span class="material-symbols-rounded text-slate-400 text-sm">tune</span>
-                  시간 설정
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Stats Bar -->
-      <!-- Stats Bar Removed -->
-
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <!-- Student Grid -->
+      <!-- 1. Status Summary Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Standing -->
         <div
-          class="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-[500px]">
-          <div class="px-4 py-3 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-            <div class="flex items-center gap-2">
-              <span class="material-symbols-rounded text-slate-400 text-lg">grid_view</span>
-              <h3 class="font-bold text-sm text-slate-700">학습 현황</h3>
+          class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex flex-col justify-between h-24 relative overflow-hidden group">
+          <div class="flex items-center gap-2 z-10">
+            <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <span class="material-symbols-rounded">accessibility_new</span>
             </div>
-            <div class="flex items-center gap-2">
-              <button id="broadcast-btn"
-                class="px-2.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5">
-                <span class="material-symbols-rounded text-sm">campaign</span>
-                전체 공지
-              </button>
-            </div>
+            <span class="font-bold text-slate-500 text-sm">서있음</span>
           </div>
-          <div id="student-grid" class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 content-start bg-slate-50/30">
-            <div class="col-span-full flex flex-col items-center justify-center py-10 text-center text-slate-400">
-              <div class="w-12 h-12 mb-3 rounded-full bg-slate-100 flex items-center justify-center">
-                <span class="material-symbols-rounded text-2xl opacity-50">hourglass_empty</span>
-              </div>
-              <h4 class="text-sm font-bold text-slate-500 mb-1">접속한 학생이 없습니다</h4>
-              <h4 class="text-sm font-bold text-slate-500 mb-1">접속한 학생이 없습니다</h4>
-            </div>
+          <span id="count-standing" class="text-3xl font-black text-emerald-600 z-10 ml-1">0</span>
+          <!-- Decoration -->
+          <div
+            class="absolute -right-4 -bottom-4 text-emerald-50 opacity-50 transform rotate-12 group-hover:scale-110 transition-transform">
+            <span class="material-symbols-rounded text-8xl">accessibility_new</span>
           </div>
         </div>
 
-        <!-- Alert List -->
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-[500px]">
-          <div class="px-4 py-3 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-            <div class="flex items-center gap-2">
-              <span class="material-symbols-rounded text-primary text-lg">notifications</span>
-              <h3 class="font-bold text-sm text-slate-700">ALERTS</h3>
+        <!-- Sitting -->
+        <div
+          class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex flex-col justify-between h-24 relative overflow-hidden group">
+          <div class="flex items-center gap-2 z-10">
+            <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+              <span class="material-symbols-rounded">chair</span>
             </div>
+            <span class="font-bold text-slate-500 text-sm">앉음</span>
           </div>
-          <div id="alert-list" class="flex-1 overflow-y-auto p-3 space-y-2 bg-slate-50/30">
-            <div class="flex flex-col items-center justify-center py-10 text-center text-slate-400">
-              <div class="w-10 h-10 mb-3 rounded-full bg-slate-100 flex items-center justify-center">
-                <span class="material-symbols-rounded text-lg opacity-50">notifications_off</span>
-              </div>
-              <h4 class="text-sm font-bold text-slate-500">알림이 없습니다</h4>
+          <span id="count-sitting" class="text-3xl font-black text-blue-600 z-10 ml-1">0</span>
+          <!-- Decoration -->
+          <div
+            class="absolute -right-4 -bottom-4 text-blue-50 opacity-50 transform rotate-12 group-hover:scale-110 transition-transform">
+            <span class="material-symbols-rounded text-8xl">chair</span>
+          </div>
+        </div>
+
+        <!-- Away -->
+        <div
+          class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex flex-col justify-between h-24 relative overflow-hidden group">
+          <div class="flex items-center gap-2 z-10">
+            <div class="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center">
+              <span class="material-symbols-rounded">person_off</span>
             </div>
+            <span class="font-bold text-slate-500 text-sm">자리비움</span>
+          </div>
+          <span id="count-away" class="text-3xl font-black text-red-600 z-10 ml-1">0</span>
+          <!-- Decoration -->
+          <div
+            class="absolute -right-4 -bottom-4 text-red-50 opacity-50 transform rotate-12 group-hover:scale-110 transition-transform">
+            <span class="material-symbols-rounded text-8xl">person_off</span>
           </div>
         </div>
       </div>
+
+      <!-- 2. Learning Status (Main List) -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-rounded text-emerald-600 text-xl">bar_chart</span>
+            <h3 class="font-bold text-lg text-slate-800">학습 현황</h3>
+          </div>
+          <button id="broadcast-btn"
+            class="hidden px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5">
+            실시간
+          </button>
+        </div>
+
+        <!-- Student List Container -->
+        <div id="student-grid" class="p-6 space-y-4">
+          <!-- Student Cards will be injected here as rows -->
+          <div class="flex flex-col items-center justify-center py-12 text-center text-slate-400">
+            <div class="w-16 h-16 mb-4 rounded-2xl bg-slate-50 flex items-center justify-center">
+              <span class="material-symbols-rounded text-3xl opacity-30">hourglass_top</span>
+            </div>
+            <h4 class="text-base font-bold text-slate-500 mb-1">접속한 학생이 없습니다</h4>
+            <p class="text-xs text-slate-400">학생이 입장하면 실시간으로 표시됩니다</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Snapshot Section (Placeholder) -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden min-h-[200px]">
+        <div class="px-6 py-4 border-b border-slate-100 flex items-center gap-2 bg-slate-50/50">
+          <span class="material-symbols-rounded text-indigo-600 text-xl">photo_camera</span>
+          <h3 class="font-bold text-lg text-slate-800">오늘의 학습 스냅샷</h3>
+        </div>
+        <div class="flex flex-col items-center justify-center py-12 text-center text-slate-400">
+          <span class="material-symbols-rounded text-4xl mb-2 opacity-30">image_not_supported</span>
+          <p class="text-sm">스냅샷을 불러오는 중...</p>
+        </div>
+      </div>
+
+      <!-- 4. Reports Section -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-100 flex items-center gap-2 bg-slate-50/50">
+          <span class="material-symbols-rounded text-purple-600 text-xl">assessment</span>
+          <h3 class="font-bold text-lg text-slate-800">리포트</h3>
+        </div>
+        <div class="p-6">
+          <!-- Report Content Placeholder -->
+          <div class="bg-slate-50 rounded-xl p-4 border border-slate-100 flex items-center gap-4">
+            <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm text-purple-500">
+              <span class="material-symbols-rounded">calendar_today</span>
+            </div>
+            <div>
+              <h4 class="font-bold text-slate-800">1월 19일 (월)</h4>
+              <p class="text-xs text-slate-500">2개 세션</p>
+            </div>
+            <button
+              class="ml-auto px-4 py-2 bg-primary text-white font-bold rounded-xl text-sm shadow-sm hover:bg-red-700 transition-colors">
+              검수중
+            </button>
+          </div>
+          <!-- Timeline Chart Container -->
+          <div class="mt-4 h-64 w-full bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-center">
+            <span class="text-xs font-mono text-slate-400 flex items-center gap-2">
+              <span class="material-symbols-rounded text-sm">schedule</span>
+              17:03:56 (Timeline Placeholder)
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Alert List -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-[500px]">
+      <div class="px-4 py-3 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-rounded text-primary text-lg">notifications</span>
+          <h3 class="font-bold text-sm text-slate-700">ALERTS</h3>
+        </div>
+      </div>
+      <div id="alert-list" class="flex-1 overflow-y-auto p-3 space-y-2 bg-slate-50/30">
+        <div class="flex flex-col items-center justify-center py-10 text-center text-slate-400">
+          <div class="w-10 h-10 mb-3 rounded-full bg-slate-100 flex items-center justify-center">
+            <span class="material-symbols-rounded text-lg opacity-50">notifications_off</span>
+          </div>
+          <h4 class="text-sm font-bold text-slate-500">알림이 없습니다</h4>
+        </div>
+      </div>
+    </div>
+    </div>
     </section>
   </main>
 

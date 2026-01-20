@@ -24,28 +24,37 @@ export class UIRenderer {
   /**
    * 학생 그리드 렌더링
    */
+  /**
+   * 학생 리스트 렌더링 (Changed from Grid to List)
+   */
   renderStudentGrid(students) {
-    const grid = this.elements.studentGrid;
-    if (!grid) return;
+    const listContainer = this.elements.studentGrid;
+    if (!listContainer) return;
 
-    grid.innerHTML = '';
+    listContainer.innerHTML = '';
 
     if (students.size === 0) {
-      grid.innerHTML = `
-        <div class="col-span-full flex flex-col items-center justify-center py-6 text-slate-400">
-          <span class="material-symbols-rounded text-3xl mb-2 opacity-50">hourglass_empty</span>
-          <p class="text-sm">접속한 학생이 없습니다</p>
-        </div>
+      listContainer.innerHTML = `
+        <div class="flex flex-col items-center justify-center py-12 text-center text-slate-400">
+           <div class="w-16 h-16 mb-4 rounded-2xl bg-slate-50 flex items-center justify-center">
+             <span class="material-symbols-rounded text-3xl opacity-30">hourglass_top</span>
+           </div>
+           <h4 class="text-base font-bold text-slate-500 mb-1">접속한 학생이 없습니다</h4>
+           <p class="text-xs text-slate-400">학생이 입장하면 실시간으로 표시됩니다</p>
+         </div>
       `;
       return;
     }
 
     students.forEach((student) => {
       const card = this.createStudentCard(student);
-      grid.appendChild(card);
+      listContainer.appendChild(card);
     });
   }
 
+  /**
+   * 학생 행(Row) 생성 (리스트 뷰)
+   */
   /**
    * 학생 행(Row) 생성 (리스트 뷰)
    */
@@ -53,71 +62,74 @@ export class UIRenderer {
     const row = document.createElement('div');
     const statusStyle = this.getStatusStyle(student.status);
 
-    // Row Layout: Name | Graph | Avg Score | Actions
-    row.className = `student-row group flex items-center justify-between p-4 bg-white border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors mx-2 rounded-xl`;
+    // Row Layout
+    row.className = `student-row relative group flex items-start md:items-center justify-between p-6 bg-white border border-slate-100 rounded-2xl hover:border-slate-200 hover:shadow-sm transition-all`;
     row.setAttribute('data-peer-id', student.peerId);
 
     // Calculate 10-min Average
     const validHistory = student.focusHistory.filter(h => h.score > 0);
     const avgScore = validHistory.length > 0
       ? Math.round(validHistory.reduce((a, b) => a + b.score, 0) / validHistory.length)
-      : 0;
+      : '-';
 
-    // Status Color for Gradient/Text
-    let statusColorClass = 'text-slate-500';
-    if (student.status === STATUS.AWAY) statusColorClass = 'text-red-500';
-    else if (student.status === STATUS.STANDING) statusColorClass = 'text-emerald-500';
-    else if (student.status === STATUS.SITTING) statusColorClass = 'text-blue-500';
-    else if (student.status === STATUS.HAND_RAISED) statusColorClass = 'text-purple-500';
+    // Avg Box Color
+    let avgColorBg = 'bg-slate-50';
+    let avgColorText = 'text-slate-500';
+    if (typeof avgScore === 'number') {
+      if (avgScore >= 80) { avgColorBg = 'bg-emerald-50'; avgColorText = 'text-emerald-600'; }
+      else if (avgScore >= 50) { avgColorBg = 'bg-orange-50'; avgColorText = 'text-orange-600'; }
+      else { avgColorBg = 'bg-red-50'; avgColorText = 'text-red-600'; }
+    }
 
     row.innerHTML = `
-      <!-- 1. Student Info -->
-      <div class="flex items-center gap-4 w-[250px]">
-        <div class="flex flex-col">
-          <div class="flex items-center gap-2">
-            <h3 class="font-bold text-slate-800 text-base">${student.name}</h3>
-            <h3 class="font-bold text-slate-800 text-base">${student.name}</h3>
-            <span class="text-[10px] text-slate-400 font-medium">${student.grade ? student.grade + '학년' : ''}</span>
-          </div>
-          <div class="flex items-center gap-1.5 mt-0.5">
-            <span class="material-symbols-rounded text-sm ${statusStyle.textColor}">${statusStyle.icon}</span>
-            <span class="text-xs font-medium ${statusStyle.textColor}">${STATUS_LABEL[student.status]}</span>
-            ${this.getStatusInfo(student)}
-          </div>
+      <!-- 1. Left: Info -->
+      <div class="flex items-start gap-4 w-full md:w-[30%] min-w-[200px]">
+        <div class="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400">
+           <span class="material-symbols-rounded text-2xl">${statusStyle.icon}</span>
         </div>
-      </div>
-
-      <!-- 2. Focus Information (Graph & Current) -->
-      <div class="flex-1 flex items-center justify-center px-4 gap-6">
-        <!-- 5-min Trend Graph -->
-        <div class="flex flex-col items-center w-full max-w-[200px]">
-          <canvas class="focus-sparkline w-full h-[40px]" width="200" height="40"></canvas>
-        </div>
-        
-        <!-- Current Score (Small) -->
-        <div class="text-center w-[80px]">
-           <div class="text-xl font-bold ${student.focus?.level === 'high' ? 'text-primary' : 'text-slate-700'}">
-             ${student.focus ? student.focus.score : '-'}%
+        <div>
+           <div class="flex items-center gap-2 mb-1">
+             <h3 class="font-bold text-slate-900 text-lg">${student.name}</h3>
+             <span class="px-2 py-0.5 rounded-md bg-slate-100 text-[10px] font-bold text-slate-500">${student.grade ? student.grade + '학년' : ''}</span>
+           </div>
+           
+           <div class="flex items-center gap-2 text-xs">
+              <span class="font-bold ${statusStyle.textColor}">${STATUS_LABEL[student.status]}</span>
+              <span class="text-slate-300">|</span>
+              <span class="text-slate-400">방금 전</span>
+           </div>
+           
+           <!-- Screen Thumbnail Slot -->
+           <div class="screen-thumbnail-slot mt-2 hidden">
+             <!-- Thumbnail injected by TeacherApp -->
            </div>
         </div>
       </div>
 
-      <!-- 3. 10-min Avg -->
-      <div class="w-[120px] text-center border-l border-slate-100 pl-4">
-        <div class="text-2xl font-bold text-slate-800">${avgScore}%</div>
+      <!-- 2. Middle: Graph (Hidden on mobile?) -->
+      <div class="hidden md:flex flex-1 mx-8 h-20 bg-slate-50 rounded-xl p-4 items-center justify-center relative">
+         <div class="absolute top-2 left-4 text-[10px] font-bold text-slate-400">집중도 추이 (5분)</div>
+         <canvas class="focus-sparkline w-full h-full" width="300" height="60"></canvas>
       </div>
 
-      <!-- 4. Actions -->
-      <div class="flex items-center gap-1 pl-4">
-         <button class="btn-view-video p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-primary transition-colors" title="영상 확인">
-          <span class="material-symbols-rounded">videocam</span>
-        </button>
-        <button class="btn-send-message p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-900 transition-colors" title="메시지">
-          <span class="material-symbols-rounded">chat</span>
-        </button>
-        <button class="btn-focus-report p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-900 transition-colors" title="리포트">
-          <span class="material-symbols-rounded">assessment</span>
-        </button>
+      <!-- 3. Right: Avg Box -->
+      <div class="flex flex-col md:w-[25%] items-end md:items-center justify-center">
+         <div class="w-full h-24 ${avgColorBg} rounded-xl flex flex-col items-center justify-center border border-white/50">
+            <span class="text-[10px] font-bold ${avgColorText} mb-1 opacity-80 uppercase tracking-wide">최근 10분 평균</span>
+            <div class="text-3xl font-black ${avgColorText} mb-1">${avgScore}</div>
+            <span class="text-[10px] ${avgColorText} font-medium">점</span>
+             <p class="text-[9px] text-slate-400 mt-2">최근 학습 흐름을 분석합니다</p>
+         </div>
+      </div>
+      
+       <!-- Actions (Hover) -->
+      <div class="absolute top-4 right-4 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white p-1 rounded-lg border border-slate-100 shadow-sm">
+         <button class="btn-view-video p-1.5 hover:bg-slate-50 rounded text-slate-400 hover:text-primary transition-colors">
+            <span class="material-symbols-rounded text-lg">videocam</span>
+         </button>
+           <button class="btn-send-message p-1.5 hover:bg-slate-50 rounded text-slate-400 hover:text-slate-900 transition-colors">
+            <span class="material-symbols-rounded text-lg">chat</span>
+         </button>
       </div>
     `;
 
@@ -134,59 +146,75 @@ export class UIRenderer {
   }
 
   /**
+   * Helper: Get Status Style
+   */
+  getStatusStyle(status) {
+    if (status === STATUS.STANDING) return { icon: 'accessibility_new', textColor: 'text-emerald-500' };
+    if (status === STATUS.SITTING) return { icon: 'chair', textColor: 'text-blue-500' };
+    if (status === STATUS.AWAY) return { icon: 'person_off', textColor: 'text-red-500' };
+    return { icon: 'hourglass_empty', textColor: 'text-slate-400' };
+  }
+
+  /**
+   * 개별 카드 부분 업데이트 (Row Layout)
+   */
+  /**
    * 개별 카드 부분 업데이트 (Row Layout)
    */
   updateStudentCard(peerId, student) {
     const row = this.elements.studentGrid?.querySelector(`[data-peer-id="${peerId}"]`);
     if (!row) return;
 
-    // Update Score
+    // 1. Update Sparkline
     if (student.focus) {
-      // Update Score
-      // Current score is .text-xl
-      const currentScoreEl = row.querySelector('.text-xl.font-bold');
-      if (currentScoreEl) {
-        currentScoreEl.textContent = `${student.focus.score}%`;
-
-        // Remove old color classes
-        currentScoreEl.classList.remove('text-primary', 'text-slate-700', 'text-slate-400', 'text-red-500');
-
-        // Add new color class
-        if (student.focus.level === 'high') currentScoreEl.classList.add('text-primary');
-        else currentScoreEl.classList.add('text-slate-700');
-      }
-
-      // Update Sparkline
       const canvas = row.querySelector('.focus-sparkline');
-      if (canvas) {
-        this.drawSparkline(canvas, student.focusHistory);
-      }
+      if (canvas) this.drawSparkline(canvas, student.focusHistory);
     }
 
-    // Update Avg Score
-    const avgEl = row.querySelector('.text-2xl.font-bold');
-    if (avgEl) {
+    // 2. Update Avg Score & Colors
+    const avgScoreEl = row.querySelector('.text-3xl.font-black');
+    const avgBox = row.querySelector('.w-full.h-24');
+
+    if (avgScoreEl && avgBox) {
       const validHistory = student.focusHistory.filter(h => h.score > 0);
       const avgScore = validHistory.length > 0
         ? Math.round(validHistory.reduce((a, b) => a + b.score, 0) / validHistory.length)
-        : 0;
-      avgEl.textContent = `${avgScore}%`;
+        : '-';
+
+      // Determine Colors
+      let avgColorBg = 'bg-slate-50';
+      let avgColorText = 'text-slate-500';
+
+      if (typeof avgScore === 'number') {
+        if (avgScore >= 80) { avgColorBg = 'bg-emerald-50'; avgColorText = 'text-emerald-600'; }
+        else if (avgScore >= 50) { avgColorBg = 'bg-orange-50'; avgColorText = 'text-orange-600'; }
+        else { avgColorBg = 'bg-red-50'; avgColorText = 'text-red-600'; }
+      }
+
+      // Update Container Background
+      avgBox.classList.remove('bg-slate-50', 'bg-emerald-50', 'bg-orange-50', 'bg-red-50');
+      avgBox.classList.add(avgColorBg);
+
+      // Update Content (Re-render inner layout details for text colors)
+      avgBox.innerHTML = `
+        <span class="text-[10px] font-bold ${avgColorText} mb-1 opacity-80 uppercase tracking-wide">최근 10분 평균</span>
+        <div class="text-3xl font-black ${avgColorText} mb-1">${avgScore}</div>
+        <span class="text-[10px] ${avgColorText} font-medium">점</span>
+        <p class="text-[9px] text-slate-400 mt-2">최근 학습 흐름을 분석합니다</p>
+      `;
     }
 
-    // Update Status Badge & Info
-    const statusLabel = row.querySelector('.text-xs.font-medium');
-    const statusIcon = row.querySelector('.material-symbols-rounded.text-sm');
+    // 3. Update Status
+    const statusIcon = row.querySelector('.w-12.h-12 .material-symbols-rounded');
+    const statusLabel = row.querySelector('.flex.items-center.gap-2.text-xs .font-bold');
 
-    if (statusLabel && statusIcon) {
+    if (statusIcon && statusLabel) {
       const statusStyle = this.getStatusStyle(student.status);
-
-      statusLabel.textContent = STATUS_LABEL[student.status];
       statusIcon.textContent = statusStyle.icon;
+      statusLabel.textContent = STATUS_LABEL[student.status];
 
-      // Update classes
-      // Note: Use setAttribute or assignment to completely replace
-      statusLabel.className = `text-xs font-medium ${statusStyle.textColor}`;
-      statusIcon.className = `material-symbols-rounded text-sm ${statusStyle.textColor}`;
+      // Update text color
+      statusLabel.className = `font-bold ${statusStyle.textColor}`;
     }
   }
 
