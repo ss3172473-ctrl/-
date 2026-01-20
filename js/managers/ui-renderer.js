@@ -32,7 +32,7 @@ export class UIRenderer {
 
     if (students.size === 0) {
       grid.innerHTML = `
-        <div class="col-span-full flex flex-col items-center justify-center py-6 text-gray-400 dark:text-gray-500">
+        <div class="col-span-full flex flex-col items-center justify-center py-6 text-slate-400">
           <span class="material-symbols-rounded text-3xl mb-2 opacity-50">hourglass_empty</span>
           <p class="text-sm">접속한 학생이 없습니다</p>
         </div>
@@ -53,35 +53,35 @@ export class UIRenderer {
     const card = document.createElement('div');
     const statusStyle = this.getStatusStyle(student.status);
 
-    // Premium Card Design: Glass-like background, deep soft shadow, no border, floating hover effect
-    card.className = `group relative bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] hover:-translate-y-1.5 transition-all duration-300 overflow-hidden ring-1 ring-black/5 dark:ring-white/5`;
+    // Premium Card Design: White clean card with subtle border and shadow
+    card.className = `group relative bg-white rounded-3xl shadow-sm border border-slate-200 hover:shadow-xl hover:border-red-100 hover:-translate-y-1 transition-all duration-300 overflow-hidden`;
     card.setAttribute('data-peer-id', student.peerId);
 
     const statusInfo = this.getStatusInfo(student);
     const focusDisplay = this.getFocusDisplay(student);
 
     // Gradient top bar based on status
-    const statusGradient = statusStyle.bg.includes('green') ? 'from-green-400 to-emerald-500' :
+    const statusGradient = statusStyle.bg.includes('green') ? 'from-emerald-400 to-teal-500' :
       statusStyle.bg.includes('blue') ? 'from-blue-400 to-indigo-500' :
-        statusStyle.bg.includes('red') ? 'from-red-400 to-rose-500' :
-          statusStyle.bg.includes('purple') ? 'from-purple-400 to-violet-500' :
+        statusStyle.bg.includes('red') ? 'from-red-500 to-rose-600' :
+          statusStyle.bg.includes('purple') ? 'from-violet-500 to-purple-600' :
             statusStyle.bg.includes('amber') ? 'from-amber-400 to-orange-500' :
-              'from-gray-300 to-gray-400';
+              'from-slate-300 to-slate-400';
 
     card.innerHTML = `
       <!-- Top Status Stripe (Gradient) -->
-      <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r ${statusGradient} opacity-80"></div>
+      <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r ${statusGradient} opacity-90"></div>
 
-      <div class="p-6">
+      <div class="p-5">
         <!-- Header: Name & Status -->
-        <div class="flex items-start justify-between mb-5">
+        <div class="flex items-start justify-between mb-4">
           <div>
-            <div class="flex items-center gap-2.5 mb-1">
-              <h3 class="font-bold text-xl text-gray-900 dark:text-gray-100 tracking-tight">${student.name}</h3>
-              <span class="text-[11px] text-gray-500 font-semibold px-2 py-0.5 bg-gray-100/80 dark:bg-gray-700/80 rounded-full border border-gray-200/50 dark:border-gray-600/50">${student.grade ? student.grade + '학년' : '학생'}</span>
+            <div class="flex items-center gap-2 mb-1">
+              <h3 class="font-bold text-lg text-slate-800 tracking-tight">${student.name}</h3>
+              <span class="text-[10px] text-slate-500 font-semibold px-2 py-0.5 bg-slate-100 rounded-full border border-slate-200">${student.grade ? student.grade + '학년' : '학생'}</span>
             </div>
             <div class="flex items-center gap-2 mt-1">
-               <div class="flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50">
+               <div class="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-slate-50 border border-slate-100">
                 <span class="material-symbols-rounded text-sm ${statusStyle.textColor}">${statusStyle.icon}</span>
                 <span class="text-xs font-semibold ${statusStyle.textColor}">${STATUS_LABEL[student.status]}</span>
               </div>
@@ -90,28 +90,28 @@ export class UIRenderer {
           </div>
           
           <!-- Quick Action -->
-           <button class="btn-view-video p-2.5 rounded-full bg-gray-50 dark:bg-gray-800 text-gray-400 hover:text-white hover:bg-gradient-to-br hover:from-emerald-400 hover:to-emerald-500 transition-all shadow-sm hover:shadow-lg hover:shadow-emerald-500/30 group-hover:opacity-100 opacity-0 transform translate-x-2 group-hover:translate-x-0 transition-all duration-300 delay-75" title="영상 확인">
+           <button class="btn-view-video p-2 rounded-full bg-slate-50 text-slate-400 hover:text-white hover:bg-gradient-to-br hover:from-primary hover:to-red-600 transition-all shadow-sm hover:shadow-red-500/30 group-hover:opacity-100 opacity-0 transform translate-x-2 group-hover:translate-x-0 transition-all duration-300 delay-75" title="영상 확인">
             <span class="material-symbols-rounded text-[20px]">videocam</span>
           </button>
         </div>
 
         <!-- Body: Focus & Activity -->
-        <div class="space-y-4">
+        <div class="space-y-3">
           ${focusDisplay}
         </div>
 
         <!-- Footer: Actions (Hidden by default, shown on hover) -->
-        <div class="absolute bottom-0 left-0 w-full bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm border-t border-gray-100 dark:border-gray-700/50 p-3 flex items-center justify-around translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-            <button class="btn-ptt p-2 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-emerald-500 transition-colors" title="음성 메시지">
+        <div class="absolute bottom-0 left-0 w-full bg-white/95 backdrop-blur-sm border-t border-slate-100 p-2 flex items-center justify-around translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-10">
+            <button class="btn-ptt p-2 rounded-lg text-slate-400 hover:bg-slate-50 hover:text-emerald-500 transition-colors" title="음성 메시지">
               <span class="material-symbols-rounded">mic</span>
             </button>
-            <button class="btn-send-message p-2 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-indigo-500 transition-colors" title="메시지 전송">
+            <button class="btn-send-message p-2 rounded-lg text-slate-400 hover:bg-slate-50 hover:text-indigo-500 transition-colors" title="메시지 전송">
               <span class="material-symbols-rounded">chat</span>
             </button>
-            <button class="btn-focus-report p-2 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-orange-500 transition-colors" title="집중도 보고서">
+            <button class="btn-focus-report p-2 rounded-lg text-slate-400 hover:bg-slate-50 hover:text-orange-500 transition-colors" title="집중도 보고서">
               <span class="material-symbols-rounded">assessment</span>
             </button>
-            <button class="btn-attendance p-2 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-teal-500 transition-colors" title="출석 현황">
+            <button class="btn-attendance p-2 rounded-lg text-slate-400 hover:bg-slate-50 hover:text-teal-500 transition-colors" title="출석 현황">
               <span class="material-symbols-rounded">calendar_month</span>
             </button>
         </div>
@@ -199,55 +199,55 @@ export class UIRenderer {
   getStatusStyle(status) {
     const styles = {
       [STATUS.STANDING]: {
-        bg: 'bg-white dark:bg-gray-800',
-        border: 'border-l-4 border-l-green-500 border-gray-200 dark:border-gray-700',
+        bg: 'bg-white',
+        border: 'border-l-4 border-l-emerald-500 border-slate-200',
         icon: 'accessibility_new',
-        iconColor: 'text-green-500',
-        textColor: 'text-green-600 dark:text-green-400'
+        iconColor: 'text-emerald-500',
+        textColor: 'text-emerald-600'
       },
       [STATUS.SITTING]: {
-        bg: 'bg-white dark:bg-gray-800',
-        border: 'border-l-4 border-l-blue-500 border-gray-200 dark:border-gray-700',
+        bg: 'bg-white',
+        border: 'border-l-4 border-l-blue-500 border-slate-200',
         icon: 'weekend',
         iconColor: 'text-blue-500',
-        textColor: 'text-blue-600 dark:text-blue-400'
+        textColor: 'text-blue-600'
       },
       [STATUS.AWAY]: {
-        bg: 'bg-white dark:bg-gray-800',
-        border: 'border-l-4 border-l-red-500 border-gray-200 dark:border-gray-700',
+        bg: 'bg-white',
+        border: 'border-l-4 border-l-red-500 border-slate-200',
         icon: 'person_off',
         iconColor: 'text-red-500',
-        textColor: 'text-red-600 dark:text-red-400'
+        textColor: 'text-red-600'
       },
       [STATUS.HAND_RAISED]: {
-        bg: 'bg-white dark:bg-gray-800',
-        border: 'border-l-4 border-l-purple-500 border-gray-200 dark:border-gray-700',
+        bg: 'bg-white',
+        border: 'border-l-4 border-l-purple-500 border-slate-200',
         icon: 'pan_tool',
         iconColor: 'text-purple-500',
-        textColor: 'text-purple-600 dark:text-purple-400'
+        textColor: 'text-purple-600'
       },
       [STATUS.NO_RESPONSE]: {
-        bg: 'bg-white dark:bg-gray-800',
-        border: 'border-l-4 border-l-amber-500 border-gray-200 dark:border-gray-700',
+        bg: 'bg-white',
+        border: 'border-l-4 border-l-amber-500 border-slate-200',
         icon: 'wifi_off',
         iconColor: 'text-amber-500',
-        textColor: 'text-amber-600 dark:text-amber-400'
+        textColor: 'text-amber-600'
       },
       [STATUS.DISCONNECTED]: {
-        bg: 'bg-gray-50 dark:bg-gray-800/50',
-        border: 'border-l-4 border-l-gray-400 border-gray-200 dark:border-gray-700',
+        bg: 'bg-slate-50',
+        border: 'border-l-4 border-l-slate-400 border-slate-200',
         icon: 'link_off',
-        iconColor: 'text-gray-400',
-        textColor: 'text-gray-500'
+        iconColor: 'text-slate-400',
+        textColor: 'text-slate-500'
       }
     };
 
     return styles[status] || {
-      bg: 'bg-white dark:bg-gray-800',
-      border: 'border-gray-200 dark:border-gray-700',
+      bg: 'bg-white',
+      border: 'border-slate-200',
       icon: 'hourglass_empty',
-      iconColor: 'text-gray-400',
-      textColor: 'text-gray-500'
+      iconColor: 'text-slate-400',
+      textColor: 'text-slate-500'
     };
   }
 
@@ -277,20 +277,20 @@ export class UIRenderer {
     // 화면 공유 중이면 썸네일 표시
     if (student.isScreenSharing && student.screenThumbnail) {
       html += `
-        <div class="screen-thumbnail-container mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+        <div class="screen-thumbnail-container mt-2 pt-2 border-t border-slate-100">
           <div class="flex items-center justify-between mb-1">
-            <span class="text-[10px] text-gray-400 flex items-center gap-1">
+            <span class="text-[10px] text-slate-400 flex items-center gap-1">
               <span class="material-symbols-rounded text-xs text-indigo-500">screen_share</span>
               화면 공유 중
             </span>
             <button class="btn-view-screen text-[10px] text-indigo-500 hover:text-indigo-600 font-medium">확대</button>
           </div>
-          <img class="screen-thumbnail w-full rounded-md border border-gray-200 dark:border-gray-600 cursor-pointer hover:opacity-90 transition-opacity" src="${student.screenThumbnail}" />
+          <img class="screen-thumbnail w-full rounded-md border border-slate-200 cursor-pointer hover:opacity-90 transition-opacity" src="${student.screenThumbnail}" />
         </div>
       `;
     } else if (student.isScreenSharing) {
       html += `
-        <div class="mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+        <div class="mt-2 pt-2 border-t border-slate-100">
           <div class="flex items-center gap-1 text-[10px] text-indigo-500">
             <span class="material-symbols-rounded text-xs">screen_share</span>
             화면 공유 대기 중...
@@ -300,17 +300,17 @@ export class UIRenderer {
     }
 
     if (student.focus && student.status !== STATUS.DISCONNECTED && student.status !== STATUS.NO_RESPONSE) {
-      const focusColor = FOCUS_COLOR[student.focus.level] || '#9CA3AF';
+      const focusColor = FOCUS_COLOR[student.focus.level] || '#94A3B8';
       // Use brand color for high focus
-      const displayColor = student.focus.level === 'high' ? '#69D29D' : focusColor;
+      const displayColor = student.focus.level === 'high' ? '#E30000' : focusColor; // Primary Red
 
       html += `
-        <div class="mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+        <div class="mt-2 pt-2 border-t border-slate-100">
           <div class="flex items-center justify-between text-[10px] mb-1">
-            <span class="text-gray-400">집중도</span>
+            <span class="text-slate-400">집중도</span>
             <span class="font-bold focus-score" style="color: ${displayColor}">${student.focus.score}%</span>
           </div>
-          <div class="w-full h-1.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+          <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
             <div class="h-full rounded-full transition-all duration-300 focus-bar" style="width: ${student.focus.score}%; background-color: ${displayColor}"></div>
           </div>
         </div>

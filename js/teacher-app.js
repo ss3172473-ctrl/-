@@ -21,7 +21,7 @@ class TeacherApp {
     this.peerManager = new PeerManager();
     this.attendanceManager = new AttendanceManager();
     this.focusReportManager = new FocusReportManager();
-    
+
     // 상태
     this.currentVideoStudent = null;
     this.currentFocusStudent = null;
@@ -39,19 +39,19 @@ class TeacherApp {
   async init() {
     // DOM 요소 수집
     this.elements = this.collectElements();
-    
+
     // 매니저 초기화
     await this.initManagers();
-    
+
     // 이벤트 바인딩
     this.bindEvents();
-    
+
     // 전역 함수 노출
     this.exposeGlobalFunctions();
-    
+
     // 저장된 ID 표시
     this.showSavedIds();
-    
+
     // 타이머 시작
     setInterval(() => this.updateTimers(), 1000);
   }
@@ -63,14 +63,14 @@ class TeacherApp {
     const savedIdBox = document.getElementById('saved-id-box');
     const savedIdList = document.getElementById('saved-id-list');
     const clearHistoryBtn = document.getElementById('clear-id-history-btn');
-    
+
     const history = this.getIdHistory();
-    
+
     if (history.length === 0 || !savedIdBox || !savedIdList) return;
-    
+
     savedIdBox.classList.remove('hidden');
     this.renderIdHistory(history, savedIdList);
-    
+
     // 전체 삭제 버튼
     clearHistoryBtn?.addEventListener('click', () => {
       if (confirm('저장된 ID 히스토리를 모두 삭제할까요?')) {
@@ -97,22 +97,22 @@ class TeacherApp {
    */
   addToIdHistory(id, isCustom = false) {
     if (!id) return;
-    
+
     let history = this.getIdHistory();
-    
+
     // 중복 제거
     history = history.filter(item => item.id !== id);
-    
+
     // 맨 앞에 추가
     history.unshift({
       id,
       isCustom,
       timestamp: Date.now()
     });
-    
+
     // 최대 5개 유지
     history = history.slice(0, 5);
-    
+
     localStorage.setItem('teacherIdHistory', JSON.stringify(history));
   }
 
@@ -124,31 +124,31 @@ class TeacherApp {
       const date = new Date(item.timestamp);
       const dateStr = `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
       const typeLabel = item.isCustom ? '고정' : '자동';
-      const typeBg = item.isCustom ? 'bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400';
-      
+      const typeBg = item.isCustom ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-600';
+
       return `
-        <div class="flex items-center gap-2 p-2 bg-white dark:bg-gray-800 rounded-lg border border-amber-200 dark:border-amber-700 hover:bg-amber-100 dark:hover:bg-amber-900/30 cursor-pointer transition-colors group" data-id="${item.id}" data-custom="${item.isCustom}">
-          <code class="flex-1 text-sm font-mono text-amber-800 dark:text-amber-300 truncate">${item.id}</code>
-          <span class="text-[10px] px-1.5 py-0.5 rounded ${typeBg}">${typeLabel}</span>
-          <span class="text-[10px] text-gray-400 dark:text-gray-500 hidden sm:inline">${dateStr}</span>
-          <button class="copy-id-btn p-1 opacity-0 group-hover:opacity-100 hover:bg-amber-200 dark:hover:bg-amber-700 rounded transition-all" title="복사">
-            <span class="material-symbols-rounded text-sm text-amber-600 dark:text-amber-400">content_copy</span>
+        <div class="flex items-center gap-2 p-2 bg-white rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer transition-colors group" data-id="${item.id}" data-custom="${item.isCustom}">
+          <code class="flex-1 text-sm font-mono text-slate-700 truncate">${item.id}</code>
+          <span class="text-[10px] px-1.5 py-0.5 rounded ${typeBg} font-bold">${typeLabel}</span>
+          <span class="text-[10px] text-slate-400 hidden sm:inline">${dateStr}</span>
+          <button class="copy-id-btn p-1 opacity-0 group-hover:opacity-100 hover:bg-slate-200 rounded transition-all" title="복사">
+            <span class="material-symbols-rounded text-sm text-slate-600">content_copy</span>
           </button>
-          <button class="delete-id-btn p-1 opacity-0 group-hover:opacity-100 hover:bg-red-100 dark:hover:bg-red-900/30 rounded transition-all" title="삭제">
+          <button class="delete-id-btn p-1 opacity-0 group-hover:opacity-100 hover:bg-red-50 rounded transition-all" title="삭제">
             <span class="material-symbols-rounded text-sm text-red-500">close</span>
           </button>
         </div>
       `;
     }).join('');
-    
+
     // 이벤트 바인딩
     container.querySelectorAll('[data-id]').forEach(item => {
       const id = item.dataset.id;
-      
+
       // 클릭 시 고정 ID로 입력
       item.addEventListener('click', (e) => {
         if (e.target.closest('.copy-id-btn') || e.target.closest('.delete-id-btn')) return;
-        
+
         if (this.elements.useCustomId) {
           this.elements.useCustomId.checked = true;
           this.elements.customIdInput?.classList.remove('hidden');
@@ -159,7 +159,7 @@ class TeacherApp {
           this.elements.customIdInput.focus();
         }
       });
-      
+
       // 복사 버튼
       item.querySelector('.copy-id-btn')?.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -171,13 +171,13 @@ class TeacherApp {
           }
         });
       });
-      
+
       // 삭제 버튼
       item.querySelector('.delete-id-btn')?.addEventListener('click', (e) => {
         e.stopPropagation();
         this.removeFromIdHistory(id);
         item.remove();
-        
+
         // 히스토리가 비면 박스 숨김
         if (this.getIdHistory().length === 0) {
           document.getElementById('saved-id-box')?.classList.add('hidden');
@@ -212,7 +212,7 @@ class TeacherApp {
       useCustomId: document.getElementById('use-custom-id'),
       customIdInput: document.getElementById('custom-id-input'),
       customIdHint: document.getElementById('custom-id-hint'),
-      
+
       // 학생 그리드
       studentGrid: document.getElementById('student-grid'),
       totalStudents: document.getElementById('total-students'),
@@ -220,17 +220,17 @@ class TeacherApp {
       sittingCount: document.getElementById('sitting-count'),
       awayCount: document.getElementById('away-count'),
       handRaisedCount: document.getElementById('hand-raised-count'),
-      
+
       // 알림
       alertList: document.getElementById('alert-list'),
       alertSound: document.getElementById('alert-sound'),
-      
+
       // 영상 모달
       videoModal: document.getElementById('video-modal'),
       modalVideo: document.getElementById('modal-video'),
       modalStudentName: document.getElementById('modal-student-name'),
       closeModalBtn: document.getElementById('close-modal-btn'),
-      
+
       // 집중도 상세 모달
       focusDetailModal: document.getElementById('focus-detail-modal'),
       focusDetailName: document.getElementById('focus-detail-name'),
@@ -242,7 +242,7 @@ class TeacherApp {
       focusMinScore: document.getElementById('focus-min-score'),
       focusMaxScore: document.getElementById('focus-max-score'),
       focusLastUpdate: document.getElementById('focus-last-update'),
-      
+
       // 메시지 모달
       broadcastBtn: document.getElementById('broadcast-btn'),
       messageModal: document.getElementById('message-modal'),
@@ -252,7 +252,7 @@ class TeacherApp {
       closeMessageModalBtn: document.getElementById('close-message-modal-btn'),
       cancelMessageBtn: document.getElementById('cancel-message-btn'),
       sendMessageBtn: document.getElementById('send-message-btn'),
-      
+
       // 출석 모달
       attendanceModal: document.getElementById('attendance-modal'),
       attendanceStudentName: document.getElementById('attendance-student-name'),
@@ -269,13 +269,13 @@ class TeacherApp {
       todayAttendanceDate: document.getElementById('today-attendance-date'),
       todayAttendanceTotal: document.getElementById('today-attendance-total'),
       todayAttendanceList: document.getElementById('today-attendance-list'),
-      
+
       // 집중도 보고서 모달
       focusReportModal: document.getElementById('focus-report-modal'),
       focusReportStudentName: document.getElementById('focus-report-student-name'),
       focusReportStudentGrade: document.getElementById('focus-report-student-grade'),
       focusReportContent: document.getElementById('focus-report-content'),
-      
+
       // 수업 타이머
       classTimerBar: document.getElementById('class-timer-bar'),
       classTimerStatus: document.getElementById('class-timer-status'),
@@ -295,13 +295,13 @@ class TeacherApp {
     // 출석/집중도 보고서 초기화
     await this.attendanceManager.init();
     await this.focusReportManager.init();
-    
+
     // 알림 매니저
     this.alertManager = new AlertManager({
       elements: this.elements,
       alertSound: this.elements.alertSound
     });
-    
+
     // 수업 타이머 매니저
     this.classTimerManager = new ClassTimerManager({
       elements: this.elements,
@@ -310,13 +310,13 @@ class TeacherApp {
       onBroadcast: (msg) => this.broadcastClassNotification(msg),
       onNotifyModeChange: (data) => this.peerManager.send(null, data)
     });
-    
+
     // 메시지 매니저
     this.messageManager = new MessageManager({
       elements: this.elements,
       onAlert: (msg, type) => this.alertManager.addAlert(msg, type)
     });
-    
+
     // 학생 매니저
     this.studentManager = new StudentManager({
       elements: this.elements,
@@ -326,7 +326,7 @@ class TeacherApp {
       onPlaySound: () => this.alertManager.playSound(),
       isLessonTime: () => this.classTimerManager.isLessonTime()
     });
-    
+
     // UI 렌더러
     this.uiRenderer = new UIRenderer({
       elements: this.elements,
@@ -340,7 +340,7 @@ class TeacherApp {
       onStopPTT: (peerId, btn) => this.stopPTT(peerId, btn),
       onOpenScreenModal: (peerId) => this.openScreenModal(peerId)
     });
-    
+
     // 오늘 출석 카운트 초기화
     this.updateTodayAttendance();
   }
@@ -354,7 +354,7 @@ class TeacherApp {
     this.elements.copyIdBtn?.addEventListener('click', () => this.copyTeacherId());
     this.elements.closeModalBtn?.addEventListener('click', () => this.closeVideoModal());
     this.elements.closeFocusDetailBtn?.addEventListener('click', () => this.closeFocusDetailModal());
-    
+
     // 커스텀 ID 토글
     this.elements.useCustomId?.addEventListener('change', (e) => {
       const show = e.target.checked;
@@ -368,12 +368,12 @@ class TeacherApp {
         }
       }
     });
-    
+
     // 오늘 출석 카드 클릭
     this.elements.todayAttendanceCard?.addEventListener('click', () => {
       this.openTodayAttendanceModal();
     });
-    
+
     // 메시지 관련 이벤트 위임
     document.addEventListener('click', (e) => {
       if (e.target.closest('#broadcast-btn')) {
@@ -409,18 +409,18 @@ class TeacherApp {
     window.saveClassSettings = () => this.classTimerManager.saveSettingsFromModal();
     window.forceBreak = () => this.classTimerManager.forceBreak();
     window.forceLesson = () => this.classTimerManager.forceLesson();
-    
+
     // 이해도 체크 관련
     window.openUnderstandingQuestionModal = () => this.openUnderstandingQuestionModal();
     window.closeUnderstandingQuestionModal = () => this.closeUnderstandingQuestionModal();
     window.sendUnderstandingCheck = () => this.sendUnderstandingCheck();
     window.closeUnderstandingResultModal = () => this.closeUnderstandingResultModal();
-    
+
     // 이해도 체크 버튼 이벤트
     document.getElementById('understanding-check-btn')?.addEventListener('click', () => {
       this.openUnderstandingQuestionModal();
     });
-    
+
     // 시간 제한 슬라이더 이벤트
     document.getElementById('understanding-time-limit')?.addEventListener('input', (e) => {
       document.getElementById('understanding-time-display').textContent = e.target.value + '초';
@@ -461,10 +461,10 @@ class TeacherApp {
       this.elements.startServerBtn.textContent = '연결 중...';
 
       const myId = await this.peerManager.init('teacher', customId);
-      
+
       // 메시지 매니저에 PeerManager 설정
       this.messageManager.setPeerManager(this.peerManager);
-      
+
       this.elements.teacherIdDisplay.value = myId;
       this.elements.dashboardSection?.classList.remove('hidden');
       this.elements.startServerBtn.textContent = '서버 실행 중';
@@ -488,7 +488,7 @@ class TeacherApp {
       });
 
       localStorage.setItem('teacherId', myId);
-      
+
       // ID 히스토리에 추가
       this.addToIdHistory(myId, !!customId);
 
@@ -496,7 +496,7 @@ class TeacherApp {
       console.error('서버 시작 실패:', error);
       this.elements.startServerBtn.disabled = false;
       this.elements.startServerBtn.textContent = '서버 시작';
-      
+
       if (error.type === 'unavailable-id') {
         alert('이전 세션이 아직 정리되지 않았습니다. 잠시 후 다시 시도해주세요.');
       } else {
@@ -508,7 +508,7 @@ class TeacherApp {
   copyTeacherId() {
     const id = this.elements.teacherIdDisplay?.value;
     if (!id) return;
-    
+
     navigator.clipboard.writeText(id).then(() => {
       const btn = this.elements.copyIdBtn;
       if (btn) {
@@ -587,7 +587,7 @@ class TeacherApp {
   }
 
   // ==================== 영상 모달 ====================
-  
+
   async openVideoModal(peerId, studentName) {
     const student = this.studentManager.getStudent(peerId);
     if (!student || student.status === STATUS.DISCONNECTED) {
@@ -626,18 +626,18 @@ class TeacherApp {
   }
 
   // ==================== 집중도 상세 모달 ====================
-  
+
   openFocusDetailModal(peerId) {
     const student = this.studentManager.getStudent(peerId);
     if (!student) return;
-    
+
     this.currentFocusStudent = peerId;
     this.elements.focusDetailName.textContent = student.name;
-    
+
     if (student.focus) {
       this.elements.focusDetailScore.textContent = student.focus.score + '%';
       this.elements.focusDetailScore.style.color = FOCUS_COLOR[student.focus.level];
-      
+
       const levelSpan = this.elements.focusDetailLevel.querySelector('span') || this.elements.focusDetailLevel;
       levelSpan.textContent = FOCUS_LABEL[student.focus.level];
       this.elements.focusDetailLevel.style.color = FOCUS_COLOR[student.focus.level];
@@ -646,16 +646,16 @@ class TeacherApp {
       const levelSpan = this.elements.focusDetailLevel.querySelector('span') || this.elements.focusDetailLevel;
       levelSpan.textContent = '데이터 없음';
     }
-    
+
     if (this.elements.focusLastUpdate) {
       this.elements.focusLastUpdate.textContent = `마지막 업데이트: ${new Date().toLocaleTimeString('ko-KR')}`;
     }
-    
+
     this.chartRange = 60;
     this.updateChartRangeButtons();
     this.drawFocusChart(student.focusHistory);
     this.updateFocusStats(student.focusHistory);
-    
+
     this.elements.focusDetailModal.style.display = 'flex';
   }
 
@@ -669,7 +669,7 @@ class TeacherApp {
   setChartRange(range) {
     this.chartRange = range;
     this.updateChartRangeButtons();
-    
+
     if (this.currentFocusStudent) {
       const student = this.studentManager.getStudent(this.currentFocusStudent);
       if (student) {
@@ -686,7 +686,7 @@ class TeacherApp {
       if (range === this.chartRange) {
         btn.className = 'chart-range-btn px-2 py-1 text-xs rounded-md bg-primary text-white font-medium transition-all';
       } else {
-        btn.className = 'chart-range-btn px-2 py-1 text-xs rounded-md bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 font-medium transition-all';
+        btn.className = 'chart-range-btn px-2 py-1 text-xs rounded-md bg-white border border-slate-200 text-slate-600 font-medium transition-all hover:bg-slate-50';
       }
     });
   }
@@ -698,15 +698,15 @@ class TeacherApp {
       if (this.elements.focusMaxScore) this.elements.focusMaxScore.textContent = '-';
       return;
     }
-    
+
     const points = history.slice(-this.chartRange);
     if (points.length === 0) return;
-    
+
     const scores = points.map(p => p.score);
     const avg = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
     const min = Math.min(...scores);
     const max = Math.max(...scores);
-    
+
     if (this.elements.focusAvgScore) this.elements.focusAvgScore.textContent = avg + '%';
     if (this.elements.focusMinScore) this.elements.focusMinScore.textContent = min + '%';
     if (this.elements.focusMaxScore) this.elements.focusMaxScore.textContent = max + '%';
@@ -715,15 +715,15 @@ class TeacherApp {
   drawFocusChart(history) {
     const ctx = this.elements.focusChart?.getContext('2d');
     if (!ctx) return;
-    
+
     const points = history?.slice(-this.chartRange) || [];
     const labels = points.map((_, i) => i + 1);
     const data = points.map(p => p.score);
-    
+
     if (this.focusChart) {
       this.focusChart.destroy();
     }
-    
+
     this.focusChart = new Chart(ctx, {
       type: 'line',
       data: {
@@ -731,8 +731,8 @@ class TeacherApp {
         datasets: [{
           label: '집중도',
           data: data,
-          borderColor: '#0D9488',
-          backgroundColor: 'rgba(13, 148, 136, 0.1)',
+          borderColor: '#E30000', // Primary Red
+          backgroundColor: 'rgba(227, 0, 0, 0.1)', // Primary Red 10%
           fill: true,
           tension: 0.4,
           pointRadius: 0
@@ -751,18 +751,18 @@ class TeacherApp {
   }
 
   // ==================== PTT ====================
-  
+
   async startPTT(peerId, studentName, btnElement) {
     const student = this.studentManager.getStudent(peerId);
     if (!student || student.status === STATUS.DISCONNECTED) return;
 
     this.currentPTTTarget = peerId;
-    
+
     btnElement.classList.remove('bg-white/80', 'dark:bg-gray-700/80', 'text-gray-500', 'dark:text-gray-400');
     btnElement.classList.add('bg-red-500', 'text-white', 'animate-pulse');
-    
+
     const success = await this.peerManager.startPTT(peerId);
-    
+
     if (success) {
       this.alertManager.addAlert(`🎤 ${studentName} 학생에게 말하는 중...`, 'info');
     } else {
@@ -773,17 +773,17 @@ class TeacherApp {
 
   stopPTT(peerId, btnElement) {
     if (this.currentPTTTarget !== peerId) return;
-    
+
     this.currentPTTTarget = null;
-    
+
     btnElement.classList.remove('bg-red-500', 'text-white', 'animate-pulse');
     btnElement.classList.add('bg-white/80', 'dark:bg-gray-700/80', 'text-gray-500', 'dark:text-gray-400');
-    
+
     this.peerManager.stopPTT(peerId);
   }
 
   // ==================== 출석 관련 ====================
-  
+
   updateTodayAttendance() {
     const stats = this.attendanceManager.getTodayStats();
     if (this.elements.todayAttendanceCount) {
@@ -793,18 +793,18 @@ class TeacherApp {
 
   openTodayAttendanceModal() {
     const stats = this.attendanceManager.getTodayStats();
-    
+
     if (this.elements.todayAttendanceDate) {
       const today = new Date();
       this.elements.todayAttendanceDate.textContent = `${today.getFullYear()}년 ${today.getMonth() + 1}월 ${today.getDate()}일`;
     }
-    
+
     if (this.elements.todayAttendanceTotal) {
       this.elements.todayAttendanceTotal.textContent = `${stats.totalStudents}명`;
     }
-    
+
     this.renderTodayAttendanceList(stats.records);
-    
+
     if (this.elements.todayAttendanceModal) {
       this.elements.todayAttendanceModal.style.display = 'flex';
     }
@@ -818,7 +818,7 @@ class TeacherApp {
 
   renderTodayAttendanceList(records) {
     if (!this.elements.todayAttendanceList) return;
-    
+
     if (!records || records.length === 0) {
       this.elements.todayAttendanceList.innerHTML = `
         <div class="flex flex-col items-center justify-center py-8 text-gray-400 dark:text-gray-500">
@@ -828,27 +828,27 @@ class TeacherApp {
       `;
       return;
     }
-    
+
     const sortedRecords = [...records].sort((a, b) => a.checkInTime - b.checkInTime);
     const students = this.studentManager.getAllStudents();
-    
+
     let html = '<div class="space-y-2">';
-    
+
     sortedRecords.forEach((record, index) => {
-      const checkInTime = new Date(record.checkInTime).toLocaleTimeString('ko-KR', { 
-        hour: '2-digit', minute: '2-digit' 
+      const checkInTime = new Date(record.checkInTime).toLocaleTimeString('ko-KR', {
+        hour: '2-digit', minute: '2-digit'
       });
-      
+
       const isOnline = Array.from(students.values()).some(
         s => s.name === record.studentName && s.status !== STATUS.DISCONNECTED
       );
-      
+
       let totalTime = record.totalTime || 0;
       if (!record.checkOutTime && record.checkInTime) {
         totalTime += Date.now() - record.checkInTime;
       }
       const duration = this.attendanceManager.formatDuration(totalTime);
-      
+
       html += `
         <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-700">
           <div class="flex items-center gap-3">
@@ -878,7 +878,7 @@ class TeacherApp {
         </div>
       `;
     });
-    
+
     html += '</div>';
     this.elements.todayAttendanceList.innerHTML = html;
   }
@@ -886,13 +886,13 @@ class TeacherApp {
   async openAttendanceModal(studentName) {
     this.currentAttendanceStudent = studentName;
     this.attendanceMonthOffset = 0;
-    
+
     if (this.elements.attendanceStudentName) {
       this.elements.attendanceStudentName.textContent = studentName;
     }
-    
+
     await this.updateAttendanceStats();
-    
+
     if (this.elements.attendanceModal) {
       this.elements.attendanceModal.style.display = 'flex';
     }
@@ -907,9 +907,9 @@ class TeacherApp {
 
   async updateAttendanceStats() {
     if (!this.currentAttendanceStudent) return;
-    
+
     const summary = await this.attendanceManager.getStudentSummary(this.currentAttendanceStudent);
-    
+
     // 주간
     if (this.elements.attendanceWeeklyDays) {
       this.elements.attendanceWeeklyDays.textContent = `${summary.weekly.presentDays}/${summary.weekly.totalDays}일`;
@@ -921,7 +921,7 @@ class TeacherApp {
     if (this.elements.attendanceWeeklyTime) {
       this.elements.attendanceWeeklyTime.textContent = this.attendanceManager.formatDuration(summary.weekly.totalTime);
     }
-    
+
     // 월간
     if (this.elements.attendanceMonthlyDays) {
       this.elements.attendanceMonthlyDays.textContent = `${summary.monthly.presentDays}/${summary.monthly.totalDays}일`;
@@ -933,42 +933,42 @@ class TeacherApp {
     if (this.elements.attendanceMonthlyTime) {
       this.elements.attendanceMonthlyTime.textContent = this.attendanceManager.formatDuration(summary.monthly.totalTime);
     }
-    
+
     // 캘린더
     await this.renderAttendanceCalendar();
   }
 
   async renderAttendanceCalendar() {
     if (!this.elements.attendanceCalendar || !this.currentAttendanceStudent) return;
-    
+
     const now = new Date();
     const offset = this.attendanceMonthOffset || 0;
     const year = now.getFullYear();
     const month = now.getMonth() + offset;
-    
+
     const targetDate = new Date(year, month, 1);
     const targetYear = targetDate.getFullYear();
     const targetMonth = targetDate.getMonth();
-    
+
     const monthlyStats = await this.attendanceManager.getMonthlyStats(
-      this.currentAttendanceStudent, 
-      targetYear, 
+      this.currentAttendanceStudent,
+      targetYear,
       targetMonth
     );
-    
+
     const monthNames = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
     const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
-    
+
     const firstDay = new Date(targetYear, targetMonth, 1).getDay();
     const lastDate = new Date(targetYear, targetMonth + 1, 0).getDate();
     const today = this.attendanceManager.getDateString(new Date());
-    
+
     const presentDates = new Set(
       monthlyStats.dailyRecords
         .filter(r => r.status !== 'absent')
         .map(r => r.date)
     );
-    
+
     let html = `
       <div class="flex items-center justify-between mb-3">
         <button onclick="window.setAttendanceMonth(-1)" class="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
@@ -981,22 +981,22 @@ class TeacherApp {
       </div>
       <div class="grid grid-cols-7 gap-1 text-center text-xs">
     `;
-    
+
     dayNames.forEach((day, i) => {
       const color = i === 0 ? 'text-red-400' : i === 6 ? 'text-blue-400' : 'text-gray-400';
       html += `<div class="${color} font-medium py-1">${day}</div>`;
     });
-    
+
     for (let i = 0; i < firstDay; i++) {
       html += '<div></div>';
     }
-    
+
     for (let d = 1; d <= lastDate; d++) {
       const dateStr = `${targetYear}-${String(targetMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
       const isPresent = presentDates.has(dateStr);
       const isToday = dateStr === today;
       const isFuture = dateStr > today;
-      
+
       let cellClass = 'py-1.5 rounded-lg text-sm ';
       if (isFuture) {
         cellClass += 'text-gray-300 dark:text-gray-600';
@@ -1005,14 +1005,14 @@ class TeacherApp {
       } else {
         cellClass += 'text-gray-400 dark:text-gray-500';
       }
-      
+
       if (isToday) {
         cellClass += ' ring-2 ring-primary';
       }
-      
+
       html += `<div class="${cellClass}">${d}</div>`;
     }
-    
+
     html += '</div>';
     this.elements.attendanceCalendar.innerHTML = html;
   }
@@ -1024,26 +1024,26 @@ class TeacherApp {
 
   async downloadAttendanceCSV() {
     if (!this.currentAttendanceStudent) return;
-    
+
     const now = new Date();
     const offset = this.attendanceMonthOffset || 0;
     const targetDate = new Date(now.getFullYear(), now.getMonth() + offset, 1);
-    
+
     const startDate = this.attendanceManager.getDateString(targetDate);
     const endDate = this.attendanceManager.getDateString(new Date(targetDate.getFullYear(), targetDate.getMonth() + 1, 0));
-    
+
     let csv = '\uFEFF날짜,학생이름,출석시간,퇴실시간,총접속시간,상태\n';
-    
+
     const start = new Date(startDate);
     const end = new Date(endDate);
-    
+
     for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
       const dateStr = this.attendanceManager.getDateString(d);
       if (dateStr > this.attendanceManager.today) break;
-      
+
       const records = await this.attendanceManager.getDailyRecords(dateStr);
       const record = records.find(r => r.studentName === this.currentAttendanceStudent);
-      
+
       if (record) {
         const checkIn = new Date(record.checkInTime).toLocaleTimeString('ko-KR');
         const checkOut = record.checkOutTime ? new Date(record.checkOutTime).toLocaleTimeString('ko-KR') : '-';
@@ -1053,7 +1053,7 @@ class TeacherApp {
         csv += `${dateStr},${this.currentAttendanceStudent},-,-,-,결석\n`;
       }
     }
-    
+
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -1065,41 +1065,41 @@ class TeacherApp {
 
   async downloadAttendancePDF() {
     if (!this.currentAttendanceStudent) return;
-    
+
     const now = new Date();
     const offset = this.attendanceMonthOffset || 0;
     const targetDate = new Date(now.getFullYear(), now.getMonth() + offset, 1);
     const year = targetDate.getFullYear();
     const month = targetDate.getMonth() + 1;
-    
+
     const summary = await this.attendanceManager.getStudentSummary(this.currentAttendanceStudent);
     const monthlyStats = await this.attendanceManager.getMonthlyStats(
       this.currentAttendanceStudent,
       targetDate.getFullYear(),
       targetDate.getMonth()
     );
-    
+
     const dailyData = [];
     const startDate = this.attendanceManager.getDateString(targetDate);
     const endDate = this.attendanceManager.getDateString(new Date(year, month, 0));
-    
+
     for (let d = new Date(startDate); d <= new Date(endDate); d.setDate(d.getDate() + 1)) {
       const dateStr = this.attendanceManager.getDateString(d);
       if (dateStr > this.attendanceManager.today) break;
-      
+
       const records = await this.attendanceManager.getDailyRecords(dateStr);
       const record = records.find(r => r.studentName === this.currentAttendanceStudent);
-      
+
       dailyData.push({
         date: dateStr,
         dayOfWeek: ['일', '월', '화', '수', '목', '금', '토'][d.getDay()],
-        checkIn: record ? new Date(record.checkInTime).toLocaleTimeString('ko-KR', {hour: '2-digit', minute: '2-digit'}) : '-',
-        checkOut: record?.checkOutTime ? new Date(record.checkOutTime).toLocaleTimeString('ko-KR', {hour: '2-digit', minute: '2-digit'}) : '-',
+        checkIn: record ? new Date(record.checkInTime).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }) : '-',
+        checkOut: record?.checkOutTime ? new Date(record.checkOutTime).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }) : '-',
         duration: record ? this.attendanceManager.formatDuration(record.totalTime) : '-',
         status: record ? '출석' : '결석'
       });
     }
-    
+
     const html = `
       <!DOCTYPE html>
       <html>
@@ -1182,7 +1182,7 @@ class TeacherApp {
       </body>
       </html>
     `;
-    
+
     const printWindow = window.open('', '_blank');
     printWindow.document.write(html);
     printWindow.document.close();
@@ -1192,22 +1192,22 @@ class TeacherApp {
   }
 
   // ==================== 집중도 보고서 ====================
-  
+
   async openFocusReportModal(studentName, grade) {
     this.currentFocusReportStudent = studentName;
     this.currentFocusReportGrade = grade;
     this.focusReportType = 'daily';
-    
+
     if (this.elements.focusReportStudentName) {
       this.elements.focusReportStudentName.textContent = studentName;
     }
     if (this.elements.focusReportStudentGrade) {
       this.elements.focusReportStudentGrade.textContent = grade ? `${grade}학년` : '';
     }
-    
+
     this.updateFocusReportTypeButtons();
     await this.renderFocusReport();
-    
+
     if (this.elements.focusReportModal) {
       this.elements.focusReportModal.style.display = 'flex';
     }
@@ -1240,11 +1240,11 @@ class TeacherApp {
 
   async renderFocusReport() {
     if (!this.currentFocusReportStudent || !this.elements.focusReportContent) return;
-    
+
     let report;
     let periodLabel;
     let comparison = null;
-    
+
     if (this.focusReportType === 'daily') {
       report = await this.focusReportManager.getDailyReport(this.currentFocusReportStudent);
       periodLabel = report.date;
@@ -1256,10 +1256,10 @@ class TeacherApp {
       periodLabel = `${report.year}년 ${report.month}월`;
       comparison = await this.focusReportManager.getMonthlyComparison(this.currentFocusReportStudent);
     }
-    
+
     const attendanceSummary = await this.attendanceManager.getStudentSummary(this.currentFocusReportStudent);
     const grade = this.focusReportManager.getFocusGrade(report.focusRate || 0);
-    
+
     const formatChange = (value, isTime = false) => {
       if (value === 0) return '<span class="text-gray-400">-</span>';
       const sign = value > 0 ? '+' : '';
@@ -1268,7 +1268,7 @@ class TeacherApp {
       const displayValue = isTime ? this.focusReportManager.formatDuration(Math.abs(value)) : `${Math.abs(value)}%`;
       return `<span class="${color} flex items-center gap-0.5 text-[10px]"><span class="material-symbols-rounded text-xs">${icon}</span>${sign}${displayValue}</span>`;
     };
-    
+
     const html = `
       <div class="text-center mb-4">
         <span class="text-xs text-gray-500">${periodLabel}</span>
@@ -1340,24 +1340,24 @@ class TeacherApp {
             <span class="material-symbols-rounded text-indigo-500 text-lg">calendar_month</span>
             <span class="text-sm text-gray-700 dark:text-gray-300">출석일수 (${this.focusReportType === 'weekly' ? '주간' : '월간'})</span>
           </div>
-          <span class="font-bold text-indigo-600 dark:text-indigo-400">${this.focusReportType === 'weekly' ? 
-            `${attendanceSummary.weekly.presentDays}/${attendanceSummary.weekly.totalDays}일` : 
-            `${attendanceSummary.monthly.presentDays}/${attendanceSummary.monthly.totalDays}일`}</span>
+          <span class="font-bold text-indigo-600 dark:text-indigo-400">${this.focusReportType === 'weekly' ?
+          `${attendanceSummary.weekly.presentDays}/${attendanceSummary.weekly.totalDays}일` :
+          `${attendanceSummary.monthly.presentDays}/${attendanceSummary.monthly.totalDays}일`}</span>
         </div>
         ` : ''}
       </div>
     `;
-    
+
     this.elements.focusReportContent.innerHTML = html;
   }
 
   async downloadFocusReportCSV() {
     if (!this.currentFocusReportStudent) return;
-    
+
     let report;
     let filename;
     let comparison = null;
-    
+
     if (this.focusReportType === 'daily') {
       report = await this.focusReportManager.getDailyReport(this.currentFocusReportStudent);
       filename = `집중도_${this.currentFocusReportStudent}_${report.date}.csv`;
@@ -1369,32 +1369,32 @@ class TeacherApp {
       filename = `집중도_${this.currentFocusReportStudent}_${report.year}년${report.month}월.csv`;
       comparison = await this.focusReportManager.getMonthlyComparison(this.currentFocusReportStudent);
     }
-    
+
     const attendanceSummary = await this.attendanceManager.getStudentSummary(this.currentFocusReportStudent);
     const attendanceData = this.focusReportType === 'weekly' ? attendanceSummary.weekly : attendanceSummary.monthly;
-    
+
     let csv = '\uFEFF이름,학년,기간,집중률,평균점수,순집중시간(초),최대연속집중(초),최대착석시간(초),총학습시간(초),자리비움횟수,출석일수,출석률';
-    
+
     if (this.focusReportType === 'monthly') {
       csv += ',순집중시간변화(초),순집중시간변화율(%),최대착석시간변화(초),최대착석시간변화율(%)';
     }
     csv += '\n';
-    
+
     const grade = this.currentFocusReportGrade || '';
-    const period = this.focusReportType === 'daily' ? report.date : 
-                   this.focusReportType === 'weekly' ? `${report.weekStart}~주간` : 
-                   `${report.year}년${report.month}월`;
-    
+    const period = this.focusReportType === 'daily' ? report.date :
+      this.focusReportType === 'weekly' ? `${report.weekStart}~주간` :
+        `${report.year}년${report.month}월`;
+
     const attendanceDays = this.focusReportType === 'daily' ? '-' : `${attendanceData.presentDays}/${attendanceData.totalDays}`;
     const attendanceRate = this.focusReportType === 'daily' ? '-' : `${attendanceData.rate}%`;
-    
+
     csv += `${this.currentFocusReportStudent},${grade}학년,${period},${report.focusRate || 0}%,${report.avgScore || 0},${report.focusedTime || 0},${report.maxFocusDuration || 0},${report.maxSeatedDuration || 0},${report.totalTime || 0},${report.awayCount || report.totalAwayCount || 0},${attendanceDays},${attendanceRate}`;
-    
+
     if (this.focusReportType === 'monthly' && comparison) {
       csv += `,${comparison.changes.focusedTime},${comparison.changes.focusedTimePercent}%,${comparison.changes.maxSeatedDuration},${comparison.changes.maxSeatedDurationPercent}%`;
     }
     csv += '\n';
-    
+
     if (report.days && report.days.length > 0) {
       csv += '\n날짜,집중률,평균점수,순집중시간(초),최대연속집중(초),최대착석시간(초),총학습시간(초),자리비움횟수\n';
       report.days.forEach(day => {
@@ -1403,7 +1403,7 @@ class TeacherApp {
         }
       });
     }
-    
+
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -1415,11 +1415,11 @@ class TeacherApp {
 
   async downloadFocusReportPDF() {
     if (!this.currentFocusReportStudent) return;
-    
+
     let report;
     let periodLabel;
     let comparison = null;
-    
+
     if (this.focusReportType === 'daily') {
       report = await this.focusReportManager.getDailyReport(this.currentFocusReportStudent);
       periodLabel = report.date;
@@ -1431,11 +1431,11 @@ class TeacherApp {
       periodLabel = `${report.year}년 ${report.month}월`;
       comparison = await this.focusReportManager.getMonthlyComparison(this.currentFocusReportStudent);
     }
-    
+
     const attendanceSummary = await this.attendanceManager.getStudentSummary(this.currentFocusReportStudent);
     const grade = this.focusReportManager.getFocusGrade(report.focusRate || 0);
     const studentGrade = this.currentFocusReportGrade ? `${this.currentFocusReportGrade}학년` : '';
-    
+
     const formatChangeText = (value, isTime = false) => {
       if (!comparison?.hasLastMonthData || value === 0) return '';
       const sign = value > 0 ? '+' : '';
@@ -1443,7 +1443,7 @@ class TeacherApp {
       const displayValue = isTime ? this.focusReportManager.formatDuration(Math.abs(value)) : `${Math.abs(value)}%`;
       return ` <span style="color: ${value > 0 ? '#10B981' : '#EF4444'}; font-size: 10px;">(${arrow}${sign}${displayValue})</span>`;
     };
-    
+
     const html = `
       <!DOCTYPE html>
       <html>
@@ -1525,9 +1525,9 @@ class TeacherApp {
           </div>
           ${this.focusReportType !== 'daily' ? `
           <div class="stat-card indigo">
-            <div class="value">${this.focusReportType === 'weekly' ? 
-              `${attendanceSummary.weekly.presentDays}/${attendanceSummary.weekly.totalDays}` : 
-              `${attendanceSummary.monthly.presentDays}/${attendanceSummary.monthly.totalDays}`}일</div>
+            <div class="value">${this.focusReportType === 'weekly' ?
+          `${attendanceSummary.weekly.presentDays}/${attendanceSummary.weekly.totalDays}` :
+          `${attendanceSummary.monthly.presentDays}/${attendanceSummary.monthly.totalDays}`}일</div>
             <div class="label">출석일수</div>
           </div>
           <div class="stat-card teal">
@@ -1569,9 +1569,9 @@ class TeacherApp {
             최대 연속 집중 시간은 <strong>${this.focusReportManager.formatDuration(report.maxFocusDuration || 0)}</strong>이며,
             최대 착석 시간은 <strong>${this.focusReportManager.formatDuration(report.maxSeatedDuration || 0)}</strong>입니다.
             ${this.focusReportType !== 'daily' ? `
-            출석일수는 <strong>${this.focusReportType === 'weekly' ? 
-              `${attendanceSummary.weekly.presentDays}/${attendanceSummary.weekly.totalDays}일 (${attendanceSummary.weekly.rate}%)` : 
-              `${attendanceSummary.monthly.presentDays}/${attendanceSummary.monthly.totalDays}일 (${attendanceSummary.monthly.rate}%)`}</strong>입니다.
+            출석일수는 <strong>${this.focusReportType === 'weekly' ?
+          `${attendanceSummary.weekly.presentDays}/${attendanceSummary.weekly.totalDays}일 (${attendanceSummary.weekly.rate}%)` :
+          `${attendanceSummary.monthly.presentDays}/${attendanceSummary.monthly.totalDays}일 (${attendanceSummary.monthly.rate}%)`}</strong>입니다.
             ` : ''}
             ${this.focusReportType === 'monthly' && comparison?.hasLastMonthData ? `
             지난달 대비 순 집중시간은 <strong style="color: ${comparison.changes.focusedTime >= 0 ? '#10B981' : '#EF4444'};">${comparison.changes.focusedTime >= 0 ? '+' : ''}${this.focusReportManager.formatDuration(comparison.changes.focusedTime)}</strong>,
@@ -1613,7 +1613,7 @@ class TeacherApp {
       </body>
       </html>
     `;
-    
+
     const printWindow = window.open('', '_blank');
     printWindow.document.write(html);
     printWindow.document.close();
@@ -1635,7 +1635,7 @@ class TeacherApp {
 
     // 카드 업데이트
     this.updateScreenThumbnailInCard(peerId, data.thumbnail);
-    
+
     // 썸네일 모달이 열려있으면 업데이트
     if (this.currentScreenStudent === peerId) {
       this.updateScreenModal(data.thumbnail);
@@ -1650,7 +1650,7 @@ class TeacherApp {
     if (!student) return;
 
     student.isScreenSharing = data.sharing;
-    
+
     if (data.sharing) {
       this.alertManager.addAlert(`🖥️ ${data.name} 학생이 화면 공유를 시작했습니다.`, 'info');
     } else {
@@ -1670,7 +1670,7 @@ class TeacherApp {
     if (!card) return;
 
     let thumbnailContainer = card.querySelector('.screen-thumbnail-container');
-    
+
     if (!thumbnailContainer) {
       // 썸네일 컨테이너 생성
       thumbnailContainer = document.createElement('div');
@@ -1685,7 +1685,7 @@ class TeacherApp {
         </div>
         <img class="screen-thumbnail w-full rounded-md border border-gray-200 dark:border-gray-600 cursor-pointer hover:opacity-90 transition-opacity" />
       `;
-      
+
       const centerDiv = card.querySelector('.text-center');
       if (centerDiv) {
         centerDiv.appendChild(thumbnailContainer);
@@ -1694,7 +1694,7 @@ class TeacherApp {
       // 클릭 이벤트 바인딩
       const img = thumbnailContainer.querySelector('.screen-thumbnail');
       const viewBtn = thumbnailContainer.querySelector('.btn-view-screen');
-      
+
       const openModal = () => this.openScreenModal(peerId);
       img?.addEventListener('click', openModal);
       viewBtn?.addEventListener('click', openModal);
@@ -1771,7 +1771,7 @@ class TeacherApp {
   updateScreenModal(thumbnail) {
     const img = document.getElementById('screen-modal-image');
     const time = document.getElementById('screen-modal-time');
-    
+
     if (img && thumbnail) {
       img.src = thumbnail;
     }
@@ -1799,7 +1799,7 @@ class TeacherApp {
   openUnderstandingQuestionModal() {
     const modal = document.getElementById('understanding-question-modal');
     const input = document.getElementById('understanding-question-input');
-    
+
     if (modal) {
       modal.style.display = 'flex';
       if (input) {
@@ -1826,19 +1826,19 @@ class TeacherApp {
   sendUnderstandingCheck() {
     const questionInput = document.getElementById('understanding-question-input');
     const timeLimitInput = document.getElementById('understanding-time-limit');
-    
+
     const question = questionInput?.value?.trim() || '지금 설명한 내용이 이해가 되나요?';
     const timeLimit = parseInt(timeLimitInput?.value) || 10;
-    
+
     // 접속 중인 학생 목록 가져오기
     const students = this.studentManager.getAllStudents();
     const connectedStudents = Array.from(students.entries()).filter(([_, s]) => s.status !== 'disconnected');
-    
+
     if (connectedStudents.length === 0) {
       alert('접속 중인 학생이 없습니다.');
       return;
     }
-    
+
     // 이해도 체크 세션 초기화
     this.understandingCheckSession = {
       question,
@@ -1848,7 +1848,7 @@ class TeacherApp {
       totalStudents: connectedStudents.length,
       studentList: connectedStudents.map(([peerId, s]) => ({ peerId, name: s.name }))
     };
-    
+
     // 모든 학생에게 질문 전송
     this.peerManager.send(null, {
       type: 'understanding_check',
@@ -1856,16 +1856,16 @@ class TeacherApp {
       timeLimit,
       timestamp: Date.now()
     });
-    
+
     // 질문 모달 닫기
     this.closeUnderstandingQuestionModal();
-    
+
     // 결과 모달 열기
     this.openUnderstandingResultModal();
-    
+
     // 타이머 시작
     this.startUnderstandingTimer(timeLimit);
-    
+
     // 알림
     this.alertManager.addAlert(`📊 이해도 체크 전송됨 (${connectedStudents.length}명)`, 'info');
   }
@@ -1876,7 +1876,7 @@ class TeacherApp {
   openUnderstandingResultModal() {
     const modal = document.getElementById('understanding-result-modal');
     const questionEl = document.getElementById('understanding-result-question');
-    
+
     if (modal && this.understandingCheckSession) {
       questionEl.textContent = this.understandingCheckSession.question;
       modal.style.display = 'flex';
@@ -1892,7 +1892,7 @@ class TeacherApp {
     if (modal) {
       modal.style.display = 'none';
     }
-    
+
     // 타이머 정리
     if (this.understandingTimerInterval) {
       clearInterval(this.understandingTimerInterval);
@@ -1907,23 +1907,23 @@ class TeacherApp {
     let remaining = seconds;
     const timerEl = document.getElementById('understanding-result-timer');
     const statusEl = document.getElementById('understanding-result-status');
-    
+
     // 기존 타이머 정리
     if (this.understandingTimerInterval) {
       clearInterval(this.understandingTimerInterval);
     }
-    
+
     this.understandingTimerInterval = setInterval(() => {
       remaining--;
-      
+
       if (timerEl) {
         timerEl.textContent = remaining;
       }
-      
+
       if (remaining <= 0) {
         clearInterval(this.understandingTimerInterval);
         this.understandingTimerInterval = null;
-        
+
         // 타이머 종료 UI
         if (statusEl) {
           statusEl.innerHTML = `
@@ -1932,7 +1932,7 @@ class TeacherApp {
           `;
           statusEl.className = 'flex items-center justify-center gap-2 py-2 px-4 bg-green-100 dark:bg-green-900/30 rounded-lg';
         }
-        
+
         // 최종 결과 알림
         this.showUnderstandingFinalResult();
       }
@@ -1944,17 +1944,17 @@ class TeacherApp {
    */
   handleUnderstandingResponse(peerId, data) {
     if (!this.understandingCheckSession) return;
-    
+
     const student = this.studentManager.getStudent(peerId);
     const studentName = student?.name || data.name || '알 수 없음';
-    
+
     // 응답 저장
     this.understandingCheckSession.responses.set(peerId, {
       answer: data.answer,
       name: studentName,
       timestamp: Date.now()
     });
-    
+
     // UI 업데이트
     this.updateUnderstandingResultUI();
   }
@@ -1964,48 +1964,48 @@ class TeacherApp {
    */
   updateUnderstandingResultUI() {
     if (!this.understandingCheckSession) return;
-    
+
     const { responses, totalStudents, studentList } = this.understandingCheckSession;
-    
+
     // 집계
     let yesCount = 0;
     let noCount = 0;
-    
+
     responses.forEach(r => {
       if (r.answer === 'yes') yesCount++;
       else if (r.answer === 'no') noCount++;
     });
-    
+
     const pendingCount = totalStudents - responses.size;
     const responseRate = totalStudents > 0 ? Math.round((responses.size / totalStudents) * 100) : 0;
-    
+
     // 숫자 업데이트
     document.getElementById('understanding-yes-count').textContent = yesCount;
     document.getElementById('understanding-no-count').textContent = noCount;
     document.getElementById('understanding-pending-count').textContent = pendingCount;
     document.getElementById('understanding-response-rate').textContent = responseRate + '%';
-    
+
     // 프로그레스 바
     const yesPercent = totalStudents > 0 ? (yesCount / totalStudents) * 100 : 0;
     const noPercent = totalStudents > 0 ? (noCount / totalStudents) * 100 : 0;
-    
+
     document.getElementById('understanding-yes-bar').style.width = yesPercent + '%';
     document.getElementById('understanding-no-bar').style.width = noPercent + '%';
-    
+
     // 응답 목록
     const listEl = document.getElementById('understanding-response-list');
     if (listEl) {
       let html = '';
-      
+
       studentList.forEach(({ peerId, name }) => {
         const response = responses.get(peerId);
-        
+
         if (response) {
           const isYes = response.answer === 'yes';
           const icon = isYes ? 'check_circle' : 'cancel';
           const color = isYes ? 'emerald' : 'red';
           const text = isYes ? '예' : '아니요';
-          
+
           html += `
             <div class="flex items-center justify-between p-2 bg-${color}-50 dark:bg-${color}-900/20 rounded-lg border border-${color}-100 dark:border-${color}-800">
               <span class="font-medium text-sm text-gray-800 dark:text-gray-200">${name}</span>
@@ -2027,7 +2027,7 @@ class TeacherApp {
           `;
         }
       });
-      
+
       listEl.innerHTML = html;
     }
   }
@@ -2037,19 +2037,19 @@ class TeacherApp {
    */
   showUnderstandingFinalResult() {
     if (!this.understandingCheckSession) return;
-    
+
     const { responses, totalStudents } = this.understandingCheckSession;
-    
+
     let yesCount = 0;
     let noCount = 0;
-    
+
     responses.forEach(r => {
       if (r.answer === 'yes') yesCount++;
       else if (r.answer === 'no') noCount++;
     });
-    
+
     const yesPercent = totalStudents > 0 ? Math.round((yesCount / totalStudents) * 100) : 0;
-    
+
     if (yesPercent >= 80) {
       this.alertManager.addAlert(`✅ 이해도 체크 완료: ${yesPercent}%가 이해함 (${yesCount}/${totalStudents}명)`, 'success');
     } else if (yesPercent >= 50) {

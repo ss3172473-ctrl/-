@@ -15,13 +15,13 @@ export class ClassTimerManager {
     this.breakDuration = CONFIG.classTime.breakDuration;
     this.lessonCount = 0;
     this.notifiedBeforeEnd = false;
-    
+
     this.elements = options.elements || {};
-    this.onAlert = options.onAlert || (() => {});
-    this.onPlaySound = options.onPlaySound || (() => {});
-    this.onBroadcast = options.onBroadcast || (() => {});
-    this.onNotifyModeChange = options.onNotifyModeChange || (() => {});
-    
+    this.onAlert = options.onAlert || (() => { });
+    this.onPlaySound = options.onPlaySound || (() => { });
+    this.onBroadcast = options.onBroadcast || (() => { });
+    this.onNotifyModeChange = options.onNotifyModeChange || (() => { });
+
     this.loadSettings();
   }
 
@@ -58,19 +58,19 @@ export class ClassTimerManager {
     if (this.classTimerInterval) {
       clearInterval(this.classTimerInterval);
     }
-    
+
     this.classMode = CLASS_MODE.LESSON;
     this.lessonCount = 1;
     this.remainingSeconds = this.lessonDuration * 60;
     this.notifiedBeforeEnd = false;
-    
+
     this.updateUI();
     this.notifyModeChange();
-    
+
     this.classTimerInterval = setInterval(() => {
       this.tick();
     }, 1000);
-    
+
     this.onAlert(`📚 ${this.lessonCount}교시 수업이 시작되었습니다. (${this.lessonDuration}분)`, 'info');
   }
 
@@ -82,12 +82,12 @@ export class ClassTimerManager {
       clearInterval(this.classTimerInterval);
       this.classTimerInterval = null;
     }
-    
+
     this.classMode = CLASS_MODE.STOPPED;
     this.remainingSeconds = 0;
     this.updateUI();
     this.notifyModeChange();
-    
+
     this.onAlert('⏹️ 수업 타이머가 정지되었습니다.', 'info');
   }
 
@@ -107,24 +107,24 @@ export class ClassTimerManager {
    */
   tick() {
     this.remainingSeconds--;
-    
+
     // 종료 1분 전 알림
     if (!this.notifiedBeforeEnd && this.remainingSeconds === 60) {
       this.notifiedBeforeEnd = true;
-      const msg = this.classMode === CLASS_MODE.LESSON ? 
+      const msg = this.classMode === CLASS_MODE.LESSON ?
         '⏰ 1분 후 쉬는 시간입니다.' : '⏰ 1분 후 수업이 시작됩니다.';
       this.onAlert(msg, 'info');
       this.onPlaySound();
       this.onBroadcast(msg);
     }
-    
+
     // 시간 종료
     if (this.remainingSeconds <= 0) {
       this.switchMode();
     }
-    
+
     this.updateUI();
-    
+
     // 학생들에게 시간 업데이트 (5초마다)
     if (this.remainingSeconds % 5 === 0 || this.remainingSeconds <= 10) {
       this.notifyModeChange();
@@ -136,7 +136,7 @@ export class ClassTimerManager {
    */
   switchMode() {
     this.notifiedBeforeEnd = false;
-    
+
     if (this.classMode === CLASS_MODE.LESSON) {
       this.classMode = CLASS_MODE.BREAK;
       this.remainingSeconds = this.breakDuration * 60;
@@ -149,7 +149,7 @@ export class ClassTimerManager {
       this.onAlert(`📚 ${this.lessonCount}교시 수업이 시작되었습니다. (${this.lessonDuration}분)`, 'info');
       this.onPlaySound();
     }
-    
+
     this.notifyModeChange();
   }
 
@@ -160,7 +160,7 @@ export class ClassTimerManager {
     if (this.classMode === CLASS_MODE.STOPPED) {
       this.start();
     }
-    
+
     this.classMode = CLASS_MODE.BREAK;
     this.remainingSeconds = this.breakDuration * 60;
     this.notifiedBeforeEnd = false;
@@ -177,7 +177,7 @@ export class ClassTimerManager {
       this.start();
       return;
     }
-    
+
     this.classMode = CLASS_MODE.LESSON;
     this.remainingSeconds = this.lessonDuration * 60;
     this.notifiedBeforeEnd = false;
@@ -222,46 +222,46 @@ export class ClassTimerManager {
     const progressEl = this.elements.classTimerProgress;
     const toggleBtn = this.elements.classTimerToggle;
     const idleMsg = document.getElementById('class-timer-idle');
-    
+
     if (!timerBar) return;
-    
+
     const mins = Math.floor(this.remainingSeconds / 60);
     const secs = this.remainingSeconds % 60;
     const timeStr = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    
+
     if (this.classMode === CLASS_MODE.STOPPED) {
       timerBar.className = 'hidden';
-      if (idleMsg) idleMsg.className = 'flex items-center gap-2 text-gray-400 flex-1';
+      if (idleMsg) idleMsg.className = 'flex items-center gap-2 text-slate-400 flex-1';
       toggleBtn.innerHTML = '<span class="material-symbols-rounded text-sm">play_arrow</span> 수업 시작';
       toggleBtn.className = 'px-3 py-1.5 bg-primary hover:bg-primary/90 text-white text-xs font-medium rounded-lg transition-colors flex items-center gap-1';
     } else if (this.classMode === CLASS_MODE.LESSON) {
-      timerBar.className = 'flex items-center gap-3 px-4 py-2 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-xl flex-1';
+      timerBar.className = 'flex items-center gap-3 px-4 py-2 bg-red-50 border border-red-200 rounded-xl flex-1 transition-all duration-300';
       if (idleMsg) idleMsg.className = 'hidden';
-      statusEl.innerHTML = `<span class="material-symbols-rounded text-emerald-500 text-lg">school</span><span class="font-bold text-emerald-700 dark:text-emerald-300">${this.lessonCount}교시 수업 중</span>`;
+      statusEl.innerHTML = `<span class="material-symbols-rounded text-red-500 text-lg">school</span><span class="font-bold text-red-700">${this.lessonCount}교시 수업 중</span>`;
       timeEl.textContent = timeStr;
-      timeEl.className = 'font-mono font-bold text-lg text-emerald-600 dark:text-emerald-400';
-      
+      timeEl.className = 'font-mono font-bold text-lg text-red-600';
+
       const totalSeconds = this.lessonDuration * 60;
       const progress = ((totalSeconds - this.remainingSeconds) / totalSeconds) * 100;
       progressEl.style.width = `${progress}%`;
-      progressEl.className = 'h-full bg-emerald-500 rounded-full transition-all duration-1000';
-      
+      progressEl.className = 'h-full bg-red-500 rounded-full transition-all duration-1000';
+
       toggleBtn.innerHTML = '<span class="material-symbols-rounded text-sm">stop</span> 정지';
-      toggleBtn.className = 'px-3 py-1.5 bg-gray-500 hover:bg-gray-600 text-white text-xs font-medium rounded-lg transition-colors flex items-center gap-1';
+      toggleBtn.className = 'px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-medium rounded-lg transition-colors flex items-center gap-1';
     } else if (this.classMode === CLASS_MODE.BREAK) {
-      timerBar.className = 'flex items-center gap-3 px-4 py-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl flex-1';
+      timerBar.className = 'flex items-center gap-3 px-4 py-2 bg-emerald-50 border border-emerald-200 rounded-xl flex-1 transition-all duration-300';
       if (idleMsg) idleMsg.className = 'hidden';
-      statusEl.innerHTML = `<span class="material-symbols-rounded text-amber-500 text-lg">coffee</span><span class="font-bold text-amber-700 dark:text-amber-300">쉬는 시간</span>`;
+      statusEl.innerHTML = `<span class="material-symbols-rounded text-emerald-500 text-lg">coffee</span><span class="font-bold text-emerald-700">쉬는 시간</span>`;
       timeEl.textContent = timeStr;
-      timeEl.className = 'font-mono font-bold text-lg text-amber-600 dark:text-amber-400';
-      
+      timeEl.className = 'font-mono font-bold text-lg text-emerald-600';
+
       const totalSeconds = this.breakDuration * 60;
       const progress = ((totalSeconds - this.remainingSeconds) / totalSeconds) * 100;
       progressEl.style.width = `${progress}%`;
-      progressEl.className = 'h-full bg-amber-500 rounded-full transition-all duration-1000';
-      
+      progressEl.className = 'h-full bg-emerald-500 rounded-full transition-all duration-1000';
+
       toggleBtn.innerHTML = '<span class="material-symbols-rounded text-sm">stop</span> 정지';
-      toggleBtn.className = 'px-3 py-1.5 bg-gray-500 hover:bg-gray-600 text-white text-xs font-medium rounded-lg transition-colors flex items-center gap-1';
+      toggleBtn.className = 'px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-medium rounded-lg transition-colors flex items-center gap-1';
     }
   }
 
@@ -271,14 +271,14 @@ export class ClassTimerManager {
   openSettingsModal() {
     const modal = this.elements.classSettingsModal;
     if (!modal) return;
-    
+
     if (this.elements.lessonDurationInput) {
       this.elements.lessonDurationInput.value = this.lessonDuration;
     }
     if (this.elements.breakDurationInput) {
       this.elements.breakDurationInput.value = this.breakDuration;
     }
-    
+
     modal.classList.remove('hidden');
     modal.classList.add('flex');
   }
@@ -289,7 +289,7 @@ export class ClassTimerManager {
   closeSettingsModal() {
     const modal = this.elements.classSettingsModal;
     if (!modal) return;
-    
+
     modal.classList.add('hidden');
     modal.classList.remove('flex');
   }
@@ -300,11 +300,11 @@ export class ClassTimerManager {
   saveSettingsFromModal() {
     const lessonInput = this.elements.lessonDurationInput;
     const breakInput = this.elements.breakDurationInput;
-    
+
     if (lessonInput && breakInput) {
       const lesson = parseInt(lessonInput.value) || 50;
       const breakTime = parseInt(breakInput.value) || 10;
-      
+
       if (lesson < 1 || lesson > 180) {
         alert('수업 시간은 1~180분 사이로 설정해주세요.');
         return false;
@@ -313,11 +313,11 @@ export class ClassTimerManager {
         alert('쉬는 시간은 1~60분 사이로 설정해주세요.');
         return false;
       }
-      
+
       this.lessonDuration = lesson;
       this.breakDuration = breakTime;
       this.saveSettings();
-      
+
       this.onAlert(`⚙️ 수업 시간 설정: 수업 ${lesson}분, 쉬는시간 ${breakTime}분`, 'info');
       this.closeSettingsModal();
       return true;

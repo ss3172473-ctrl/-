@@ -94,14 +94,16 @@ const STATUS_LABEL = {
 };
 
 // 상태 색상
+// 상태 색상 (Tailwind Palette Match)
+// Standing: Emerald-500, Sitting: Blue-500, Away: Red-500
 const STATUS_COLOR = {
-  standing: '#4CAF50',
-  sitting: '#2196F3',
-  away: '#f44336',
-  unknown: '#9E9E9E',
-  no_response: '#ff9800',
-  disconnected: '#795548',
-  hand_raised: '#9C27B0'
+  standing: '#10B981',
+  sitting: '#3B82F6',
+  away: '#E30000',
+  unknown: '#94A3B8',
+  no_response: '#F59E0B',
+  disconnected: '#64748B',
+  hand_raised: '#8B5CF6'
 };
 
 // 응답없음 판단 시간 (초)
@@ -116,17 +118,18 @@ const FOCUS_LEVEL = {
 };
 
 const FOCUS_LABEL = {
-  high: '집중',
+  high: '최고',
   medium: '보통',
-  low: '주의',
-  very_low: '경고'
+  low: '부족',
+  very_low: '산만'
 };
 
+// Red Theme Focus Colors
 const FOCUS_COLOR = {
-  high: '#69D29D',
-  medium: '#F59E0B',
-  low: '#F97316',
-  very_low: '#EF4444'
+  high: '#E30000',    // Primary Red
+  medium: '#F97316',  // Orange
+  low: '#64748B',     // Slate
+  very_low: '#94A3B8' // Light Slate
 };
 
 // 수업 상태

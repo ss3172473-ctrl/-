@@ -306,22 +306,22 @@ class StudentApp {
 
     if (status === STATUS.STANDING) {
       icon = 'accessibility_new';
-      iconColor = 'text-green-600 dark:text-green-400';
-      bgColor = 'bg-green-50 dark:bg-green-900/20';
-      textColor = 'text-green-600 dark:text-green-400';
-      borderColor = 'border-green-100 dark:border-green-800';
+      iconColor = 'text-green-600';
+      bgColor = 'bg-green-50';
+      textColor = 'text-green-600';
+      borderColor = 'border-green-100';
     } else if (status === STATUS.SITTING) {
       icon = 'chair';
-      iconColor = 'text-blue-600 dark:text-blue-400';
-      bgColor = 'bg-blue-50 dark:bg-blue-900/20';
-      textColor = 'text-blue-600 dark:text-blue-400';
-      borderColor = 'border-blue-100 dark:border-blue-800';
+      iconColor = 'text-blue-600';
+      bgColor = 'bg-blue-50';
+      textColor = 'text-blue-600';
+      borderColor = 'border-blue-100';
     } else if (status === STATUS.AWAY) {
       icon = 'person_off';
-      iconColor = 'text-red-600 dark:text-red-400';
-      bgColor = 'bg-red-50 dark:bg-red-900/20';
-      textColor = 'text-red-600 dark:text-red-400';
-      borderColor = 'border-red-100 dark:border-red-800';
+      iconColor = 'text-red-600';
+      bgColor = 'bg-red-50';
+      textColor = 'text-red-600';
+      borderColor = 'border-red-100';
     } else if (status === STATUS.HAND_RAISED) {
       icon = 'pan_tool';
       iconColor = 'text-purple-600 dark:text-purple-400';
@@ -550,10 +550,20 @@ class StudentApp {
     const circumference = 339.292;
     const offset = circumference - (circumference * score / 100);
 
-    // 1. Dynamic Color Calculation (Red -> Yellow -> Teal)
-    const hue = Math.floor(score * 1.5);
-    const color = `hsl(${hue}, 75%, 45%)`;
-    const bgColor = `hsla(${hue}, 75%, 45%, 0.1)`;
+    // 1. Dynamic Color Calculation (Red Theme)
+    let color;
+    let bgColor;
+
+    if (score >= 80) {
+      color = '#E30000'; // Primary Red (High)
+      bgColor = 'rgba(227, 0, 0, 0.1)';
+    } else if (score >= 50) {
+      color = '#F97316'; // Orange (Medium)
+      bgColor = 'rgba(249, 115, 22, 0.1)';
+    } else {
+      color = '#64748B'; // Slate (Low)
+      bgColor = 'rgba(100, 116, 139, 0.1)';
+    }
 
     if (this.elements.focusRing) {
       this.elements.focusRing.style.strokeDashoffset = offset;
@@ -564,7 +574,6 @@ class StudentApp {
     this.elements.focusScore.style.color = color;
     this.elements.focusLevel.style.color = color;
     this.elements.focusLevel.style.backgroundColor = bgColor;
-    // this.elements.focusLevel.style.backgroundColor = color.replace('rgb', 'rgba').replace(')', ', 0.1)'); // Soft background
 
     // --- 10분 평균 계산 로직 ---
     const now = Date.now();
@@ -587,9 +596,13 @@ class StudentApp {
       this.elements.avgFocusScore.textContent = this.focusHistory.length > 0 ? avg : '-';
 
       if (this.focusHistory.length > 0) {
-        // 평균 점수 색상도 옅게 따라가기
-        const avgHue = Math.floor(avg * 1.5);
-        this.elements.avgFocusScore.style.color = `hsl(${avgHue}, 60%, 40%)`;
+        // 평균 점수 색상도 비슷하게
+        let avgColor;
+        if (avg >= 80) avgColor = '#E30000';
+        else if (avg >= 50) avgColor = '#F97316';
+        else avgColor = '#64748B';
+
+        this.elements.avgFocusScore.style.color = avgColor;
       } else {
         this.elements.avgFocusScore.style.color = '';
       }
