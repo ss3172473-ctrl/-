@@ -98,8 +98,8 @@
           <div id="connection-badge"
             class="hidden items-center px-2 py-1 rounded-full bg-slate-100 border border-slate-200">
             <span class="relative flex h-2 w-2 mr-1.5">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
             </span>
             <span class="text-xs font-bold text-slate-600">LIVE</span>
           </div>
@@ -114,9 +114,7 @@
     <section id="setup-section" class="flex justify-center pt-8">
       <div class="w-full max-w-md bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center">
         <div id="setup-content">
-          <h2 class="text-2xl font-display font-bold text-slate-900 mb-2 tracking-tight">모니터링 시작</h2>
-          <p class="text-slate-500 mb-8 text-sm leading-relaxed">학생들의 학습 상태를 실시간으로 확인하고<br>집중도를 분석할 수
-            있습니다.</p>
+          <h2 class="text-2xl font-display font-bold text-slate-900 mb-8 tracking-tight">모니터링 시작</h2>
 
           <!-- 저장된 ID 히스토리 -->
           <div id="saved-id-box" class="hidden mb-6 p-4 bg-slate-50 border border-slate-200 rounded-xl">
@@ -130,7 +128,6 @@
                 삭제</button>
             </div>
             <div id="saved-id-list" class="space-y-1.5 max-h-32 overflow-y-auto"></div>
-            <p class="text-[10px] text-slate-400 mt-2">클릭하면 고정 ID로 자동 입력됩니다</p>
           </div>
 
           <div class="mb-4">
@@ -141,9 +138,7 @@
             </label>
             <input type="text" id="custom-id-input"
               class="hidden w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-sm focus:ring-2 focus:ring-primary focus:border-primary transition-all"
-              placeholder="예: math-class-1">
-            <p id="custom-id-hint" class="hidden text-xs text-slate-400 mt-1 text-left">이전에 사용한 ID로 접속하면 학생들이 자동 재연결됩니다.
-            </p>
+              placeholder="ID 입력">
           </div>
 
           <button id="start-server-btn"
@@ -155,24 +150,24 @@
 
         <!-- Teacher ID Box -->
         <div id="teacher-id-box" class="hidden">
-          <h3 class="text-slate-500 text-xs font-bold mb-3 uppercase tracking-wide">학생들에게 아래 ID를
-            공유하세요</h3>
-          <div class="flex gap-2 items-center justify-center">
-            <div class="relative flex-1">
-              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <span class="material-symbols-rounded text-slate-400 text-lg">link</span>
+          <!-- Teacher ID Box -->
+          <div id="teacher-id-box" class="hidden">
+            <div class="flex gap-2 items-center justify-center">
+              <div class="relative flex-1">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <span class="material-symbols-rounded text-slate-400 text-lg">link</span>
+                </div>
+                <input id="teacher-id-display"
+                  class="block w-full pl-10 pr-3 py-3 rounded-xl border border-slate-200 text-center font-mono font-bold text-sm text-slate-900 bg-slate-50 focus:ring-0 focus:border-slate-300 transition-colors cursor-pointer hover:bg-slate-100"
+                  readonly type="text" value="-" />
               </div>
-              <input id="teacher-id-display"
-                class="block w-full pl-10 pr-3 py-3 rounded-xl border border-slate-200 text-center font-mono font-bold text-sm text-slate-900 bg-slate-50 focus:ring-0 focus:border-slate-300 transition-colors cursor-pointer hover:bg-slate-100"
-                readonly type="text" value="-" />
+              <button id="copy-id-btn"
+                class="p-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl shadow-md transition-all active:scale-95 flex items-center justify-center">
+                <span class="material-symbols-rounded text-lg">content_copy</span>
+              </button>
             </div>
-            <button id="copy-id-btn"
-              class="p-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl shadow-md transition-all active:scale-95 flex items-center justify-center">
-              <span class="material-symbols-rounded text-lg">content_copy</span>
-            </button>
           </div>
         </div>
-      </div>
     </section>
 
     <!-- Dashboard Section -->
@@ -194,10 +189,7 @@
         </div>
 
         <!-- Timer not started message -->
-        <div id="class-timer-idle" class="flex items-center gap-2 text-slate-400 flex-1 px-4">
-          <span class="material-symbols-rounded text-lg">schedule</span>
-          <span class="text-sm font-medium">수업 타이머를 시작하면 수업/쉬는시간이 자동으로 전환됩니다</span>
-        </div>
+
 
         <!-- Controls -->
         <div class="flex items-center gap-2">
@@ -216,12 +208,12 @@
               <div class="bg-white rounded-lg shadow-xl border border-slate-100 py-1 min-w-[140px]">
                 <button onclick="window.forceLesson()"
                   class="w-full px-3 py-2 text-left text-xs hover:bg-slate-50 flex items-center gap-2 text-slate-600 font-medium">
-                  <span class="material-symbols-rounded text-emerald-500 text-sm">school</span>
+                  <span class="material-symbols-rounded text-primary text-sm">school</span>
                   수업으로 전환
                 </button>
                 <button onclick="window.forceBreak()"
                   class="w-full px-3 py-2 text-left text-xs hover:bg-slate-50 flex items-center gap-2 text-slate-600 font-medium">
-                  <span class="material-symbols-rounded text-amber-500 text-sm">coffee</span>
+                  <span class="material-symbols-rounded text-slate-400 text-sm">coffee</span>
                   쉬는시간 전환
                 </button>
                 <hr class="my-1 border-slate-100">
@@ -237,64 +229,7 @@
       </div>
 
       <!-- Stats Bar -->
-      <div class="grid grid-cols-6 gap-3">
-        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
-          <div class="flex items-center gap-1.5 mb-1">
-            <div class="p-1 rounded bg-slate-100 text-slate-500">
-              <span class="material-symbols-rounded text-sm">people</span>
-            </div>
-            <span class="text-[10px] font-bold text-slate-400 uppercase">Total</span>
-          </div>
-          <div id="total-students" class="text-xl font-bold text-slate-900 pl-1">0</div>
-        </div>
-        <div id="today-attendance-card"
-          class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-slate-300 transition-colors"
-          title="클릭하여 출석자 명단 보기">
-          <div class="flex items-center gap-1.5 mb-1">
-            <div class="p-1 rounded bg-slate-100 text-slate-500">
-              <span class="material-symbols-rounded text-sm">event_available</span>
-            </div>
-            <span class="text-[10px] font-bold text-slate-400 uppercase">Today</span>
-          </div>
-          <div id="today-attendance-count" class="text-xl font-bold text-slate-900 pl-1">0</div>
-        </div>
-        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
-          <div class="flex items-center gap-1.5 mb-1">
-            <div class="p-1 rounded bg-purple-50 text-purple-600">
-              <span class="material-symbols-rounded text-sm">pan_tool</span>
-            </div>
-            <span class="text-[10px] font-bold text-slate-400 uppercase">Hand</span>
-          </div>
-          <div id="hand-raised-count" class="text-xl font-bold text-purple-600 pl-1">0</div>
-        </div>
-        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
-          <div class="flex items-center gap-1.5 mb-1">
-            <div class="p-1 rounded bg-emerald-50 text-emerald-600">
-              <span class="material-symbols-rounded text-sm">accessibility_new</span>
-            </div>
-            <span class="text-[10px] font-bold text-slate-400 uppercase">Stand</span>
-          </div>
-          <div id="standing-count" class="text-xl font-bold text-emerald-600 pl-1">0</div>
-        </div>
-        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
-          <div class="flex items-center gap-1.5 mb-1">
-            <div class="p-1 rounded bg-blue-50 text-blue-600">
-              <span class="material-symbols-rounded text-sm">weekend</span>
-            </div>
-            <span class="text-[10px] font-bold text-slate-400 uppercase">Sit</span>
-          </div>
-          <div id="sitting-count" class="text-xl font-bold text-blue-600 pl-1">0</div>
-        </div>
-        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
-          <div class="flex items-center gap-1.5 mb-1">
-            <div class="p-1 rounded bg-red-50 text-red-600">
-              <span class="material-symbols-rounded text-sm">person_off</span>
-            </div>
-            <span class="text-[10px] font-bold text-slate-400 uppercase">Away</span>
-          </div>
-          <div id="away-count" class="text-xl font-bold text-red-600 pl-1">0</div>
-        </div>
-      </div>
+      <!-- Stats Bar Removed -->
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <!-- Student Grid -->
@@ -303,14 +238,9 @@
           <div class="px-4 py-3 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
             <div class="flex items-center gap-2">
               <span class="material-symbols-rounded text-slate-400 text-lg">grid_view</span>
-              <h3 class="font-bold text-sm text-slate-700">STUDENTS</h3>
+              <h3 class="font-bold text-sm text-slate-700">학습 현황</h3>
             </div>
             <div class="flex items-center gap-2">
-              <button id="understanding-check-btn"
-                class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5">
-                <span class="material-symbols-rounded text-sm">help</span>
-                이해도 체크
-              </button>
               <button id="broadcast-btn"
                 class="px-2.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5">
                 <span class="material-symbols-rounded text-sm">campaign</span>
@@ -318,14 +248,13 @@
               </button>
             </div>
           </div>
-          <div id="student-grid"
-            class="flex-1 overflow-y-auto p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 content-start bg-slate-50/30">
+          <div id="student-grid" class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 content-start bg-slate-50/30">
             <div class="col-span-full flex flex-col items-center justify-center py-10 text-center text-slate-400">
               <div class="w-12 h-12 mb-3 rounded-full bg-slate-100 flex items-center justify-center">
                 <span class="material-symbols-rounded text-2xl opacity-50">hourglass_empty</span>
               </div>
               <h4 class="text-sm font-bold text-slate-500 mb-1">접속한 학생이 없습니다</h4>
-              <p class="text-xs opacity-70">서버 ID를 공유하여 수업을 시작하세요.</p>
+              <h4 class="text-sm font-bold text-slate-500 mb-1">접속한 학생이 없습니다</h4>
             </div>
           </div>
         </div>
@@ -436,7 +365,7 @@
         <!-- Stats Cards -->
         <div class="grid grid-cols-3 gap-3">
           <div class="bg-white border border-slate-100 shadow-sm rounded-xl p-3 text-center">
-            <div class="inline-flex p-1.5 rounded-full bg-emerald-50 text-emerald-500 mb-1">
+            <div class="inline-flex p-1.5 rounded-full bg-slate-100 text-slate-600 mb-1">
               <span class="material-symbols-rounded text-lg">trending_up</span>
             </div>
             <p class="text-[10px] text-slate-400 font-bold uppercase mt-1">Average</p>
@@ -450,7 +379,7 @@
             <p id="focus-min-score" class="text-lg font-bold text-slate-900">-</p>
           </div>
           <div class="bg-white border border-slate-100 shadow-sm rounded-xl p-3 text-center">
-            <div class="inline-flex p-1.5 rounded-full bg-blue-50 text-blue-500 mb-1">
+            <div class="inline-flex p-1.5 rounded-full bg-slate-100 text-slate-600 mb-1">
               <span class="material-symbols-rounded text-lg">star</span>
             </div>
             <p class="text-[10px] text-slate-400 font-bold uppercase mt-1">Max</p>
@@ -617,7 +546,7 @@
           </div>
           <div class="flex items-center justify-center gap-4 mt-3 pt-2 border-t border-slate-100">
             <div class="flex items-center gap-1.5">
-              <div class="w-3 h-3 rounded bg-emerald-100 border border-emerald-300">
+              <div class="w-3 h-3 rounded bg-slate-200 border border-slate-300">
               </div>
               <span class="text-[10px] text-slate-500">출석</span>
             </div>
@@ -742,10 +671,10 @@
       <div class="px-5 py-3 bg-slate-50 border-b border-slate-200">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
-            <span class="material-symbols-rounded text-emerald-600">groups</span>
+            <span class="material-symbols-rounded text-slate-900">groups</span>
             <span class="text-sm font-bold text-slate-700">총 출석</span>
           </div>
-          <span id="today-attendance-total" class="text-xl font-bold text-emerald-600">0명</span>
+          <span id="today-attendance-total" class="text-xl font-bold text-slate-900">0명</span>
         </div>
       </div>
 
@@ -784,7 +713,7 @@
         <div>
           <label class="block text-sm font-bold text-slate-700 mb-2">
             <span class="flex items-center gap-2">
-              <span class="material-symbols-rounded text-emerald-500 text-lg">school</span>
+              <span class="material-symbols-rounded text-primary text-lg">school</span>
               수업 시간
             </span>
           </label>
@@ -799,7 +728,7 @@
         <div>
           <label class="block text-sm font-bold text-slate-700 mb-2">
             <span class="flex items-center gap-2">
-              <span class="material-symbols-rounded text-amber-500 text-lg">coffee</span>
+              <span class="material-symbols-rounded text-slate-500 text-lg">coffee</span>
               쉬는 시간
             </span>
           </label>
@@ -811,12 +740,12 @@
           <p class="text-xs text-slate-400 mt-1.5 ml-1">1~60분 사이로 설정</p>
         </div>
 
-        <div class="bg-blue-50 rounded-xl p-3 border border-blue-100">
+        <div class="bg-slate-50 rounded-xl p-3 border border-slate-200">
           <div class="flex items-start gap-2">
-            <span class="material-symbols-rounded text-blue-500 text-lg mt-0.5">info</span>
-            <div class="text-xs text-blue-700">
+            <span class="material-symbols-rounded text-slate-500 text-lg mt-0.5">info</span>
+            <div class="text-xs text-slate-700">
               <p class="font-bold mb-1">쉬는 시간 동안:</p>
-              <ul class="list-disc list-inside space-y-0.5 text-blue-600">
+              <ul class="list-disc list-inside space-y-0.5 text-slate-600">
                 <li>자리비움 알림이 비활성화됩니다</li>
                 <li>집중도 데이터가 통계에서 제외됩니다</li>
                 <li>학생들에게 쉬는 시간 알림이 전송됩니다</li>
@@ -837,146 +766,24 @@
     </div>
   </div>
 
-  <!-- Understanding Check Question Modal (이해도 체크 질문 입력) -->
-  <div id="understanding-question-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
-    <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
-      onclick="window.closeUnderstandingQuestionModal && window.closeUnderstandingQuestionModal()"></div>
-    <div class="relative z-20 w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
-      <!-- Header -->
-      <div class="bg-slate-900 px-6 py-4 flex items-center justify-between shadow-sm">
-        <div class="flex items-center gap-3 text-white">
-          <span class="material-symbols-rounded text-2xl">help</span>
-          <h2 class="text-lg font-bold">이해도 체크</h2>
-        </div>
-        <button onclick="window.closeUnderstandingQuestionModal && window.closeUnderstandingQuestionModal()"
-          class="text-white/60 hover:text-white p-1 rounded-full transition-colors">
-          <span class="material-symbols-rounded text-xl">close</span>
-        </button>
-      </div>
 
-      <!-- Content -->
-      <div class="p-6 space-y-5">
-        <div>
-          <label class="block text-sm font-bold text-slate-700 mb-2">질문 내용</label>
-          <textarea id="understanding-question-input" rows="3"
-            class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all resize-none"
-            placeholder="지금 설명한 내용이 이해가 되나요?"></textarea>
-        </div>
-
-        <div>
-          <label class="block text-sm font-bold text-slate-700 mb-2">응답 시간 제한</label>
-          <div class="flex items-center gap-3">
-            <input type="range" id="understanding-time-limit" min="5" max="30" value="10"
-              class="flex-1 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary">
-            <span id="understanding-time-display"
-              class="w-14 py-1 text-center font-bold text-primary bg-red-50 rounded-lg text-sm">10초</span>
-          </div>
-        </div>
-
-        <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
-          <div class="flex items-start gap-2">
-            <span class="material-symbols-rounded text-slate-500 text-lg">info</span>
-            <p class="text-xs text-slate-600 leading-relaxed">
-              모든 접속 중인 학생에게 질문이 전송되고,<br>응답 결과를 실시간으로 확인할 수 있습니다.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Footer -->
-      <div class="px-6 pb-6 flex gap-3">
-        <button onclick="window.closeUnderstandingQuestionModal && window.closeUnderstandingQuestionModal()"
-          class="flex-1 py-3 px-4 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold rounded-xl transition-all">
-          취소
-        </button>
-        <button onclick="window.sendUnderstandingCheck && window.sendUnderstandingCheck()"
-          class="flex-1 py-3 px-4 bg-primary hover:bg-red-700 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm shadow-red-500/20">
-          <span class="material-symbols-rounded text-lg">send</span>
-          전송
-        </button>
-      </div>
+  <!-- Response List -->
+  <div>
+    <h4 class="text-sm font-bold text-slate-700 mb-3">응답 현황</h4>
+    <div id="understanding-response-list" class="max-h-40 overflow-y-auto space-y-2 pr-1">
+      <!-- 응답 목록이 여기에 표시됨 -->
     </div>
   </div>
+  </div>
 
-  <!-- Understanding Check Result Modal (이해도 체크 결과) -->
-  <div id="understanding-result-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
-    <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
-    <div class="relative z-20 w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
-      <!-- Header -->
-      <div class="bg-slate-900 px-6 py-4 flex items-center justify-between shadow-sm">
-        <div class="flex items-center gap-3 text-white">
-          <span class="material-symbols-rounded text-2xl">analytics</span>
-          <div>
-            <h2 class="text-lg font-bold">이해도 체크 결과</h2>
-            <p id="understanding-result-question" class="text-white/60 text-xs truncate max-w-[250px]"></p>
-          </div>
-        </div>
-        <button onclick="window.closeUnderstandingResultModal && window.closeUnderstandingResultModal()"
-          class="text-white/60 hover:text-white p-1.5 rounded-full transition-colors">
-          <span class="material-symbols-rounded text-xl">close</span>
-        </button>
-      </div>
-
-      <!-- Stats -->
-      <div class="p-6 space-y-6">
-        <!-- Timer / Status -->
-        <div id="understanding-result-status"
-          class="flex items-center justify-center gap-2 py-2 px-4 bg-slate-100 rounded-lg">
-          <span class="material-symbols-rounded text-slate-500 animate-pulse">timer</span>
-          <span class="font-bold text-slate-600">응답 대기 중... <span id="understanding-result-timer"
-              class="text-primary">10</span>초</span>
-        </div>
-
-        <!-- Summary Cards -->
-        <div class="grid grid-cols-3 gap-3">
-          <div class="bg-emerald-50 rounded-xl p-4 text-center border border-emerald-100">
-            <span class="material-symbols-rounded text-emerald-500 text-3xl mb-1">check_circle</span>
-            <p class="text-2xl font-bold text-emerald-600 mt-1" id="understanding-yes-count">0</p>
-            <p class="text-xs font-bold text-emerald-600 uppercase">Yes</p>
-          </div>
-          <div class="bg-red-50 rounded-xl p-4 text-center border border-red-100">
-            <span class="material-symbols-rounded text-red-500 text-3xl mb-1">cancel</span>
-            <p class="text-2xl font-bold text-red-600 mt-1" id="understanding-no-count">0</p>
-            <p class="text-xs font-bold text-red-600 uppercase">No</p>
-          </div>
-          <div class="bg-slate-50 rounded-xl p-4 text-center border border-slate-200">
-            <span class="material-symbols-rounded text-slate-400 text-3xl mb-1">hourglass_empty</span>
-            <p class="text-2xl font-bold text-slate-600 mt-1" id="understanding-pending-count">0</p>
-            <p class="text-xs font-bold text-slate-500 uppercase">Pending</p>
-          </div>
-        </div>
-
-        <!-- Progress Bar -->
-        <div>
-          <div class="flex justify-between text-xs font-bold text-slate-500 mb-2">
-            <span>RESPONSE RATE</span>
-            <span id="understanding-response-rate">0%</span>
-          </div>
-          <div class="h-3 bg-slate-100 rounded-full overflow-hidden flex">
-            <div id="understanding-yes-bar" class="h-full bg-emerald-500 transition-all duration-300" style="width: 0%">
-            </div>
-            <div id="understanding-no-bar" class="h-full bg-red-500 transition-all duration-300" style="width: 0%">
-            </div>
-          </div>
-        </div>
-
-        <!-- Response List -->
-        <div>
-          <h4 class="text-sm font-bold text-slate-700 mb-3">응답 현황</h4>
-          <div id="understanding-response-list" class="max-h-40 overflow-y-auto space-y-2 pr-1">
-            <!-- 응답 목록이 여기에 표시됨 -->
-          </div>
-        </div>
-      </div>
-
-      <!-- Footer -->
-      <div class="px-6 pb-6">
-        <button onclick="window.closeUnderstandingResultModal && window.closeUnderstandingResultModal()"
-          class="w-full py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-all">
-          닫기
-        </button>
-      </div>
-    </div>
+  <!-- Footer -->
+  <div class="px-6 pb-6">
+    <button onclick="window.closeUnderstandingResultModal && window.closeUnderstandingResultModal()"
+      class="w-full py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-all">
+      닫기
+    </button>
+  </div>
+  </div>
   </div>
 
   <script type="module" src="js/teacher-app.js"></script>

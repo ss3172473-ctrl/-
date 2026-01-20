@@ -21,7 +21,10 @@ class StudentApp {
     this.currentStatus = STATUS.UNKNOWN;
     this.statusHistory = [];
     this.statusInterval = null;
+    this.statusInterval = null;
     this.awayStartTime = null;
+    this.totalAwayDuration = 0; // 누적 자리비움 시간 (초)
+    this.lastAwayDuration = 0; // 마지막(현재) 자리비움 시간 (초)
     this.messageTimeout = null; // 메시지 자동 숨김 타이머
     this.currentFocusData = null;
     this.reconnectInterval = null; // 재연결 타이머
@@ -38,6 +41,10 @@ class StudentApp {
 
     // 집중도 평균 계산용
     this.focusHistory = [];
+
+    // New Feature Modes
+    this.isReadingMode = false;
+    this.isRestMode = false;
   }
 
   async init() {
@@ -70,13 +77,28 @@ class StudentApp {
       teacherMessageTime: document.getElementById('teacher-message-time'),
       closeTeacherMessage: document.getElementById('close-teacher-message'),
       // 화면 공유 상태
-      screenShareStatus: document.getElementById('screen-share-status')
+      screenShareStatus: document.getElementById('screen-share-status'),
+      // PIP Focus Overlay
+      pipFocusOverlay: document.getElementById('pip-focus-overlay'),
+      pipFocusScore: document.getElementById('pip-focus-score'),
+      pipFocusDot: document.getElementById('pip-focus-dot')
     };
 
     // 이벤트 바인딩
     this.elements.startBtn.addEventListener('click', () => this.start());
     this.elements.stopBtn.addEventListener('click', () => this.stop());
     this.elements.closeTeacherMessage.addEventListener('click', () => this.hideTeacherMessage());
+
+    // New Mode Buttons
+    this.elements.readingModeBtn = document.getElementById('reading-mode-btn');
+    this.elements.restBtn = document.getElementById('rest-btn');
+
+    if (this.elements.readingModeBtn) {
+      this.elements.readingModeBtn.addEventListener('click', () => this.toggleReadingMode());
+    }
+    if (this.elements.restBtn) {
+      this.elements.restBtn.addEventListener('click', () => this.toggleRestMode());
+    }
 
     // 저장된 설정 불러오기
     this.loadSettings();
@@ -281,6 +303,11 @@ class StudentApp {
   }
 
   updateStatus(status) {
+    // Override status if Rest Mode is active
+    if (this.isRestMode && status !== STATUS.DISCONNECTED) {
+      status = STATUS.REST;
+    }
+
     this.currentStatus = status;
 
     // 자리비움 타이머
@@ -291,9 +318,22 @@ class StudentApp {
       this.elements.awayTimer.classList.remove('hidden'); // 타이머 표시
       this.updateAwayTimer();
     } else {
-      this.awayStartTime = null;
-      this.elements.awayTimer.textContent = '';
-      this.elements.awayTimer.classList.add('hidden'); // 타이머 숨김
+      if (this.awayStartTime) {
+        // 자리비움 종료 시 누적 시간 추가
+        const duration = Math.floor((Date.now() - this.awayStartTime) / 1000);
+        this.totalAwayDuration += duration;
+        this.awayStartTime = null;
+        this.lastAwayDuration = 0;
+      }
+      // 타이머 표시 유지 (누적 시간 보여줌) 또는 숨김 선택
+      // 여기서는 계속 보여주되, 현재 상태가 아니면 색을 바꿀 수도 있음.
+      // 하지만 사용자 요구사항은 "Cumulative time for Away status"를 표시하는 것.
+      // 자리비움 상태가 아닐 때도 보여줄지 결정 필요.
+      // 보통은 '오늘 총 자리비움 시간'을 어딘가에 표시하거나,
+      // 자리비움 상태일 때 '이번 자리비움' 대신 '총 자리비움'을 보여달라는 뜻일 수 있음.
+      // 가설: 자리비움 상태일 때 "총 누적 시간"을 보여준다.
+
+      this.elements.awayTimer.classList.add('hidden');
     }
 
     // 상태별 스타일
@@ -306,16 +346,16 @@ class StudentApp {
 
     if (status === STATUS.STANDING) {
       icon = 'accessibility_new';
-      iconColor = 'text-green-600';
-      bgColor = 'bg-green-50';
-      textColor = 'text-green-600';
-      borderColor = 'border-green-100';
+      iconColor = 'text-slate-600';
+      bgColor = 'bg-slate-50';
+      textColor = 'text-slate-700';
+      borderColor = 'border-slate-200';
     } else if (status === STATUS.SITTING) {
       icon = 'chair';
-      iconColor = 'text-blue-600';
-      bgColor = 'bg-blue-50';
-      textColor = 'text-blue-600';
-      borderColor = 'border-blue-100';
+      iconColor = 'text-slate-900';
+      bgColor = 'bg-white';
+      textColor = 'text-slate-900';
+      borderColor = 'border-slate-200';
     } else if (status === STATUS.AWAY) {
       icon = 'person_off';
       iconColor = 'text-red-600';
@@ -324,10 +364,16 @@ class StudentApp {
       borderColor = 'border-red-100';
     } else if (status === STATUS.HAND_RAISED) {
       icon = 'pan_tool';
-      iconColor = 'text-purple-600 dark:text-purple-400';
-      bgColor = 'bg-purple-50 dark:bg-purple-900/20';
-      textColor = 'text-purple-600 dark:text-purple-400';
-      borderColor = 'border-purple-100 dark:border-purple-800';
+      iconColor = 'text-slate-900 dark:text-slate-400';
+      bgColor = 'bg-slate-50 dark:bg-slate-900/20';
+      textColor = 'text-slate-900 dark:text-slate-400';
+      borderColor = 'border-slate-200 dark:border-slate-800';
+    } else if (status === STATUS.REST) {
+      icon = 'coffee';
+      iconColor = 'text-slate-500';
+      bgColor = 'bg-slate-100';
+      textColor = 'text-slate-500';
+      borderColor = 'border-slate-200';
     }
 
     // Premium Status Badge Styling
@@ -344,11 +390,15 @@ class StudentApp {
 
   updateAwayTimer() {
     if (this.awayStartTime) {
-      const seconds = Math.floor((Date.now() - this.awayStartTime) / 1000);
-      const mins = Math.floor(seconds / 60);
-      const secs = seconds % 60;
+      const currentAwaySeconds = Math.floor((Date.now() - this.awayStartTime) / 1000);
+      const totalSeconds = this.totalAwayDuration + currentAwaySeconds;
+
+      const mins = Math.floor(totalSeconds / 60);
+      const secs = totalSeconds % 60;
+
+      // 누적 시간 표시
       this.elements.awayTimer.textContent =
-        `자리비움: ${mins}분 ${secs.toString().padStart(2, '0')}초`;
+        `총 자리비움: ${mins}분 ${secs.toString().padStart(2, '0')}초`;
     }
   }
 
@@ -530,6 +580,92 @@ class StudentApp {
   }
 
   /**
+   * Reading Mode Toggle
+   * - Adjusts focus analysis thresholds
+   * - Shows toast notification
+   */
+  toggleReadingMode() {
+    this.isReadingMode = !this.isReadingMode;
+    const btn = this.elements.readingModeBtn;
+
+    if (this.isReadingMode) {
+      // ON
+      btn.innerHTML = `<span class="material-symbols-rounded text-base">auto_stories</span><span class="mode-text">독서 모드</span>`;
+      btn.classList.add('bg-slate-900', 'text-white', 'border-transparent');
+      btn.classList.remove('bg-white', 'text-slate-600', 'border-slate-200');
+
+      this.focusAnalyzer.setReadingMode(true);
+
+      // Show Toast
+      this.showToast('독서 모드 시작: 집중력 측정 기준이 독서 환경에 맞춰 최적화되었습니다. 바른 자세를 유지해주세요.');
+    } else {
+      // OFF (Video Mode default)
+      btn.innerHTML = `<span class="material-symbols-rounded text-base">import_contacts</span><span class="mode-text">인강 모드</span>`;
+      btn.classList.add('bg-white', 'text-slate-600', 'border-slate-200');
+      btn.classList.remove('bg-slate-900', 'text-white', 'border-transparent');
+
+      this.focusAnalyzer.setReadingMode(false);
+    }
+  }
+
+  /**
+   * Rest Mode Toggle
+   * - Changes status to REST
+   * - Pauses strict focus tracking visually if needed (logic managed by FocusAnalyzer still runs but status overrides)
+   */
+  toggleRestMode() {
+    this.isRestMode = !this.isRestMode;
+    const btn = this.elements.restBtn;
+
+    if (this.isRestMode) {
+      // ON (Resting)
+      btn.innerHTML = `<span class="material-symbols-rounded text-base">play_arrow</span>공부 하기`;
+      btn.classList.add('bg-slate-900', 'text-white', 'border-transparent', 'hover:bg-slate-800');
+      btn.classList.remove('bg-white', 'text-slate-600', 'border-slate-200', 'hover:bg-slate-50');
+
+      // Force update status immediately
+      this.updateStatus(STATUS.REST);
+    } else {
+      // OFF (Back to Study)
+      btn.innerHTML = `<span class="material-symbols-rounded text-base">coffee</span>쉬는 시간`;
+      btn.classList.add('bg-white', 'text-slate-600', 'border-slate-200', 'hover:bg-slate-50');
+      btn.classList.remove('bg-slate-900', 'text-white', 'border-transparent', 'hover:bg-slate-800');
+
+      // Status will automatically update on next pose check
+    }
+  }
+
+  /**
+   * Simple Toast Notification
+   */
+  showToast(message) {
+    // Check if container exists
+    let container = document.getElementById('toast-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'toast-container';
+      container.className = 'fixed bottom-24 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 w-max max-w-[90%] pointer-events-none';
+      document.body.appendChild(container); // Append to body, not monitor section
+    }
+
+    const toast = document.createElement('div');
+    toast.className = 'bg-slate-900/90 backdrop-blur text-white px-4 py-3 rounded-xl shadow-xl text-sm font-medium animate-fade-in flex items-center gap-3';
+    toast.innerHTML = `
+      <span class="material-symbols-rounded text-yellow-400">info</span>
+      <span>${message}</span>
+    `;
+
+    container.appendChild(toast);
+
+    // Remove after 4 seconds
+    setTimeout(() => {
+      toast.classList.add('opacity-0', 'translate-y-2');
+      toast.style.transition = 'all 0.5s ease';
+      setTimeout(() => toast.remove(), 500);
+    }, 4000);
+  }
+
+  /**
    * 집중도 표시 업데이트
    */
   updateFocusDisplay(focusData) {
@@ -606,6 +742,13 @@ class StudentApp {
       } else {
         this.elements.avgFocusScore.style.color = '';
       }
+    }
+
+    // 5. PIP Overlay Update
+    if (this.elements.pipFocusOverlay) {
+      this.elements.pipFocusOverlay.classList.remove('hidden');
+      this.elements.pipFocusScore.textContent = score;
+      this.elements.pipFocusDot.style.backgroundColor = color;
     }
   }
 

@@ -257,13 +257,13 @@ class PoseAnalyzer {
       return STATUS.UNKNOWN;
     }
 
-    // 손들기 감지 (손목이 머리(코) 위에 있으면)
-    const leftHandRaised = leftWrist.visibility > 0.5 && leftWrist.y < nose.y - 0.05;
-    const rightHandRaised = rightWrist.visibility > 0.5 && rightWrist.y < nose.y - 0.05;
+    // Hand raise detection removed as per requirements
+    // const leftHandRaised = leftWrist.visibility > 0.5 && leftWrist.y < nose.y - 0.05;
+    // const rightHandRaised = rightWrist.visibility > 0.5 && rightWrist.y < nose.y - 0.05;
 
-    if (leftHandRaised || rightHandRaised) {
-      return STATUS.HAND_RAISED;
-    }
+    // if (leftHandRaised || rightHandRaised) {
+    //   return STATUS.HAND_RAISED;
+    // }
 
     // 어깨 중심점
     const shoulderCenterY = (leftShoulder.y + rightShoulder.y) / 2;
@@ -329,23 +329,23 @@ class PoseAnalyzer {
     const eyeDist = Math.abs((leftEye.x - rightEye.x) * width);
     const baseRadius = Math.max(eyeDist * 2.8, 65); // Slightly larger for "Space"
 
-    // Theme Colors (Zen/Flow Palette)
+    // Theme Colors (Red/Black Brand Identity)
     let mainColor, glowColor, secondaryColor;
     if (score >= 80) {
-      // High Focus: Brand Mint Green + Cyan Mix
-      mainColor = '#69D29D'; // Brand Primary
-      secondaryColor = '#00FBFF';
-      glowColor = 'rgba(105, 210, 157, 0.4)';
+      // High Focus: Primary Red + White Accent
+      mainColor = '#E30000'; // Primary Red
+      secondaryColor = '#FFFFFF';
+      glowColor = 'rgba(227, 0, 0, 0.4)';
     } else if (score >= 50) {
-      // Medium Focus: Warm Gold (Calm Alertness)
-      mainColor = '#FCD34D';
-      secondaryColor = '#F59E0B';
-      glowColor = 'rgba(252, 211, 77, 0.4)';
+      // Medium Focus: Orange (Alertness)
+      mainColor = '#F97316';
+      secondaryColor = '#FB923C';
+      glowColor = 'rgba(249, 115, 22, 0.4)';
     } else {
-      // Low Focus: Soft Rose (Gentle Nudge, not Alarm Red)
-      mainColor = '#FB7185';
-      secondaryColor = '#F43F5E';
-      glowColor = 'rgba(251, 113, 133, 0.4)';
+      // Low Focus: Slate (Distracted)
+      mainColor = '#64748B';
+      secondaryColor = '#94A3B8';
+      glowColor = 'rgba(100, 116, 139, 0.4)';
     }
 
     ctx.save();

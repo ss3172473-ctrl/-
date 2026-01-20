@@ -58,6 +58,15 @@ class FocusAnalyzer {
   }
 
   /**
+   * Reading Mode Toggle
+   * Relax thresholds for reading/writing context
+   */
+  setReadingMode(isReading) {
+    this.isReadingMode = isReading;
+    console.log(`[FocusAnalyzer] Reading Mode: ${isReading ? 'ON' : 'OFF'}`);
+  }
+
+  /**
    * 자리비움 상태 설정 (PoseAnalyzer에서 호출)
    */
   setAway(isAway) {
@@ -118,10 +127,25 @@ class FocusAnalyzer {
         '| eyeYDiff:', eyeYDiff.toFixed(3));
     }
 
+    // === Thresholds Calculation (Reading Mode Adjustment) ===
+    // Reading Mode: Relax Head Down & Gaze thresholds
+    // Head Down: Allow closer nose-shoulder distance (0.15 -> 0.08)
+    // Gaze: Allow more side deviation (0.08 -> 0.15)
+
+    // Default Thresholds
+    let headThreshold = 0.15;
+    let gazeThreshold = 0.08;
+    // let earThreshold = 0.2; // Unchanged/Unused variable
+
+    if (this.isReadingMode) {
+      headThreshold = 0.08; // Relaxed (allows more head down)
+      gazeThreshold = 0.15; // Relaxed (allows looking at book on side)
+    }
+
     // === 집중도 감점 판단 ===
 
     // 고개 숙임 (코-어깨 거리가 작아짐)
-    if (noseToShoulderDist < 0.15) {
+    if (noseToShoulderDist < headThreshold) {
       this.frameData.headDownFrames++;
       this.lastAnalysis.headDown = true;
     } else {
@@ -130,7 +154,7 @@ class FocusAnalyzer {
 
     // 옆 보기 판단 (여러 조건 OR)
     const isLookingAway =
-      noseOffsetX > 0.08 ||      // 코가 중심에서 벗어남
+      noseOffsetX > gazeThreshold ||      // 코가 중심에서 벗어남
       earDiff > 0.2 ||           // 귀 visibility 차이
       eyeYDiff > 0.03;           // 눈 높이 차이 (고개 기울임)
 

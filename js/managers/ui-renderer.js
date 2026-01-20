@@ -47,79 +47,192 @@ export class UIRenderer {
   }
 
   /**
-   * 학생 카드 생성
+   * 학생 행(Row) 생성 (리스트 뷰)
    */
   createStudentCard(student) {
-    const card = document.createElement('div');
+    const row = document.createElement('div');
     const statusStyle = this.getStatusStyle(student.status);
 
-    // Premium Card Design: White clean card with subtle border and shadow
-    card.className = `group relative bg-white rounded-3xl shadow-sm border border-slate-200 hover:shadow-xl hover:border-red-100 hover:-translate-y-1 transition-all duration-300 overflow-hidden`;
-    card.setAttribute('data-peer-id', student.peerId);
+    // Row Layout: Name | Graph | Avg Score | Actions
+    row.className = `student-row group flex items-center justify-between p-4 bg-white border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors mx-2 rounded-xl`;
+    row.setAttribute('data-peer-id', student.peerId);
 
-    const statusInfo = this.getStatusInfo(student);
-    const focusDisplay = this.getFocusDisplay(student);
+    // Calculate 10-min Average
+    const validHistory = student.focusHistory.filter(h => h.score > 0);
+    const avgScore = validHistory.length > 0
+      ? Math.round(validHistory.reduce((a, b) => a + b.score, 0) / validHistory.length)
+      : 0;
 
-    // Gradient top bar based on status
-    const statusGradient = statusStyle.bg.includes('green') ? 'from-emerald-400 to-teal-500' :
-      statusStyle.bg.includes('blue') ? 'from-blue-400 to-indigo-500' :
-        statusStyle.bg.includes('red') ? 'from-red-500 to-rose-600' :
-          statusStyle.bg.includes('purple') ? 'from-violet-500 to-purple-600' :
-            statusStyle.bg.includes('amber') ? 'from-amber-400 to-orange-500' :
-              'from-slate-300 to-slate-400';
+    // Status Color for Gradient/Text
+    let statusColorClass = 'text-slate-500';
+    if (student.status === STATUS.AWAY) statusColorClass = 'text-red-500';
+    else if (student.status === STATUS.STANDING) statusColorClass = 'text-emerald-500';
+    else if (student.status === STATUS.SITTING) statusColorClass = 'text-blue-500';
+    else if (student.status === STATUS.HAND_RAISED) statusColorClass = 'text-purple-500';
 
-    card.innerHTML = `
-      <!-- Top Status Stripe (Gradient) -->
-      <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r ${statusGradient} opacity-90"></div>
-
-      <div class="p-5">
-        <!-- Header: Name & Status -->
-        <div class="flex items-start justify-between mb-4">
-          <div>
-            <div class="flex items-center gap-2 mb-1">
-              <h3 class="font-bold text-lg text-slate-800 tracking-tight">${student.name}</h3>
-              <span class="text-[10px] text-slate-500 font-semibold px-2 py-0.5 bg-slate-100 rounded-full border border-slate-200">${student.grade ? student.grade + '학년' : '학생'}</span>
-            </div>
-            <div class="flex items-center gap-2 mt-1">
-               <div class="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-slate-50 border border-slate-100">
-                <span class="material-symbols-rounded text-sm ${statusStyle.textColor}">${statusStyle.icon}</span>
-                <span class="text-xs font-semibold ${statusStyle.textColor}">${STATUS_LABEL[student.status]}</span>
-              </div>
-              ${statusInfo}
-            </div>
+    row.innerHTML = `
+      <!-- 1. Student Info -->
+      <div class="flex items-center gap-4 w-[250px]">
+        <div class="flex flex-col">
+          <div class="flex items-center gap-2">
+            <h3 class="font-bold text-slate-800 text-base">${student.name}</h3>
+            <h3 class="font-bold text-slate-800 text-base">${student.name}</h3>
+            <span class="text-[10px] text-slate-400 font-medium">${student.grade ? student.grade + '학년' : ''}</span>
           </div>
-          
-          <!-- Quick Action -->
-           <button class="btn-view-video p-2 rounded-full bg-slate-50 text-slate-400 hover:text-white hover:bg-gradient-to-br hover:from-primary hover:to-red-600 transition-all shadow-sm hover:shadow-red-500/30 group-hover:opacity-100 opacity-0 transform translate-x-2 group-hover:translate-x-0 transition-all duration-300 delay-75" title="영상 확인">
-            <span class="material-symbols-rounded text-[20px]">videocam</span>
-          </button>
+          <div class="flex items-center gap-1.5 mt-0.5">
+            <span class="material-symbols-rounded text-sm ${statusStyle.textColor}">${statusStyle.icon}</span>
+            <span class="text-xs font-medium ${statusStyle.textColor}">${STATUS_LABEL[student.status]}</span>
+            ${this.getStatusInfo(student)}
+          </div>
         </div>
+      </div>
 
-        <!-- Body: Focus & Activity -->
-        <div class="space-y-3">
-          ${focusDisplay}
+      <!-- 2. Focus Information (Graph & Current) -->
+      <div class="flex-1 flex items-center justify-center px-4 gap-6">
+        <!-- 5-min Trend Graph -->
+        <div class="flex flex-col items-center w-full max-w-[200px]">
+          <canvas class="focus-sparkline w-full h-[40px]" width="200" height="40"></canvas>
         </div>
+        
+        <!-- Current Score (Small) -->
+        <div class="text-center w-[80px]">
+           <div class="text-xl font-bold ${student.focus?.level === 'high' ? 'text-primary' : 'text-slate-700'}">
+             ${student.focus ? student.focus.score : '-'}%
+           </div>
+        </div>
+      </div>
 
-        <!-- Footer: Actions (Hidden by default, shown on hover) -->
-        <div class="absolute bottom-0 left-0 w-full bg-white/95 backdrop-blur-sm border-t border-slate-100 p-2 flex items-center justify-around translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-10">
-            <button class="btn-ptt p-2 rounded-lg text-slate-400 hover:bg-slate-50 hover:text-emerald-500 transition-colors" title="음성 메시지">
-              <span class="material-symbols-rounded">mic</span>
-            </button>
-            <button class="btn-send-message p-2 rounded-lg text-slate-400 hover:bg-slate-50 hover:text-indigo-500 transition-colors" title="메시지 전송">
-              <span class="material-symbols-rounded">chat</span>
-            </button>
-            <button class="btn-focus-report p-2 rounded-lg text-slate-400 hover:bg-slate-50 hover:text-orange-500 transition-colors" title="집중도 보고서">
-              <span class="material-symbols-rounded">assessment</span>
-            </button>
-            <button class="btn-attendance p-2 rounded-lg text-slate-400 hover:bg-slate-50 hover:text-teal-500 transition-colors" title="출석 현황">
-              <span class="material-symbols-rounded">calendar_month</span>
-            </button>
-        </div>
+      <!-- 3. 10-min Avg -->
+      <div class="w-[120px] text-center border-l border-slate-100 pl-4">
+        <div class="text-2xl font-bold text-slate-800">${avgScore}%</div>
+      </div>
+
+      <!-- 4. Actions -->
+      <div class="flex items-center gap-1 pl-4">
+         <button class="btn-view-video p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-primary transition-colors" title="영상 확인">
+          <span class="material-symbols-rounded">videocam</span>
+        </button>
+        <button class="btn-send-message p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-900 transition-colors" title="메시지">
+          <span class="material-symbols-rounded">chat</span>
+        </button>
+        <button class="btn-focus-report p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-900 transition-colors" title="리포트">
+          <span class="material-symbols-rounded">assessment</span>
+        </button>
       </div>
     `;
 
-    this.bindCardEvents(card, student);
-    return card;
+    // Draw Sparkline
+    setTimeout(() => {
+      const canvas = row.querySelector('.focus-sparkline');
+      if (canvas && student.focusHistory.length > 0) {
+        this.drawSparkline(canvas, student.focusHistory);
+      }
+    }, 0);
+
+    this.bindCardEvents(row, student);
+    return row;
+  }
+
+  /**
+   * 개별 카드 부분 업데이트 (Row Layout)
+   */
+  updateStudentCard(peerId, student) {
+    const row = this.elements.studentGrid?.querySelector(`[data-peer-id="${peerId}"]`);
+    if (!row) return;
+
+    // Update Score
+    if (student.focus) {
+      // Update Score
+      // Current score is .text-xl
+      const currentScoreEl = row.querySelector('.text-xl.font-bold');
+      if (currentScoreEl) {
+        currentScoreEl.textContent = `${student.focus.score}%`;
+
+        // Remove old color classes
+        currentScoreEl.classList.remove('text-primary', 'text-slate-700', 'text-slate-400', 'text-red-500');
+
+        // Add new color class
+        if (student.focus.level === 'high') currentScoreEl.classList.add('text-primary');
+        else currentScoreEl.classList.add('text-slate-700');
+      }
+
+      // Update Sparkline
+      const canvas = row.querySelector('.focus-sparkline');
+      if (canvas) {
+        this.drawSparkline(canvas, student.focusHistory);
+      }
+    }
+
+    // Update Avg Score
+    const avgEl = row.querySelector('.text-2xl.font-bold');
+    if (avgEl) {
+      const validHistory = student.focusHistory.filter(h => h.score > 0);
+      const avgScore = validHistory.length > 0
+        ? Math.round(validHistory.reduce((a, b) => a + b.score, 0) / validHistory.length)
+        : 0;
+      avgEl.textContent = `${avgScore}%`;
+    }
+
+    // Update Status Badge & Info
+    const statusLabel = row.querySelector('.text-xs.font-medium');
+    const statusIcon = row.querySelector('.material-symbols-rounded.text-sm');
+
+    if (statusLabel && statusIcon) {
+      const statusStyle = this.getStatusStyle(student.status);
+
+      statusLabel.textContent = STATUS_LABEL[student.status];
+      statusIcon.textContent = statusStyle.icon;
+
+      // Update classes
+      // Note: Use setAttribute or assignment to completely replace
+      statusLabel.className = `text-xs font-medium ${statusStyle.textColor}`;
+      statusIcon.className = `material-symbols-rounded text-sm ${statusStyle.textColor}`;
+    }
+  }
+
+  /**
+   * Draw Sparkline Graph
+   */
+  drawSparkline(canvas, history) {
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+
+    ctx.clearRect(0, 0, width, height);
+
+    // Use last 5 minutes (300 seconds)
+    const data = history.slice(-300);
+    if (data.length < 2) return;
+
+    ctx.beginPath();
+    ctx.strokeStyle = '#E30000'; // Primary Red
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    const stepX = width / (data.length - 1);
+
+    data.forEach((point, i) => {
+      const x = i * stepX;
+      // y is inverted (100 is top, 0 is bottom)
+      const y = height - (point.score / 100 * height);
+
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+
+    ctx.stroke();
+
+    // Add fill gradient
+    const gradient = ctx.createLinearGradient(0, 0, 0, height);
+    gradient.addColorStop(0, 'rgba(227, 0, 0, 0.1)');
+    gradient.addColorStop(1, 'rgba(227, 0, 0, 0)');
+
+    ctx.lineTo(width, height);
+    ctx.lineTo(0, height);
+    ctx.closePath();
+    ctx.fillStyle = gradient;
+    ctx.fill();
   }
 
   /**
@@ -200,17 +313,17 @@ export class UIRenderer {
     const styles = {
       [STATUS.STANDING]: {
         bg: 'bg-white',
-        border: 'border-l-4 border-l-emerald-500 border-slate-200',
+        border: 'border-l-4 border-l-slate-600 border-slate-200',
         icon: 'accessibility_new',
-        iconColor: 'text-emerald-500',
-        textColor: 'text-emerald-600'
+        iconColor: 'text-slate-600',
+        textColor: 'text-slate-700'
       },
       [STATUS.SITTING]: {
         bg: 'bg-white',
-        border: 'border-l-4 border-l-blue-500 border-slate-200',
+        border: 'border-l-4 border-l-slate-900 border-slate-200',
         icon: 'weekend',
-        iconColor: 'text-blue-500',
-        textColor: 'text-blue-600'
+        iconColor: 'text-slate-900',
+        textColor: 'text-slate-900'
       },
       [STATUS.AWAY]: {
         bg: 'bg-white',
@@ -221,10 +334,10 @@ export class UIRenderer {
       },
       [STATUS.HAND_RAISED]: {
         bg: 'bg-white',
-        border: 'border-l-4 border-l-purple-500 border-slate-200',
+        border: 'border-l-4 border-l-slate-900 border-slate-200',
         icon: 'pan_tool',
-        iconColor: 'text-purple-500',
-        textColor: 'text-purple-600'
+        iconColor: 'text-slate-900',
+        textColor: 'text-slate-900'
       },
       [STATUS.NO_RESPONSE]: {
         bg: 'bg-white',
@@ -280,10 +393,10 @@ export class UIRenderer {
         <div class="screen-thumbnail-container mt-2 pt-2 border-t border-slate-100">
           <div class="flex items-center justify-between mb-1">
             <span class="text-[10px] text-slate-400 flex items-center gap-1">
-              <span class="material-symbols-rounded text-xs text-indigo-500">screen_share</span>
+              <span class="material-symbols-rounded text-xs text-primary">screen_share</span>
               화면 공유 중
             </span>
-            <button class="btn-view-screen text-[10px] text-indigo-500 hover:text-indigo-600 font-medium">확대</button>
+            <button class="btn-view-screen text-[10px] text-primary hover:text-red-700 font-medium">확대</button>
           </div>
           <img class="screen-thumbnail w-full rounded-md border border-slate-200 cursor-pointer hover:opacity-90 transition-opacity" src="${student.screenThumbnail}" />
         </div>
@@ -291,7 +404,7 @@ export class UIRenderer {
     } else if (student.isScreenSharing) {
       html += `
         <div class="mt-2 pt-2 border-t border-slate-100">
-          <div class="flex items-center gap-1 text-[10px] text-indigo-500">
+          <div class="flex items-center gap-1 text-[10px] text-slate-500">
             <span class="material-symbols-rounded text-xs">screen_share</span>
             화면 공유 대기 중...
           </div>

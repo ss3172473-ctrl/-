@@ -341,6 +341,8 @@ class TeacherApp {
       onOpenScreenModal: (peerId) => this.openScreenModal(peerId)
     });
 
+    this.studentManager.setUIRenderer(this.uiRenderer);
+
     // 오늘 출석 카운트 초기화
     this.updateTodayAttendance();
   }
@@ -1346,9 +1348,100 @@ class TeacherApp {
         </div>
         ` : ''}
       </div>
+      
+      <!-- Focus Timeline Chart -->
+      <div class="mt-4 bg-white rounded-xl p-4 border border-slate-200">
+        <h3 class="text-sm font-bold text-slate-800 mb-4">집중도 타임라인</h3>
+        <div class="relative h-64 w-full">
+          <canvas id="report-chart"></canvas>
+        </div>
+      </div>
     `;
 
     this.elements.focusReportContent.innerHTML = html;
+
+    // Render Chart
+    setTimeout(() => {
+      const ctx = document.getElementById('report-chart')?.getContext('2d');
+      if (ctx) {
+        this.renderReportChart(ctx, report, this.focusReportType);
+      }
+    }, 100);
+  }
+
+  renderReportChart(ctx, report, type) {
+    if (this.reportChartInstance) {
+      this.reportChartInstance.destroy();
+    }
+
+    let labels = [];
+    let data = [];
+    let label = '';
+    let color = '#E30000';
+
+    if (type === 'daily') {
+      // Daily: Score History
+      if (report.scores && report.scores.length > 0) {
+        labels = report.scores.map(s => {
+          const d = new Date(s.time);
+          return `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
+        });
+        data = report.scores.map(s => s.score);
+        label = '집중도 점수';
+      }
+    } else {
+      // Weekly/Monthly: Focus Time
+      if (report.days && report.days.length > 0) {
+        labels = report.days.map(d => {
+          const date = new Date(d.date);
+          return type === 'weekly'
+            ? ['일', '월', '화', '수', '목', '금', '토'][date.getDay()]
+            : `${date.getDate()}일`;
+        });
+
+        // Convert seconds to minutes
+        data = report.days.map(d => Math.round(d.focusedTime / 60));
+        label = '집중 시간 (분)';
+      }
+    }
+
+    this.reportChartInstance = new Chart(ctx, {
+      type: type === 'daily' ? 'line' : 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: label,
+          data: data,
+          borderColor: color,
+          backgroundColor: type === 'daily' ? 'rgba(227, 0, 0, 0.1)' : color,
+          borderWidth: 2,
+          tension: 0.3,
+          fill: type === 'daily',
+          borderRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: type === 'daily' ? 100 : undefined,
+            grid: { borderDash: [2, 4], color: '#f1f5f9' }
+          },
+          x: {
+            grid: { display: false }
+          }
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index'
+        }
+      }
+    });
   }
 
   async downloadFocusReportCSV() {

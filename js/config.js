@@ -79,7 +79,8 @@ const STATUS = {
   UNKNOWN: 'unknown',
   NO_RESPONSE: 'no_response',
   DISCONNECTED: 'disconnected',
-  HAND_RAISED: 'hand_raised'
+  HAND_RAISED: 'hand_raised',
+  REST: 'rest'
 };
 
 // 상태 한글 표시
@@ -90,20 +91,17 @@ const STATUS_LABEL = {
   unknown: '감지중...',
   no_response: '응답없음',
   disconnected: '연결끊김',
-  hand_raised: '손들기 ✋'
+  hand_raised: '손들기 ✋',
+  rest: '쉬는 시간 ☕️'
 };
 
 // 상태 색상
 // 상태 색상 (Tailwind Palette Match)
 // Standing: Emerald-500, Sitting: Blue-500, Away: Red-500
 const STATUS_COLOR = {
-  standing: '#10B981',
-  sitting: '#3B82F6',
-  away: '#E30000',
-  unknown: '#94A3B8',
-  no_response: '#F59E0B',
   disconnected: '#64748B',
-  hand_raised: '#8B5CF6'
+  hand_raised: '#8B5CF6',
+  rest: '#64748B' // Slate for Rest
 };
 
 // 응답없음 판단 시간 (초)

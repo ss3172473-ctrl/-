@@ -141,135 +141,161 @@
         <div class="bg-white rounded-[1.8rem] p-8">
 
           <div class="text-center mb-8">
-            <h2 class="text-2xl font-display font-bold text-slate-900 mb-2">학생 로그인</h2>
-            <p class="text-slate-500 text-sm">입장 정보를 입력해주세요</p>
-          </div>
+            <h2 class="text-2xl font-display font-bold text-slate-900 mb-8">학생 로그인</h2>
 
-          <div class="space-y-5">
-            <div>
-              <label for="student-name"
-                class="block text-xs font-bold text-slate-400 mb-1.5 ml-1 uppercase tracking-wider">이름</label>
-              <input type="text" id="student-name" placeholder="본명을 입력하세요"
-                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent transition-all shadow-sm">
-            </div>
-
-            <div>
-              <label for="student-grade"
-                class="block text-xs font-bold text-slate-400 mb-1.5 ml-1 uppercase tracking-wider">학년</label>
-              <select id="student-grade"
-                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent transition-all appearance-none cursor-pointer shadow-sm">
-                <option value="" disabled selected>학년 선택</option>
-                <option value="1">1학년</option>
-                <option value="2">2학년</option>
-                <option value="3">3학년</option>
-                <option value="4">4학년</option>
-                <option value="5">5학년</option>
-                <option value="6">6학년</option>
-              </select>
-            </div>
-
-            <div>
-              <label for="teacher-id"
-                class="block text-xs font-bold text-slate-400 mb-1.5 ml-1 uppercase tracking-wider">학부모 ID</label>
-              <div class="relative">
-                <span
-                  class="material-symbols-rounded absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg">vpn_key</span>
-                <input type="text" id="teacher-id" placeholder="ID 입력 (예: parent-12345)"
-                  class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent transition-all font-mono text-sm shadow-sm">
+            <div class="space-y-5">
+              <div>
+                <label for="student-name"
+                  class="hidden block text-xs font-bold text-slate-400 mb-1.5 ml-1 uppercase tracking-wider">이름</label>
+                <input type="text" id="student-name" placeholder="본명을 입력하세요"
+                  class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent transition-all shadow-sm">
               </div>
-            </div>
 
-            <button id="start-btn"
-              class="w-full py-3.5 px-4 bg-primary hover:bg-primary-dark text-white font-bold rounded-xl shadow-lg shadow-red-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 mt-4 text-sm group">
-              <span class="material-symbols-rounded group-hover:scale-110 transition-transform">rocket_launch</span>
-              공부 시작하기
-            </button>
+              <div>
+                <label for="student-grade"
+                  class="hidden block text-xs font-bold text-slate-400 mb-1.5 ml-1 uppercase tracking-wider">학년</label>
+                <select id="student-grade"
+                  class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent transition-all appearance-none cursor-pointer shadow-sm">
+                  <option value="" disabled selected>학년 선택</option>
+                  <option value="1">1학년</option>
+                  <option value="2">2학년</option>
+                  <option value="3">3학년</option>
+                  <option value="4">4학년</option>
+                  <option value="5">5학년</option>
+                  <option value="6">6학년</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="teacher-id"
+                  class="hidden block text-xs font-bold text-slate-400 mb-1.5 ml-1 uppercase tracking-wider">학부모
+                  ID</label>
+                <div class="relative">
+                  <span
+                    class="material-symbols-rounded absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg">vpn_key</span>
+                  <input type="text" id="teacher-id" placeholder="ID 입력 (예: parent-12345)"
+                    class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent transition-all font-mono text-sm shadow-sm">
+                </div>
+              </div>
+
+              <button id="start-btn"
+                class="w-full py-3.5 px-4 bg-primary hover:bg-primary-dark text-white font-bold rounded-xl shadow-lg shadow-red-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 mt-4 text-sm group">
+                <span class="material-symbols-rounded group-hover:scale-110 transition-transform">rocket_launch</span>
+                공부 시작하기
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Monitor Section (Hidden Initially) -->
-    <div id="monitor-section" class="hidden h-full flex flex-col gap-4 animate-fade-in">
+      <!-- Monitor Section (Hidden Initially) -->
+      <div id="monitor-section" class="hidden h-full flex flex-col gap-4 animate-fade-in">
 
-      <!-- Top Bar: Info & Status -->
-      <div class="flex flex-wrap items-center justify-between gap-3 glass-card p-3 rounded-2xl">
-        <div class="flex items-center gap-3">
-          <div class="px-3 py-1.5 bg-slate-100 rounded-lg text-xs font-mono text-slate-600 flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-slate-900"></span>
-            <span id="student-name-display" class="font-bold text-slate-900"></span>
-            <!-- Hidden peer ID for logic compatibility -->
-            <span id="my-peer-id" class="hidden"></span>
-          </div>
-          <div id="away-timer"
-            class="hidden text-sm font-bold text-primary animate-pulse bg-red-50 px-3 py-1.5 rounded-lg border border-red-100">
-          </div>
-          <div id="screen-share-status"
-            class="hidden px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold border border-slate-200 flex items-center gap-1.5">
-            <span class="material-symbols-rounded text-base">screen_share</span>
-            공유 중
-          </div>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <!-- Removed Message Button -->
-          <button id="stop-btn"
-            class="hidden px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-1.5">
-            <span class="material-symbols-rounded text-base">power_settings_new</span>
-            종료
-          </button>
-        </div>
-      </div>
-
-      <!-- Main Monitor Area -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1 min-h-[500px]">
-
-        <!-- Camera Feed & Poses -->
-        <div
-          class="md:col-span-2 relative bg-black rounded-3xl overflow-hidden shadow-2xl border border-slate-800 group h-full min-h-[300px] flex flex-col justify-center">
-
-          <!-- Aspect Ratio Wrapper -->
-          <div class="relative w-full aspect-video max-h-full mx-auto">
-            <video id="video" class="absolute inset-0 w-full h-full object-cover video-mirrored opacity-90" autoplay
-              playsinline muted></video>
-            <canvas id="canvas" class="absolute inset-0 w-full h-full video-mirrored"></canvas>
-
-            <!-- Overlay Gradient -->
-            <div
-              class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none">
+        <!-- Top Bar: Info & Status -->
+        <div class="flex flex-wrap items-center justify-between gap-3 glass-card p-3 rounded-2xl">
+          <div class="flex items-center gap-3">
+            <div class="px-3 py-1.5 bg-slate-100 rounded-lg text-xs font-mono text-slate-600 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-slate-900"></span>
+              <span id="student-name-display" class="font-bold text-slate-900"></span>
+              <!-- Hidden peer ID for logic compatibility -->
+              <span id="my-peer-id" class="hidden"></span>
             </div>
+            <div id="away-timer"
+              class="hidden text-sm font-bold text-primary animate-pulse bg-red-50 px-3 py-1.5 rounded-lg border border-red-100">
+            </div>
+            <div id="screen-share-status"
+              class="hidden px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold border border-slate-200 flex items-center gap-1.5">
+              <span class="material-symbols-rounded text-base">screen_share</span>
+              공유 중
+            </div>
+          </div>
 
-            <!-- Teacher Message Overlay -->
-            <div id="teacher-message-container"
-              class="absolute top-6 left-1/2 -translate-x-1/2 z-20 hidden w-[90%] max-w-lg">
-              <div id="teacher-message-box"
-                class="bg-white/95 backdrop-blur-xl text-slate-900 px-5 py-4 rounded-2xl shadow-xl flex items-start gap-4 ring-1 ring-black/5">
-                <div class="p-2 bg-slate-100 rounded-xl text-slate-900">
-                  <span class="material-symbols-rounded text-xl">campaign</span>
-                </div>
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center justify-between mb-1">
-                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">공지사항</span>
-                    <span id="teacher-message-time" class="text-xs text-slate-400"></span>
-                  </div>
-                  <p id="teacher-message-text" class="text-sm font-medium text-slate-800 leading-relaxed">아직 등록된 공지사항이
-                    없습니다.</p>
-                </div>
-                <button id="close-teacher-message" class="text-slate-400 hover:text-slate-600 transition-colors">
-                  <span class="material-symbols-rounded">close</span>
-                </button>
-              </div>
+          <div class="flex items-center gap-2">
+            <!-- Removed Message Button -->
+            <div class="flex items-center gap-2">
+              <!-- Reading Mode Toggle -->
+              <button id="reading-mode-btn"
+                class="px-3 py-2 bg-white text-slate-600 border border-slate-200 rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-1.5 hover:bg-slate-50 hover:border-slate-300">
+                <span class="material-symbols-rounded text-base">import_contacts</span>
+                <span class="mode-text">인강 모드</span>
+              </button>
+
+              <!-- Rest Button -->
+              <button id="rest-btn"
+                class="px-3 py-2 bg-white text-slate-600 border border-slate-200 rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-1.5 hover:bg-slate-50 hover:border-slate-300">
+                <span class="material-symbols-rounded text-base">coffee</span>
+                쉬는 시간
+              </button>
+
+              <!-- Stop Button -->
+              <button id="stop-btn"
+                class="hidden px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-100 rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-1.5">
+                <span class="material-symbols-rounded text-base">power_settings_new</span>
+                종료
+              </button>
             </div>
           </div>
         </div>
 
-        <!-- Right Side Panel: Focus & Status -->
-        <div class="flex flex-col gap-4">
+        <!-- Main Monitor Area -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1 min-h-[500px]">
 
-          <!-- Focus Score Card -->
+          <!-- Camera Feed & Poses -->
           <div
-            class="glass-card rounded-[2rem] p-6 flex flex-col items-center justify-center flex-1 min-h-[240px] relative overflow-hidden">
-            <h3 class="text-sm font-bold text-slate-400 mb-6 uppercase tracking-wider">실시간 집중도</h3>
+            class="md:col-span-2 relative bg-black rounded-3xl overflow-hidden shadow-2xl border border-slate-800 group h-full min-h-[300px] flex flex-col justify-center">
+
+            <!-- Aspect Ratio Wrapper -->
+            <div class="relative w-full aspect-video max-h-full mx-auto">
+              <video id="video" class="absolute inset-0 w-full h-full object-cover video-mirrored opacity-90" autoplay
+                playsinline muted></video>
+              <canvas id="canvas" class="absolute inset-0 w-full h-full video-mirrored"></canvas>
+
+              <!-- Overlay Gradient -->
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none">
+              </div>
+
+              <!-- PIP Focus Score Overlay -->
+              <div id="pip-focus-overlay" class="absolute top-4 right-4 z-10 hidden">
+                <div
+                  class="bg-black/50 backdrop-blur-md rounded-full px-4 py-2 flex items-center gap-2 border border-white/10">
+                  <span class="w-2 h-2 rounded-full bg-red-500" id="pip-focus-dot"></span>
+                  <span class="text-white font-bold font-mono text-lg" id="pip-focus-score">0</span>
+                  <span class="text-xs text-white/70">%</span>
+                </div>
+              </div>
+
+              <!-- Teacher Message Overlay -->
+              <div id="teacher-message-container"
+                class="absolute top-6 left-1/2 -translate-x-1/2 z-20 hidden w-[90%] max-w-lg">
+                <div id="teacher-message-box"
+                  class="bg-white/95 backdrop-blur-xl text-slate-900 px-5 py-4 rounded-2xl shadow-xl flex items-start gap-4 ring-1 ring-black/5">
+                  <div class="p-2 bg-slate-100 rounded-xl text-slate-900">
+                    <span class="material-symbols-rounded text-xl">campaign</span>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between mb-1">
+                      <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">공지사항</span>
+                      <span id="teacher-message-time" class="text-xs text-slate-400"></span>
+                    </div>
+                    <p id="teacher-message-text" class="text-sm font-medium text-slate-800 leading-relaxed">아직 등록된 공지사항이
+                      없습니다.</p>
+                  </div>
+                  <button id="close-teacher-message" class="text-slate-400 hover:text-slate-600 transition-colors">
+                    <span class="material-symbols-rounded">close</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Side Panel: Focus & Status -->
+          <div class="flex flex-col gap-4">
+
+            <!-- Focus Score Card -->
+            class="glass-card rounded-[2rem] p-6 flex flex-col items-center justify-center flex-1 min-h-[240px] relative
+            overflow-hidden">
+            <h3 class="hidden text-sm font-bold text-slate-400 mb-6 uppercase tracking-wider">실시간 집중도</h3>
 
             <div class="relative w-48 h-48 flex items-center justify-center mb-2">
               <!-- SVG Progress Ring -->
@@ -292,20 +318,18 @@
               </div>
             </div>
 
-            <p class="text-xs text-slate-400 text-center mt-2">AI가 실시간 분석 중입니다</p>
+
           </div>
 
           <!-- 10-Minute Average Focus Card -->
           <div
             class="glass-card rounded-[2rem] p-6 flex flex-col items-center justify-center h-40 relative overflow-hidden">
-            <h3 class="text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">최근 10분 평균</h3>
+            <h3 class="hidden text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">최근 10분 평균</h3>
             <div class="flex items-baseline gap-1">
               <span id="avg-focus-score" class="text-4xl font-black text-slate-900 tracking-tight">-</span>
               <span class="text-lg font-bold text-slate-400">점</span>
             </div>
-            <div class="mt-2 text-[10px] text-slate-400 text-center">
-              최근 학습 흐름을 분석합니다
-            </div>
+
           </div>
 
           <!-- Status Card -->
