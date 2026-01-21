@@ -1249,7 +1249,9 @@ class TeacherApp {
 
     if (this.focusReportType === 'daily') {
       report = await this.focusReportManager.getDailyReport(this.currentFocusReportStudent);
-      periodLabel = report.date;
+      const d = new Date(report.date);
+      const days = ['일', '월', '화', '수', '목', '금', '토'];
+      periodLabel = `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 (${days[d.getDay()]})`;
     } else if (this.focusReportType === 'weekly') {
       report = await this.focusReportManager.getWeeklyReport(this.currentFocusReportStudent);
       periodLabel = `${report.weekStart} ~ 이번 주`;
@@ -1271,90 +1273,146 @@ class TeacherApp {
       return `<span class="${color} flex items-center gap-0.5 text-[10px]"><span class="material-symbols-rounded text-xs">${icon}</span>${sign}${displayValue}</span>`;
     };
 
+    // 시간 포맷팅 (오전/오후)
+    const formatTime = (timestamp) => {
+      if (!timestamp) return '-';
+      return new Date(timestamp).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+    };
+
+    // Calculate Start/End Time for Daily
+    let timeRange = '';
+    if (this.focusReportType === 'daily' && report.sessions && report.sessions.length > 0) {
+      const start = report.sessions[0].startTime;
+      const end = report.sessions[report.sessions.length - 1].endTime;
+      timeRange = `${formatTime(start)} ~ ${formatTime(end)}`;
+    } else {
+      timeRange = periodLabel; // Fallback
+    }
+
     const html = `
-      <div class="text-center mb-4">
-        <span class="text-xs text-gray-500">${periodLabel}</span>
-      </div>
-      <div class="grid grid-cols-2 gap-3 mb-4">
-        <div class="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 rounded-xl p-3 text-center border border-orange-100 dark:border-orange-800">
-          <div class="text-3xl font-bold" style="color: ${grade.color}">${grade.grade}</div>
-          <div class="text-xs text-gray-500 mt-1">집중 등급</div>
-          <div class="text-xs font-medium" style="color: ${grade.color}">${grade.label}</div>
+      <!-- Header Info -->
+      <div class="flex items-center justify-between mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100">
+        <div>
+          <div class="text-sm font-bold text-slate-500 mb-1">분석 기간</div>
+          <div class="text-lg font-bold text-slate-800">${periodLabel}</div>
         </div>
-        <div class="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3 text-center border border-gray-100 dark:border-gray-700">
-          <div class="text-3xl font-bold text-gray-800 dark:text-gray-200">${report.focusRate || 0}%</div>
-          <div class="text-xs text-gray-500 mt-1">집중률</div>
-          <div class="text-xs text-gray-400">평균 ${report.avgScore || 0}점</div>
-        </div>
-      </div>
-      <div class="space-y-2">
-        <div class="flex justify-between items-center p-2.5 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-          <div class="flex items-center gap-2">
-            <span class="material-symbols-rounded text-blue-500 text-lg">schedule</span>
-            <span class="text-sm text-gray-700 dark:text-gray-300">순 집중시간</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="font-bold text-blue-600 dark:text-blue-400">${this.focusReportManager.formatDuration(report.focusedTime || 0)}</span>
-            ${this.focusReportType === 'monthly' && comparison?.hasLastMonthData ? formatChange(comparison.changes.focusedTime, true) : ''}
-          </div>
-        </div>
-        <div class="flex justify-between items-center p-2.5 bg-green-50 dark:bg-green-900/20 rounded-lg">
-          <div class="flex items-center gap-2">
-            <span class="material-symbols-rounded text-green-500 text-lg">timer</span>
-            <span class="text-sm text-gray-700 dark:text-gray-300">최대 연속 집중</span>
-          </div>
-          <span class="font-bold text-green-600 dark:text-green-400">${this.focusReportManager.formatDuration(report.maxFocusDuration || 0)}</span>
-        </div>
-        <div class="flex justify-between items-center p-2.5 bg-cyan-50 dark:bg-cyan-900/20 rounded-lg">
-          <div class="flex items-center gap-2">
-            <span class="material-symbols-rounded text-cyan-500 text-lg">event_seat</span>
-            <span class="text-sm text-gray-700 dark:text-gray-300">최대 착석 시간</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="font-bold text-cyan-600 dark:text-cyan-400">${this.focusReportManager.formatDuration(report.maxSeatedDuration || 0)}</span>
-            ${this.focusReportType === 'monthly' && comparison?.hasLastMonthData ? formatChange(comparison.changes.maxSeatedDuration, true) : ''}
-          </div>
-        </div>
-        <div class="flex justify-between items-center p-2.5 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-          <div class="flex items-center gap-2">
-            <span class="material-symbols-rounded text-purple-500 text-lg">hourglass_top</span>
-            <span class="text-sm text-gray-700 dark:text-gray-300">총 학습시간</span>
-          </div>
-          <span class="font-bold text-purple-600 dark:text-purple-400">${this.focusReportManager.formatDuration(report.totalTime || 0)}</span>
-        </div>
-        <div class="flex justify-between items-center p-2.5 bg-red-50 dark:bg-red-900/20 rounded-lg">
-          <div class="flex items-center gap-2">
-            <span class="material-symbols-rounded text-red-500 text-lg">directions_walk</span>
-            <span class="text-sm text-gray-700 dark:text-gray-300">자리비움 횟수</span>
-          </div>
-          <span class="font-bold text-red-600 dark:text-red-400">${report.awayCount || report.totalAwayCount || 0}회</span>
-        </div>
-        ${this.focusReportType !== 'daily' ? `
-        <div class="flex justify-between items-center p-2.5 bg-teal-50 dark:bg-teal-900/20 rounded-lg">
-          <div class="flex items-center gap-2">
-            <span class="material-symbols-rounded text-teal-500 text-lg">event_available</span>
-            <span class="text-sm text-gray-700 dark:text-gray-300">활동일수</span>
-          </div>
-          <span class="font-bold text-teal-600 dark:text-teal-400">${report.activeDays || 0}일</span>
-        </div>
-        <div class="flex justify-between items-center p-2.5 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
-          <div class="flex items-center gap-2">
-            <span class="material-symbols-rounded text-indigo-500 text-lg">calendar_month</span>
-            <span class="text-sm text-gray-700 dark:text-gray-300">출석일수 (${this.focusReportType === 'weekly' ? '주간' : '월간'})</span>
-          </div>
-          <span class="font-bold text-indigo-600 dark:text-indigo-400">${this.focusReportType === 'weekly' ?
-          `${attendanceSummary.weekly.presentDays}/${attendanceSummary.weekly.totalDays}일` :
-          `${attendanceSummary.monthly.presentDays}/${attendanceSummary.monthly.totalDays}일`}</span>
+        ${this.focusReportType === 'daily' ? `
+        <div class="text-right">
+          <div class="text-sm font-bold text-slate-500 mb-1">학습 시간</div>
+          <div class="text-lg font-bold text-slate-800 font-mono">${timeRange}</div>
         </div>
         ` : ''}
       </div>
-      
-      <!-- Focus Timeline Chart -->
-      <div class="mt-4 bg-white rounded-xl p-4 border border-slate-200">
-        <h3 class="text-sm font-bold text-slate-800 mb-4">집중도 타임라인</h3>
-        <div class="relative h-64 w-full">
-          <canvas id="report-chart"></canvas>
+
+      <div class="flex flex-col md:flex-row gap-6">
+        <!-- Left Column: Grade & Summary -->
+        <div class="w-full md:w-1/3 flex flex-col gap-4">
+          <!-- Grade Card -->
+          <div class="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 rounded-2xl p-6 text-center border border-orange-100 dark:border-orange-800 flex-1 flex flex-col items-center justify-center relative overflow-hidden">
+             <div class="absolute top-0 right-0 p-4 opacity-10">
+                <span class="material-symbols-rounded text-8xl text-orange-500">military_tech</span>
+             </div>
+             
+             <div class="relative z-10">
+               <div class="text-sm font-bold text-orange-600 mb-2 uppercase tracking-wider">Total Grade</div>
+               <div class="text-7xl font-black mb-2" style="color: ${grade.color}">${grade.grade}</div>
+               <div class="inline-flex px-3 py-1 rounded-full bg-white/50 text-sm font-bold border border-orange-100" style="color: ${grade.color}">
+                 ${grade.label}
+               </div>
+             </div>
+          </div>
+
+          <!-- Focus Score Card -->
+          <div class="bg-white rounded-2xl p-5 border border-slate-200 text-center shadow-sm">
+             <div class="text-sm font-bold text-slate-500 mb-1">집중도 점수</div>
+             <div class="flex items-end justify-center gap-1">
+               <span class="text-4xl font-black text-slate-800">${report.avgScore || 0}</span>
+               <span class="text-sm font-bold text-slate-400 mb-1.5">점</span>
+             </div>
+             <div class="text-xs text-slate-400 mt-2">평균 80점 이상 유지 권장</div>
+          </div>
         </div>
+
+        <!-- Right Column: Stats Grid & Timeline -->
+        <div class="w-full md:w-2/3 flex flex-col gap-4">
+          <!-- Stats Grid -->
+          <div class="grid grid-cols-2 gap-3">
+             <!-- Net Focus Time -->
+             <div class="bg-blue-50 dark:bg-blue-900/10 p-4 rounded-xl border border-blue-100 dark:border-blue-800">
+               <div class="flex items-center gap-2 mb-2">
+                 <span class="material-symbols-rounded text-blue-500">schedule</span>
+                 <span class="text-xs font-bold text-blue-600">순 집중 시간</span>
+               </div>
+               <div class="text-2xl font-bold text-slate-800">${this.focusReportManager.formatDuration(report.focusedTime || 0)}</div>
+             </div>
+
+             <!-- Max Focus -->
+             <div class="bg-emerald-50 dark:bg-emerald-900/10 p-4 rounded-xl border border-emerald-100 dark:border-emerald-800">
+               <div class="flex items-center gap-2 mb-2">
+                 <span class="material-symbols-rounded text-emerald-500">timer</span>
+                 <span class="text-xs font-bold text-emerald-600">최대 연속 집중</span>
+               </div>
+               <div class="text-2xl font-bold text-slate-800">${this.focusReportManager.formatDuration(report.maxFocusDuration || 0)}</div>
+             </div>
+
+             <!-- Max Seated -->
+             <div class="bg-cyan-50 dark:bg-cyan-900/10 p-4 rounded-xl border border-cyan-100 dark:border-cyan-800">
+               <div class="flex items-center gap-2 mb-2">
+                 <span class="material-symbols-rounded text-cyan-500">event_seat</span>
+                 <span class="text-xs font-bold text-cyan-600">최대 착석 시간</span>
+               </div>
+               <div class="text-2xl font-bold text-slate-800">${this.focusReportManager.formatDuration(report.maxSeatedDuration || 0)}</div>
+             </div>
+
+             <!-- Total Time -->
+             <div class="bg-purple-50 dark:bg-purple-900/10 p-4 rounded-xl border border-purple-100 dark:border-purple-800">
+               <div class="flex items-center gap-2 mb-2">
+                 <span class="material-symbols-rounded text-purple-500">hourglass_top</span>
+                 <span class="text-xs font-bold text-purple-600">총 학습 시간</span>
+               </div>
+               <div class="text-2xl font-bold text-slate-800">${this.focusReportManager.formatDuration(report.totalTime || 0)}</div>
+             </div>
+          </div>
+          
+           <!-- Additional Stats Row -->
+           <div class="flex gap-3">
+              <div class="flex-1 bg-red-50 p-3 rounded-xl border border-red-100 flex items-center justify-between">
+                 <span class="text-xs font-bold text-red-600 flex items-center gap-1">
+                   <span class="material-symbols-rounded text-sm">directions_walk</span> 자리비움
+                 </span>
+                 <span class="text-lg font-bold text-slate-800">${report.awayCount || report.totalAwayCount || 0}회</span>
+              </div>
+              <div class="flex-1 bg-indigo-50 p-3 rounded-xl border border-indigo-100 flex items-center justify-between">
+                 <span class="text-xs font-bold text-indigo-600 flex items-center gap-1">
+                   <span class="material-symbols-rounded text-sm">calendar_month</span> 출석일수
+                 </span>
+                 <span class="text-lg font-bold text-slate-800">
+                   ${this.focusReportType === 'daily' ? '-' :
+        (this.focusReportType === 'weekly' ? `${attendanceSummary.weekly.presentDays}일` : `${attendanceSummary.monthly.presentDays}일`)}
+                 </span>
+              </div>
+           </div>
+
+          <!-- Timeline Chart -->
+          <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm flex-1 min-h-[200px] flex flex-col">
+            <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+              <span class="material-symbols-rounded text-slate-400">timeline</span>
+              몰입도 타임라인
+            </h3>
+            <div class="relative flex-1 w-full min-h-[160px]">
+              <canvas id="report-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Footer Button -->
+      <!-- '검수중' 버튼 - 원래 요청사항에 있던 버튼 -->
+      <div class="mt-6 flex justify-end">
+        <button class="px-6 py-2.5 bg-red-100 hover:bg-red-200 text-red-600 font-bold rounded-xl transition-colors flex items-center gap-2 cursor-default">
+           <span class="material-symbols-rounded text-sm">search_check</span>
+           검수중
+        </button>
       </div>
     `;
 

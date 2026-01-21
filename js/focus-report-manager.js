@@ -55,7 +55,7 @@ class FocusReportManager {
   recordFocusData(studentName, focusData, status) {
     const now = Date.now();
     let session = this.todayData.get(studentName);
-    
+
     if (!session) {
       session = {
         studentName,
@@ -90,7 +90,7 @@ class FocusReportManager {
     // 집중 시간 계산 (70% 이상)
     if (isFocused) {
       session.focusedSeconds++;
-      
+
       // 연속 집중 시간 계산
       if (session.currentSessionStart === null) {
         // 새 집중 세션 시작
@@ -98,7 +98,7 @@ class FocusReportManager {
         session.currentFocusDuration = 0;
       }
       session.currentFocusDuration++;
-      
+
       // 최대 연속 집중 시간 업데이트 (실시간)
       if (session.currentFocusDuration > session.maxFocusDuration) {
         session.maxFocusDuration = session.currentFocusDuration;
@@ -120,7 +120,7 @@ class FocusReportManager {
     // 자리비움 카운트
     if (isAway && session.lastStatus !== 'away') {
       session.awayCount++;
-      
+
       // 착석 세션 종료 - 최대 착석 시간 업데이트
       if (session.seatedSessionStart !== null && session.currentSeatedDuration > 0) {
         if (session.currentSeatedDuration > session.maxSeatedDuration) {
@@ -130,7 +130,7 @@ class FocusReportManager {
         session.currentSeatedDuration = 0;
       }
     }
-    
+
     // 착석 시간 계산 (자리비움이 아닐 때)
     if (!isAway) {
       if (session.seatedSessionStart === null) {
@@ -139,13 +139,13 @@ class FocusReportManager {
         session.currentSeatedDuration = 0;
       }
       session.currentSeatedDuration++;
-      
+
       // 최대 착석 시간 실시간 업데이트
       if (session.currentSeatedDuration > session.maxSeatedDuration) {
         session.maxSeatedDuration = session.currentSeatedDuration;
       }
     }
-    
+
     session.lastStatus = status;
 
     // 점수 샘플링 (10초마다)
@@ -194,13 +194,13 @@ class FocusReportManager {
       this.todayData.forEach((v, k) => result[k] = v);
       return result;
     }
-    
+
     // 로컬 시간 기준 키로 먼저 조회
     let data = localStorage.getItem(`${this.prefix}daily_${dateStr}`);
     if (data) {
       return JSON.parse(data);
     }
-    
+
     // 없으면 UTC 기준 키로도 조회 (기존 데이터 호환)
     const dateObj = typeof date === 'string' ? new Date(date + 'T00:00:00') : date;
     const utcDateStr = dateObj.toISOString().split('T')[0];
@@ -210,7 +210,7 @@ class FocusReportManager {
         return JSON.parse(data);
       }
     }
-    
+
     return {};
   }
 
@@ -236,14 +236,15 @@ class FocusReportManager {
       hasData: true,
       totalTime: session.totalSeconds,
       focusedTime: session.focusedSeconds,
-      focusRate: session.totalSeconds > 0 
-        ? Math.round((session.focusedSeconds / session.totalSeconds) * 100) 
+      focusRate: session.totalSeconds > 0
+        ? Math.round((session.focusedSeconds / session.totalSeconds) * 100)
         : 0,
       avgScore: session.avgScore,
       maxFocusDuration: session.maxFocusDuration,
       maxSeatedDuration: session.maxSeatedDuration || 0,
       awayCount: session.awayCount,
       sessionCount: session.sessions?.length || 0,
+      sessions: session.sessions || [],
       scores: session.scores || []
     };
   }
@@ -272,7 +273,7 @@ class FocusReportManager {
       const date = this.parseLocalDate(weekStart);
       date.setDate(date.getDate() + i);
       const dateStr = this.getDateString(date);
-      
+
       if (dateStr > this.today) break;
 
       const daily = await this.getDailyReport(studentName, dateStr);
@@ -283,26 +284,26 @@ class FocusReportManager {
         report.totalTime += daily.totalTime;
         report.focusedTime += daily.focusedTime;
         report.totalAwayCount += daily.awayCount;
-        
+
         if (daily.maxFocusDuration > report.maxFocusDuration) {
           report.maxFocusDuration = daily.maxFocusDuration;
         }
-        
+
         if (daily.maxSeatedDuration > report.maxSeatedDuration) {
           report.maxSeatedDuration = daily.maxSeatedDuration;
         }
-        
+
         if (daily.scores) {
           totalScores = totalScores.concat(daily.scores.map(s => s.score));
         }
       }
     }
 
-    report.focusRate = report.totalTime > 0 
-      ? Math.round((report.focusedTime / report.totalTime) * 100) 
+    report.focusRate = report.totalTime > 0
+      ? Math.round((report.focusedTime / report.totalTime) * 100)
       : 0;
-    report.avgScore = totalScores.length > 0 
-      ? Math.round(totalScores.reduce((a, b) => a + b, 0) / totalScores.length) 
+    report.avgScore = totalScores.length > 0
+      ? Math.round(totalScores.reduce((a, b) => a + b, 0) / totalScores.length)
       : 0;
 
     return report;
@@ -347,26 +348,26 @@ class FocusReportManager {
         report.totalTime += daily.totalTime;
         report.focusedTime += daily.focusedTime;
         report.totalAwayCount += daily.awayCount;
-        
+
         if (daily.maxFocusDuration > report.maxFocusDuration) {
           report.maxFocusDuration = daily.maxFocusDuration;
         }
-        
+
         if (daily.maxSeatedDuration > report.maxSeatedDuration) {
           report.maxSeatedDuration = daily.maxSeatedDuration;
         }
-        
+
         if (daily.scores) {
           totalScores = totalScores.concat(daily.scores.map(s => s.score));
         }
       }
     }
 
-    report.focusRate = report.totalTime > 0 
-      ? Math.round((report.focusedTime / report.totalTime) * 100) 
+    report.focusRate = report.totalTime > 0
+      ? Math.round((report.focusedTime / report.totalTime) * 100)
       : 0;
-    report.avgScore = totalScores.length > 0 
-      ? Math.round(totalScores.reduce((a, b) => a + b, 0) / totalScores.length) 
+    report.avgScore = totalScores.length > 0
+      ? Math.round(totalScores.reduce((a, b) => a + b, 0) / totalScores.length)
       : 0;
 
     return report;
@@ -379,7 +380,7 @@ class FocusReportManager {
     const now = new Date();
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth();
-    
+
     // 지난달 계산
     let lastYear = currentYear;
     let lastMonth = currentMonth - 1;
@@ -387,11 +388,11 @@ class FocusReportManager {
       lastMonth = 11;
       lastYear--;
     }
-    
+
     // 이번달, 지난달 보고서 가져오기
     const currentReport = await this.getMonthlyReport(studentName, currentYear, currentMonth);
     const lastReport = await this.getMonthlyReport(studentName, lastYear, lastMonth);
-    
+
     // 변화량 계산
     const comparison = {
       hasLastMonthData: lastReport.activeDays > 0,
@@ -409,7 +410,7 @@ class FocusReportManager {
       },
       changes: {
         focusedTime: currentReport.focusedTime - lastReport.focusedTime,
-        focusedTimePercent: lastReport.focusedTime > 0 
+        focusedTimePercent: lastReport.focusedTime > 0
           ? Math.round(((currentReport.focusedTime - lastReport.focusedTime) / lastReport.focusedTime) * 100)
           : 0,
         maxSeatedDuration: currentReport.maxSeatedDuration - lastReport.maxSeatedDuration,
@@ -418,7 +419,7 @@ class FocusReportManager {
           : 0
       }
     };
-    
+
     return comparison;
   }
 
@@ -430,7 +431,7 @@ class FocusReportManager {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
-    
+
     if (hours > 0) {
       return `${hours}시간 ${minutes}분`;
     }
